@@ -7,9 +7,10 @@ public class UserMapper {
 
     public static User mapDtoToUser(UserDto userDto) {
         User user = new User();
-        user.setName(userDto.getName());
-        user.setSurname(userDto.getSurname());
         user.setUsername(userDto.getUsername());
+        user.setName(userDto.getName());
+        user.setCountry(userDto.getCountry());
+        user.setEmail(userDto.getEmail());
         user.setApproved(true);
         return user;
     }

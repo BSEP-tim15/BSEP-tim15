@@ -21,14 +21,17 @@ public class User implements UserDetails {
     @Column(name = "name")
     @Getter @Setter private String name;
 
-    @Column(name = "surname")
-    @Getter @Setter private String surname;
-
     @Column(name = "username")
     @Getter @Setter private String username;
 
     @Column(name = "password")
     @Getter @Setter private String password;
+
+    @Column(name = "country")
+    @Getter @Setter private String country;
+
+    @Column(name = "email")
+    @Getter @Setter private String email;
 
     @Column(name = "is_approved")
     @Getter @Setter private boolean isApproved;
@@ -39,14 +42,15 @@ public class User implements UserDetails {
 
     public User() { }
 
-    public User(Integer id, String name, String surname, String username, String password, List<Role> roles, boolean isApproved) {
+    public User(Integer id, String name, String username, String password, String country, String email, boolean isApproved, List<Role> roles) {
         this.id = id;
         this.name = name;
-        this.surname = surname;
         this.username = username;
         this.password = password;
-        this.roles = roles;
+        this.country = country;
+        this.email = email;
         this.isApproved = isApproved;
+        this.roles = roles;
     }
 
     @Override

@@ -11,7 +11,7 @@ const LogIn = () => {
     }
 
     return (
-        <div className='card ms-auto me-5' style={{width: "40%", "margin-top": "13%", borderColor: "#4a6560"}} >
+        <div className='card ms-auto me-5' style={{width: "40%", "marginTop": "13%", borderColor: "#4a6560"}} >
             <div className='card-body'>
                 <h4 className='card-title'>Log in</h4>
                 <div className='title-underline'/>
