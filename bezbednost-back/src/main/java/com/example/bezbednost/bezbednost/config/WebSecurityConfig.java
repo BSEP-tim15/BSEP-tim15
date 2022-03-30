@@ -1,6 +1,6 @@
 package com.example.bezbednost.bezbednost.config;
 
-import com.example.bezbednost.bezbednost.service.UserService;
+import com.example.bezbednost.bezbednost.service.CustomUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    private UserService userService;
+    private CustomUserService userService;
     @Autowired
     protected RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 

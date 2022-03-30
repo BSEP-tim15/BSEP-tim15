@@ -1,6 +1,7 @@
 package com.example.bezbednost.bezbednost.config;
 
 import com.example.bezbednost.bezbednost.iservice.IUserService;
+import com.example.bezbednost.bezbednost.service.CustomUserService;
 import com.example.bezbednost.bezbednost.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.apache.juli.logging.Log;
@@ -18,9 +19,9 @@ import java.io.IOException;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected final Log LOGGER = LogFactory.getLog(getClass());
     private TokenUtils tokenUtils;
-    private UserService userService;
+    private CustomUserService userService;
 
-    public TokenAuthenticationFilter(TokenUtils tokenHelper, UserService userService) {
+    public TokenAuthenticationFilter(TokenUtils tokenHelper, CustomUserService userService) {
         this.tokenUtils = tokenHelper;
         this.userService = userService;
     }
