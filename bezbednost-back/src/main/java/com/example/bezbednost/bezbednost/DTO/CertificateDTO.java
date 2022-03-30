@@ -1,4 +1,4 @@
-package com.example.bezbednost.bezbednost.DTO;
+package com.example.bezbednost.bezbednost.dto;
 
 import lombok.Getter;
 import lombok.Setter;

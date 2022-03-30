@@ -1,6 +1,6 @@
 package com.example.bezbednost.bezbednost.controller;
 
-import com.example.bezbednost.bezbednost.DTO.CertificateDTO;
+import com.example.bezbednost.bezbednost.dto.CertificateDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

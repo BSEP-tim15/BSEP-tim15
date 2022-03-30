@@ -8,9 +8,16 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     const SERVER_URL = process.env.REACT_APP_API; 
     const {addToast} = useToasts();
 
-    const [certificate, setCertificate] = useState({});
-
     const [disabledEdit, setDisabledEdit] = useState(false);
+    const [certificate, setCertificate] = useState({
+        certificateType: "",
+        issuer: "",
+        subject: "",
+        validFrom: new Date(),
+        validTo: new Date(),
+        purpose: ""
+    });
+
 
     const setCertificateType = (type) => {
         setCertificate(() => {return {...certificate, certificateType: type}});
@@ -19,13 +26,13 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         }
         else if(type == "root") {
             setDisabledEdit(true);
-            setCertificate(() => {return {...certificate, issuer: "root", subject: "root"}});
+            setCertificate(() => {return {...certificate, certificateType: type, issuer: "root", subject: "root"}});
         }   
     }
 
     const createCertificate = (e) => {
         e.preventDefault();
-        axios.post(SERVER_URL + "/certificates")
+        axios.post(SERVER_URL + "/certificates", certificate)
             .then(response => {
                 console.log(certificate);
                 setModalIsOpen(false);
