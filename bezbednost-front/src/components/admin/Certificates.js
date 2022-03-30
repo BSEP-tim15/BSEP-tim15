@@ -39,7 +39,7 @@ const Certificates = () => {
 
     const allCertificates = (
         certificates.map(certificate => (
-            <tr>
+            <tr key={certificate.id}>
                 <td>{certificate.id}</td>
                 <td>{certificate.issuer}</td>
                 <td>{certificate.subject}</td>
@@ -71,12 +71,14 @@ const Certificates = () => {
                     </div>
                     <table className="table mt-4">
                         <thead>
-                            <th style={{width: "18%"}}>Certificate ID</th>
-                            <th style={{width: "18%"}}>Issuer</th>
-                            <th style={{width: "18%"}}>Subject</th>
-                            <th style={{width: "18%"}}>Valid from</th>
-                            <th style={{width: "18%"}}>Valid to</th>
-                            <th style={{width: "18%"}}>Status</th>
+                            <tr>
+                                <th style={{width: "18%"}}>Certificate ID</th>
+                                <th style={{width: "18%"}}>Issuer</th>
+                                <th style={{width: "18%"}}>Subject</th>
+                                <th style={{width: "18%"}}>Valid from</th>
+                                <th style={{width: "18%"}}>Valid to</th>
+                                <th style={{width: "18%"}}>Status</th>
+                            </tr>
                         </thead>
                         <tbody>
                             {allCertificates}
