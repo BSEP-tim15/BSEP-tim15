@@ -45,7 +45,7 @@ public class CertificationService implements ICertificationService {
         X500NameBuilder issuer = new X500NameBuilder(BCStyle.INSTANCE);
         issuer.addRDN(BCStyle.CN, certificateDTO.getIssuer());
         X500NameBuilder subject = new X500NameBuilder(BCStyle.INSTANCE);
-        subject.addRDN(BCStyle.CN, certificateDTO.getSubject());
+        subject.addRDN(BCStyle.CN, certificateDTO.getSubjectUsername());
         X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuer.build(),
                 createSerialNumber(),
                 certificateDTO.getValidFrom(),
@@ -79,8 +79,8 @@ public class CertificationService implements ICertificationService {
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
-            CertificateDTO certificateDTO = new CertificateDTO(cert.getSerialNumber().toString(), cert.getIssuerDN().toString(),
-                    cert.getSubjectDN().toString(),  cert.getNotBefore(), cert.getNotAfter(), "");
+            CertificateDTO certificateDTO = new CertificateDTO(cert.getSerialNumber(), cert.getIssuerDN().toString(),
+                    cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter());
             entries.add(certificateDTO);
         }
         return entries;

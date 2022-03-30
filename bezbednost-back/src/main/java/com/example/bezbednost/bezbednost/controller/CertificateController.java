@@ -2,9 +2,7 @@ package com.example.bezbednost.bezbednost.controller;
 
 import com.example.bezbednost.bezbednost.dto.CertificateDTO;
 import com.example.bezbednost.bezbednost.dto.UserDto;
-import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
-import com.example.bezbednost.bezbednost.model.User;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,11 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -33,17 +28,13 @@ import java.util.List;
 public class CertificateController {
     private final ICertificationService certificationService;
     private final IKeyService keyService;
-
-    public CertificateController(ICertificationService certificationService, IKeyService keyService) {
-        this.certificationService = certificationService;
-        this.keyService = keyService;
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
     private final IUserService userService;
 
-    public CertificateController(IUserService userService) {
+    public CertificateController(ICertificationService certificationService, IKeyService keyService, IUserService userService) {
+        this.certificationService = certificationService;
+        this.keyService = keyService;
         this.userService = userService;
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     @PostMapping

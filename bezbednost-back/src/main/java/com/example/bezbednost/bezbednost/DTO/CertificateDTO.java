@@ -3,9 +3,12 @@ package com.example.bezbednost.bezbednost.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 public class CertificateDTO {
+
+    @Getter @Setter private BigInteger serialNumber;
 
     @Getter @Setter private String certificateType;
 
@@ -38,5 +41,13 @@ public class CertificateDTO {
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.purpose = purpose;
+    }
+
+    public CertificateDTO(BigInteger serialNumber, String issuer, String subjectUsername, Date validFrom, Date validTo) {
+        this.serialNumber = serialNumber;
+        this.issuer = issuer;
+        this.subjectUsername = subjectUsername;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
     }
 }
