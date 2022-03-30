@@ -13,14 +13,14 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Random;
+import java.util.*;
 
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
@@ -28,12 +28,12 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 @Service
 public class CertificationService implements ICertificationService {
     private KeyService keyService = new KeyService();
+    private static final Base64.Encoder encoder = Base64.getEncoder();
 
     @Override
-    public X509Certificate createCertificate(CertificateDTO certificateDTO) throws OperatorCreationException,
+    public X509Certificate createCertificate(KeyPair keyPair, CertificateDTO certificateDTO) throws OperatorCreationException,
             CertificateException {
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption").setProvider("BC");
-        KeyPair keyPair = keyService.generateKeyPair();
         ContentSigner contentSigner = builder.build(keyPair.getPrivate());
         X509v3CertificateBuilder certificateBuilder = generateCertificateBuilder(keyPair.getPublic(), certificateDTO);
         X509CertificateHolder certHolder = certificateBuilder.build(contentSigner);
@@ -68,5 +68,24 @@ public class CertificationService implements ICertificationService {
             res = res.mod(bigInteger).add(minLimit);
         return res;
     }
+
+    @Override
+    public List<CertificateDTO> getAllCertificates(String fileName, char[] password) throws KeyStoreException,
+            NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException {
+        KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+        keyStore.load(new FileInputStream(fileName), password);
+        Enumeration<String> aliases = keyStore.aliases();
+        List<CertificateDTO> entries = new ArrayList<>();
+        while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
+            CertificateDTO certificateDTO = new CertificateDTO(cert.getSerialNumber().toString(), cert.getIssuerDN().toString(),
+                    cert.getSubjectDN().toString(),  cert.getNotBefore(), cert.getNotAfter(), "");
+            entries.add(certificateDTO);
+        }
+        return entries;
+    }
+
+
 
 }
