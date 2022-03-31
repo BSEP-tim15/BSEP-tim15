@@ -1,50 +1,32 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { format } from 'date-fns';
 import NavBar from "../NavBar";
 import validImg from "../../images/valid.png";
 import invalidImg from "../../images/invalid.png";
 
 const Certificates = () => {
 
+    const SERVER_URL = process.env.REACT_APP_API; 
     const [certificates, setCertificates] = useState([]);
 
     useEffect(() => {
-        setCertificates([
-            {
-                id: 1,
-                issuer: "Mark",
-                subject: "Otto",
-                validFrom: "22.03.2022.",
-                validTo: "22.03.2022.",
-                valid: true
-            },
-            {
-                id: 2,
-                issuer: "Mark",
-                subject: "Otto",
-                validFrom: "22.03.2022.",
-                validTo: "22.03.2022.",
-                valid: false
-            },
-            {
-                id: 3,
-                issuer: "Mark",
-                subject: "Otto",
-                validFrom: "22.03.2022.",
-                validTo: "22.03.2022.",
-                valid: true
-            }
-        ])
-
+        
+        axios.get(SERVER_URL + "/certificates")
+            .then(response => {
+                setCertificates(response.data)
+                console.log(response.data)
+            })
     }, [])
 
     const allCertificates = (
         certificates.map(certificate => (
-            <tr key={certificate.id}>
-                <td>{certificate.id}</td>
-                <td>{certificate.issuer}</td>
-                <td>{certificate.subject}</td>
-                <td>{certificate.validFrom}</td>
-                <td>{certificate.validTo}</td>
+            <tr key={certificate.serialNumber}>
+                <td>{certificate.serialNumber}</td>
+                <td>{certificate.issuer.split('=')[1]}</td>
+                <td>{certificate.subjectUsername.split('=')[1]}</td>
+                <td>{format(certificate.validFrom, 'dd.MM.yyyy. kk:mm')}</td>
+                <td>{format(certificate.validTo, 'dd.MM.yyyy. kk:mm')}</td>
                 <td><img className="icon" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
             </tr>
         ))
