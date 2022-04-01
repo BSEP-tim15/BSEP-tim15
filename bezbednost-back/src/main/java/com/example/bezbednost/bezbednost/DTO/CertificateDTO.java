@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class CertificateDTO {
+public class CertificateDto {
 
     @Getter @Setter private BigInteger serialNumber;
 
@@ -14,13 +14,7 @@ public class CertificateDTO {
 
     @Getter @Setter private String issuer;
 
-    @Getter @Setter private String subjectName;
-
-    @Getter @Setter private String subjectUsername;
-
-    @Getter @Setter private String subjectEmail;
-
-    @Getter @Setter private String subjectCountry;
+    @Getter @Setter private String subject;
 
     @Getter @Setter private Date validFrom;
 
@@ -28,25 +22,22 @@ public class CertificateDTO {
 
     @Getter @Setter private String purpose;
 
-    public CertificateDTO() { }
 
-    public CertificateDTO(String certificateType, String issuer, String subjectName, String subjectUsername,
-                          String subjectEmail, String subjectCountry, Date validFrom, Date validTo, String purpose) {
+    public CertificateDto() { }
+
+    public CertificateDto(String certificateType, String issuer, String subject, Date validFrom, Date validTo, String purpose) {
         this.certificateType = certificateType;
         this.issuer = issuer;
-        this.subjectName = subjectName;
-        this.subjectUsername = subjectUsername;
-        this.subjectEmail = subjectEmail;
-        this.subjectCountry = subjectCountry;
+        this.subject = subject;
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.purpose = purpose;
     }
 
-    public CertificateDTO(BigInteger serialNumber, String issuer, String subjectUsername, Date validFrom, Date validTo) {
+    public CertificateDto(BigInteger serialNumber, String issuer, String subject, Date validFrom, Date validTo) {
         this.serialNumber = serialNumber;
         this.issuer = issuer;
-        this.subjectUsername = subjectUsername;
+        this.subject = subject;
         this.validFrom = validFrom;
         this.validTo = validTo;
     }

@@ -1,8 +1,6 @@
 package com.example.bezbednost.bezbednost.controller;
 
-import com.example.bezbednost.bezbednost.dto.CertificateDTO;
-import com.example.bezbednost.bezbednost.dto.UserDto;
-import com.example.bezbednost.bezbednost.iservice.IUserService;
+import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,17 +26,15 @@ import java.util.List;
 public class CertificateController {
     private final ICertificationService certificationService;
     private final IKeyService keyService;
-    private final IUserService userService;
 
-    public CertificateController(ICertificationService certificationService, IKeyService keyService, IUserService userService) {
+    public CertificateController(ICertificationService certificationService, IKeyService keyService) {
         this.certificationService = certificationService;
         this.keyService = keyService;
-        this.userService = userService;
         Security.addProvider(new BouncyCastleProvider());
     }
 
     @PostMapping
-    public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws CertificateException,
+    public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws CertificateException,
             OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException {
         System.out.println(certificateDTO.getIssuer());
         KeyPair keyPair = keyService.generateKeyPair();
@@ -53,14 +49,13 @@ public class CertificateController {
         keyService.writeToKeyStore(String.valueOf(certificate.getSerialNumber()), keyPair.getPrivate(),
                 "sifra".toCharArray(), certificate);
         keyService.saveKeyStore("proba.jks", "sifra".toCharArray());
-        userService.save(new UserDto(certificateDTO.getSubjectName(), certificateDTO.getSubjectUsername(),
-        certificateDTO.getSubjectEmail(), certificateDTO.getSubjectCountry(), certificateDTO.getCertificateType()));
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
     @JsonIgnoreProperties("publicKey")
-    public ResponseEntity<List<CertificateDTO>> getCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+    public ResponseEntity<List<CertificateDto>> getCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         var certificates = certificationService.getAllCertificates("proba.jks", "sifra".toCharArray());
         return new ResponseEntity<>(certificates, HttpStatus.OK);
     }

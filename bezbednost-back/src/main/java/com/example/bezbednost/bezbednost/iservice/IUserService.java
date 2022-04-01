@@ -7,4 +7,6 @@ public interface IUserService {
     User findByUsername(String username);
 
     User save(UserDto userDto);
+
+    boolean isUserRegistered(String username);
 }
