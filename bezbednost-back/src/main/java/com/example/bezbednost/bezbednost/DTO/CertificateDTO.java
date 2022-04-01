@@ -41,4 +41,5 @@ public class CertificateDto {
         this.validFrom = validFrom;
         this.validTo = validTo;
     }
+
 }

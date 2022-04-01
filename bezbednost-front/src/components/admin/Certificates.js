@@ -8,16 +8,18 @@ import invalidImg from "../../images/invalid.png";
 const Certificates = () => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
+
+    const [certificateType, setCertificateType] = useState("");
     const [certificates, setCertificates] = useState([]);
 
     useEffect(() => {
         
-        axios.get(SERVER_URL + "/certificates")
+        axios.get(SERVER_URL + "/certificates?certificateType=" + certificateType)
             .then(response => {
                 setCertificates(response.data)
                 console.log(response.data)
             })
-    }, [])
+    }, [certificateType])
 
     const allCertificates = (
         certificates.map(certificate => (
@@ -41,13 +43,16 @@ const Certificates = () => {
                     <div className='title-underline'/>
                     <div style={{display: "flex"}}>
                         <span className="mt-4">Filter by type:</span>
-                        <button className='btn mt-3 ms-3' style={{width: "10%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}>
+                        <button className='btn mt-3 ms-3' onClick={() => setCertificateType("root")}
+                            style={{width: "10%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}>
                             Root
                         </button>
-                        <button className='btn mt-3 ms-3' style={{width: "10%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}>
+                        <button className='btn mt-3 ms-3' onClick={() => setCertificateType("intermediate")}
+                            style={{width: "10%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}>
                             Intermediate
                         </button>
-                        <button className='btn mt-3 ms-3' style={{width: "10%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}>
+                        <button className='btn mt-3 ms-3' onClick={() => setCertificateType("end-entity")}
+                            style={{width: "10%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}>
                             End-entity
                         </button>
                     </div>

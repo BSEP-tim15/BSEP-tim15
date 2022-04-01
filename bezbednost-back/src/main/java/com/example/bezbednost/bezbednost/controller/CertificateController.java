@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,12 +48,12 @@ public class CertificateController {
 
     private void saveCertificate(X509Certificate certificate, PrivateKey privateKey, String type) throws CertificateException,
             IOException, NoSuchAlgorithmException, KeyStoreException {
-       String fileName = type+"Certificates.jsk";
-       System.out.println("Unesite sifru za fajl:" + type + "Certificates.jsk");
-       Scanner scanner = new Scanner(System.in);
-       String password = scanner.nextLine();
-       try {
-           keyService.loadKeyStore(fileName, password.toCharArray());
+        String fileName = type+"Certificates.jsk";
+        System.out.println("Please enter file password:" + type + "Certificates.jsk");
+        Scanner scanner = new Scanner(System.in);
+        String password = scanner.nextLine();
+        try {
+            keyService.loadKeyStore(fileName, password.toCharArray());
         }
         catch(FileNotFoundException e){
             keyService.loadKeyStore(null, password.toCharArray());
@@ -68,29 +65,60 @@ public class CertificateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CertificateDto>> getCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+    public ResponseEntity<List<CertificateDto>> getCertificates(@RequestParam String certificateType) throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        if(Objects.equals(certificateType, "root")){
+            return new ResponseEntity<>(getRootCertificates(), HttpStatus.OK);
+        }
+        else if(Objects.equals(certificateType, "intermediate")){
+            return new ResponseEntity<>(getIntermediateCertificates(), HttpStatus.OK);
+        }
+        else if(Objects.equals(certificateType, "end-entity")){
+            return new ResponseEntity<>(getEndEntityCertificates(), HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(getAllCertificates(), HttpStatus.OK);
+        }
+    }
+
+    private List<CertificateDto> getAllCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        return Stream.of(getRootCertificates(), getIntermediateCertificates(), getEndEntityCertificates())
+                .flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private List<CertificateDto> getRootCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> rootCertificates = new ArrayList<>();
-        List<CertificateDto> intermediateCertificates = new ArrayList<>();
-        List<CertificateDto> entityCertificates = new ArrayList<>();
         try{
             rootCertificates = certificationService.getAllCertificates("rootCertificates.jsk",
                     "sifra".toCharArray());
-        }catch(FileNotFoundException e){
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
         }
-        try{
-            intermediateCertificates = certificationService.getAllCertificates
-                    ("intermediateCertificates.jsk","sifra".toCharArray());
-        }catch(FileNotFoundException e){
-        }
-        try{
-            entityCertificates = certificationService.getAllCertificates("end-entityCertificates.jsk",
-                    "sifra".toCharArray());
-        }catch(FileNotFoundException e){
-        }
-        var certificates = Stream.of(rootCertificates, intermediateCertificates, entityCertificates)
-                .flatMap(Collection::stream).collect(Collectors.toList());
 
-        return new ResponseEntity<>(certificates, HttpStatus.OK);
+        return rootCertificates;
+    }
+
+    private List<CertificateDto> getIntermediateCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        List<CertificateDto> intermediateCertificates = new ArrayList<>();
+        try{
+            intermediateCertificates = certificationService.getAllCertificates("intermediateCertificates.jsk",
+                    "sifra".toCharArray());
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+
+        return intermediateCertificates;
+    }
+
+    private List<CertificateDto> getEndEntityCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        List<CertificateDto> endEntityCertificates = new ArrayList<>();
+        try{
+            endEntityCertificates = certificationService.getAllCertificates("end-entityCertificates.jsk",
+                    "sifra".toCharArray());
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+
+        return endEntityCertificates;
     }
 
 }
