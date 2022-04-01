@@ -1,8 +1,6 @@
 package com.example.bezbednost.bezbednost.controller;
 
-import com.example.bezbednost.bezbednost.dto.CertificateDTO;
-import com.example.bezbednost.bezbednost.dto.UserDto;
-import com.example.bezbednost.bezbednost.iservice.IUserService;
+import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -34,23 +32,20 @@ import java.util.stream.Stream;
 public class CertificateController {
     private final ICertificationService certificationService;
     private final IKeyService keyService;
-    private final IUserService userService;
 
-    public CertificateController(ICertificationService certificationService, IKeyService keyService, IUserService userService) {
+    public CertificateController(ICertificationService certificationService, IKeyService keyService) {
         this.certificationService = certificationService;
         this.keyService = keyService;
-        this.userService = userService;
         Security.addProvider(new BouncyCastleProvider());
     }
 
     @PostMapping
+
     public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws
             CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException {
         KeyPair keyPair = keyService.generateKeyPair();
         X509Certificate certificate = certificationService.createCertificate(keyPair, certificateDTO);
         saveCertificate(certificate, keyPair.getPrivate(), certificateDTO.getCertificateType());
-        userService.save(new UserDto(certificateDTO.getSubjectName(), certificateDTO.getSubjectUsername(),
-        certificateDTO.getSubjectEmail(), certificateDTO.getSubjectCountry(), certificateDTO.getCertificateType()));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -73,7 +68,6 @@ public class CertificateController {
     }
 
     @GetMapping
-    @JsonIgnoreProperties("publicKey")
     public ResponseEntity<List<CertificateDTO>> getCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDTO> rootCertificates = new ArrayList<>();
         List<CertificateDTO> intermediateCertificates = new ArrayList<>();
@@ -95,6 +89,7 @@ public class CertificateController {
         }
         var certificates = Stream.of(rootCertificates, intermediateCertificates, entityCertificates)
                 .flatMap(Collection::stream).collect(Collectors.toList());
+
         return new ResponseEntity<>(certificates, HttpStatus.OK);
     }
 

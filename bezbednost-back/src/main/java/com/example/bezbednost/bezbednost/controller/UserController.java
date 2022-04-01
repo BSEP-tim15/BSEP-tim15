@@ -1,12 +1,12 @@
 package com.example.bezbednost.bezbednost.controller;
 
+import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.model.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -24,5 +24,16 @@ public class UserController {
     @GetMapping()
     public User user(Principal user) {
         return userService.findByUsername(user.getName());
+    }
+
+    @PostMapping()
+    public ResponseEntity<User> registerUser(@RequestBody UserDto userDto){
+        userService.save(userDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/isUserRegistered")
+    public boolean isUserRegistered(@RequestParam String username){
+        return userService.isUserRegistered(username);
     }
 }

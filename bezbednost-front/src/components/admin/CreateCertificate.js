@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { useToasts } from "react-toast-notifications";
 import axios from "axios";
+import RegistrationQuestion from './RegistrationQuestion';
 
 const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
     const {addToast} = useToasts();
+
+    const [registration, setRegistration] = useState(false);
 
     const [maxDate, setMaxDate] = useState("");
     const [minDate, setMinDate] = useState("");
@@ -16,13 +19,10 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     const [certificate, setCertificate] = useState({
         certificateType: "",
         issuer: "",
+        subject: "",
         validFrom : new Date(),
         validTo: new Date(),
-        purpose: "",
-        subjectName: "",
-        subjectUsername: "",
-        subjectEmail: "",
-        subjectCountry: ""
+        purpose: ""
     });
     
 
@@ -65,13 +65,20 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         e.preventDefault();
         axios.post(SERVER_URL + "/certificates", certificate)
             .then(response => {
-                console.log(certificate);
-                setModalIsOpen(false);
-                window.location.reload();
+          
+                axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
+                    .then(response => {
+                        if(response.data === false){
+                            setRegistration(true);
+                            setModalIsOpen(false);
+                        }
+                        else{
+                            window.location.reload();
+                        }
+                    })
+  
             })
-            .catch(error => {
-                addToast(error.response.data, { appearance: "error" });
-            })
+
     }
 
     const issuerForm = (
@@ -108,6 +115,9 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                             </select>
                             <label className='form-label mt-3'>Issuer</label>
                             {issuerForm}
+                            <label className='form-label mt-3'>Subject</label>
+                            <input className='form-control' type="text" reqired 
+                                value={certificate.subject} onChange={(e) => setCertificate(() => {return {...certificate, subject: e.target.value}})} />
                             <label className='form-label'>Valid from</label>
                             <input className='form-control' type="date" required min={minDate}
                                 value={certificate.validFrom} onChange={(e) => setCertificate(() => {return {...certificate, validFrom: e.target.value}})}/>
@@ -116,24 +126,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                                 value={certificate.validTo} onChange={(e) => setCertificate(() => {return {...certificate, validTo: e.target.value}})}/>
                             <label className='form-label mt-3'>Certificate's purpose</label>
                             <textarea className='form-control' type="text" required 
-                                value={certificate.purpose} onChange={(e) => setCertificate(() => {return {...certificate, purpose: e.target.value}})}/>
-                            
-                            <hr className="bg-light border-3 border-top mt-3" />
-                            <label className='form-label mt-0'><h5>Subject informations</h5></label><br/>
-                            <label className='form-label mt-0'>Name</label>
-                            <input className='form-control' type="text" required
-                                value={certificate.subjectName} onChange={(e) => setCertificate(() => {return {...certificate, subjectName: e.target.value}})}/>
-                            <label className='form-label mt-2'>Username</label>
-                            <input className='form-control' type="text" required
-                                value={certificate.subjectUsername} onChange={(e) => setCertificate(() => {return {...certificate, subjectUsername: e.target.value}})}/>
-                            <label className='form-label mt-2'>Email</label>
-                            <input className='form-control' type="text" required
-                                value={certificate.subjectEmail} onChange={(e) => setCertificate(() => {return {...certificate, subjectEmail: e.target.value}})}/>                          
-                            <label className='form-label mt-2'>Country</label>
-                            <input className='form-control' type="text" required
-                                value={certificate.subjectCountry} onChange={(e) => setCertificate(() => {return {...certificate, subjectCountry: e.target.value}})}/>
-                            <hr className="bg-light border-3 border-top mt-3" />
-                            
+                                value={certificate.purpose} onChange={(e) => setCertificate(() => {return {...certificate, purpose: e.target.value}})}/>                            
                             <button type='submit' className='btn mt-4 w-25' 
                                 style={{marginLeft: "35%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                                 Submit
@@ -142,6 +135,8 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                     </div>
                 </div>
             </Modal>
+
+            <RegistrationQuestion modalIsOpen={registration} setModalIsOpen={setRegistration} username={certificate.subject} role={certificate.certificateType} />
         </div>
     )
 

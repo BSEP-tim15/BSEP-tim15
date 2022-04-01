@@ -1,6 +1,6 @@
 package com.example.bezbednost.bezbednost.service;
 
-import com.example.bezbednost.bezbednost.dto.CertificateDTO;
+import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -8,13 +8,11 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
@@ -27,11 +25,11 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 @Service
 public class CertificationService implements ICertificationService {
-    private KeyService keyService = new KeyService();
+    private final KeyService keyService = new KeyService();
     private static final Base64.Encoder encoder = Base64.getEncoder();
 
     @Override
-    public X509Certificate createCertificate(KeyPair keyPair, CertificateDTO certificateDTO) throws OperatorCreationException,
+    public X509Certificate createCertificate(KeyPair keyPair, CertificateDto certificateDTO) throws OperatorCreationException,
             CertificateException {
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption").setProvider("BC");
         ContentSigner contentSigner = builder.build(keyPair.getPrivate());
@@ -41,18 +39,19 @@ public class CertificationService implements ICertificationService {
         return certConverter.getCertificate(certHolder);
     }
 
-    private X509v3CertificateBuilder generateCertificateBuilder(PublicKey publicKey, CertificateDTO certificateDTO){
+    private X509v3CertificateBuilder generateCertificateBuilder(PublicKey publicKey, CertificateDto certificateDTO){
         X500NameBuilder issuer = new X500NameBuilder(BCStyle.INSTANCE);
         issuer.addRDN(BCStyle.CN, certificateDTO.getIssuer());
         X500NameBuilder subject = new X500NameBuilder(BCStyle.INSTANCE);
-        subject.addRDN(BCStyle.CN, certificateDTO.getSubjectUsername());
-        X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuer.build(),
+        subject.addRDN(BCStyle.CN, certificateDTO.getSubject());
+        X509v3CertificateBuilder generatedCertificate = new JcaX509v3CertificateBuilder(issuer.build(),
                 createSerialNumber(),
                 certificateDTO.getValidFrom(),
                 certificateDTO.getValidTo(),
                 subject.build(),
                 publicKey);
-        return certGen;
+
+        return generatedCertificate;
     }
 
     private BigInteger createSerialNumber(){
@@ -70,16 +69,16 @@ public class CertificationService implements ICertificationService {
     }
 
     @Override
-    public List<CertificateDTO> getAllCertificates(String fileName, char[] password) throws KeyStoreException,
+    public List<CertificateDto> getAllCertificates(String fileName, char[] password) throws KeyStoreException,
             NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException {
         KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
         keyStore.load(new FileInputStream(fileName), password);
         Enumeration<String> aliases = keyStore.aliases();
-        List<CertificateDTO> entries = new ArrayList<>();
+        List<CertificateDto> entries = new ArrayList<>();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
-            CertificateDTO certificateDTO = new CertificateDTO(cert.getSerialNumber(), cert.getIssuerDN().toString(),
+            CertificateDto certificateDTO = new CertificateDto(cert.getSerialNumber(), cert.getIssuerDN().toString(),
                     cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter());
             entries.add(certificateDTO);
         }

@@ -42,6 +42,12 @@ public class UserService implements IUserService {
         return user;
     }
 
+    @Override
+    public boolean isUserRegistered(String username) {
+        User user = findByUsername(username);
+        return user != null;
+    }
+
     private String getUserRole(String role){
         if(Objects.equals(role, "root")){
             return "organization";
