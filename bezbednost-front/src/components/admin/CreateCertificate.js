@@ -67,6 +67,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
             .then(response => {
                 console.log(certificate);
                 setModalIsOpen(false);
+                window.location.reload();
             })
             .catch(error => {
                 addToast(error.response.data, { appearance: "error" });

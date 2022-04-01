@@ -39,7 +39,7 @@ public class KeyService implements IKeyService {
 
     @Override
     public void loadKeyStore(String fileName, char[] password) throws
-            IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
+            IOException, CertificateException, NoSuchAlgorithmException {
         if(fileName != null) {
             keyStore.load(new FileInputStream(fileName), password);
         } else {

@@ -15,5 +15,6 @@ import java.util.List;
 public interface ICertificationService {
     X509Certificate createCertificate(KeyPair keyPair, CertificateDTO certificateDTO) throws OperatorCreationException,
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException;
-    List<CertificateDTO> getAllCertificates(String fileName, char[] password) throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
+    List<CertificateDTO> getAllCertificates(String fileName, char[] password) throws CertificateException,
+            IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 }
