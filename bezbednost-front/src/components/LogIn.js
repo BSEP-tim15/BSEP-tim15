@@ -19,7 +19,7 @@ const LogIn = () => {
                     <label className='form-label'>Username</label>
                     <input className='form-control' type="text" />
                     <label className='form-label mt-2'>Password</label>
-                    <input className='form-control' type="text" />
+                    <input className='form-control' type="password" />
                     <button type='submit' className='btn mt-4 w-25' 
                         style={{marginLeft: "38%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                         Log in

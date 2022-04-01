@@ -24,10 +24,10 @@ const Certificates = () => {
             <tr key={certificate.serialNumber}>
                 <td>{certificate.serialNumber}</td>
                 <td>{certificate.issuer.split('=')[1]}</td>
-                <td>{certificate.subjectUsername.split('=')[1]}</td>
+                <td>{certificate.subject.split('=')[1]}</td>
                 <td>{format(certificate.validFrom, 'dd.MM.yyyy. kk:mm')}</td>
                 <td>{format(certificate.validTo, 'dd.MM.yyyy. kk:mm')}</td>
-                <td><img className="icon" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
+                <td><img className="icon ms-2" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
             </tr>
         ))
     )
@@ -35,7 +35,7 @@ const Certificates = () => {
     return (
         <div>
             <NavBar/>
-            <div className='card' style={{marginLeft: "5%", width: "90%", marginTop: "1%", borderColor: "#4a6560"}}>
+            <div className='card' style={{marginLeft: "5%", width: "90%", maxHeight: "550px", marginTop: "1%", borderColor: "#4a6560"}}>
                 <div className='card-body' style={{overflowY: "scroll"}}>
                     <h4 className='card-title'>Certificates</h4>
                     <div className='title-underline'/>
