@@ -3,7 +3,6 @@ package com.example.bezbednost.bezbednost.controller;
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -91,9 +90,10 @@ public class CertificateController {
         List<CertificateDto> rootCertificates = new ArrayList<>();
         try{
             System.out.println("Please enter file password (rootCertificates.jsk):");
-            Scanner scanner = new Scanner(System.in);
-            String password = scanner.nextLine();
-            rootCertificates = certificationService.getAllCertificates("rootCertificates.jsk",
+            //Scanner scanner = new Scanner(System.in);
+            //String password = scanner.nextLine();
+            String password = "sifra";
+            rootCertificates = certificationService.getCertificates("rootCertificates.jsk",
                     password.toCharArray());
         } catch (FileNotFoundException e){
             e.printStackTrace();
@@ -106,9 +106,10 @@ public class CertificateController {
         List<CertificateDto> intermediateCertificates = new ArrayList<>();
         try{
             System.out.println("Please enter file password (intermediateCertificates.jsk):");
-            Scanner scanner = new Scanner(System.in);
-            String password = scanner.nextLine();
-            intermediateCertificates = certificationService.getAllCertificates("intermediateCertificates.jsk",
+            //Scanner scanner = new Scanner(System.in);
+            //String password = scanner.nextLine();
+            String password = "sifra";
+            intermediateCertificates = certificationService.getCertificates("intermediateCertificates.jsk",
                     password.toCharArray());
         } catch (FileNotFoundException e){
             e.printStackTrace();
@@ -122,8 +123,9 @@ public class CertificateController {
         try{
             System.out.println("Please enter file password (end-entityCertificates.jsk):");
             Scanner scanner = new Scanner(System.in);
-            String password = scanner.nextLine();
-            endEntityCertificates = certificationService.getAllCertificates("end-entityCertificates.jsk",
+            //String password = scanner.nextLine();
+            String password = "sifra";
+            endEntityCertificates = certificationService.getCertificates("end-entityCertificates.jsk",
                    password.toCharArray());
         } catch (FileNotFoundException e){
             e.printStackTrace();
@@ -137,10 +139,17 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> subjectCertificates = new ArrayList<>();
         for(CertificateDto certificate : getAllCertificates()){
-            if(certificate.getSubject().contains(subject)){
+            String subjectUsername = "CN=" + certificate.getSubject();
+            if(Objects.equals(subjectUsername, subject)){
                 subjectCertificates.add(certificate);
             }
         }
         return new ResponseEntity<>(subjectCertificates, HttpStatus.OK);
+    }
+
+    @GetMapping("/issuers")
+    public ResponseEntity<List<String>> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        List<CertificateDto> certificates = getAllCertificates();
+        return new ResponseEntity<>(certificationService.getIssuers(certificates), HttpStatus.OK);
     }
 }

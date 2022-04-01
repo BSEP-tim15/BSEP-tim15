@@ -15,7 +15,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     const [minDate, setMinDate] = useState("");
 
     const certificateTypes = ["root", "intermediate", "end-entity"];
-    const [issuers, setIssuers] = useState(["issuer1", "issuer2"]);
+    const [issuers, setIssuers] = useState([]);
     const [certificate, setCertificate] = useState({
         certificateType: "",
         issuer: "",
@@ -53,7 +53,10 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const setCertificateType = (type) => {
         setCertificate(() => {return {...certificate, certificateType: type}});
-        //GET ISSUERS => setIssuers
+        axios.get(SERVER_URL + "/certificates/issuers")
+            .then(response => {
+                setIssuers(response.data);
+            })
     }
 
     const setIssuer = (issuer) => {
