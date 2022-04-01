@@ -4,3 +4,7 @@ node_modules
 dist
 /bezbednost-front/package-lock.json
 /.idea
+
+/bezbednost-back/rootCertificates.jsk
+/bezbednost-back/intermediateCertificates.jsk
+/bezbednost-back/end-entityCertificates.jsk
