@@ -44,14 +44,14 @@ public class CertificationService implements ICertificationService {
         issuer.addRDN(BCStyle.CN, certificateDTO.getIssuer());
         X500NameBuilder subject = new X500NameBuilder(BCStyle.INSTANCE);
         subject.addRDN(BCStyle.CN, certificateDTO.getSubject());
-        X509v3CertificateBuilder generatedCertificate = new JcaX509v3CertificateBuilder(issuer.build(),
+        X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(issuer.build(),
                 createSerialNumber(),
                 certificateDTO.getValidFrom(),
                 certificateDTO.getValidTo(),
                 subject.build(),
                 publicKey);
 
-        return generatedCertificate;
+        return builder;
     }
 
     private BigInteger createSerialNumber(){
