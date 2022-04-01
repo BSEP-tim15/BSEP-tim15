@@ -65,7 +65,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         e.preventDefault();
         axios.post(SERVER_URL + "/certificates", certificate)
             .then(response => {
-
+          
                 axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
                     .then(response => {
                         if(response.data === false){
@@ -76,8 +76,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                             window.location.reload();
                         }
                     })
-                
-                
+  
             })
 
     }
