@@ -41,7 +41,7 @@ public class CertificateController {
 
     @PostMapping
 
-    public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws
+    public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws
             CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException {
         KeyPair keyPair = keyService.generateKeyPair();
         X509Certificate certificate = certificationService.createCertificate(keyPair, certificateDTO);
@@ -68,10 +68,10 @@ public class CertificateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CertificateDTO>> getCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
-        List<CertificateDTO> rootCertificates = new ArrayList<>();
-        List<CertificateDTO> intermediateCertificates = new ArrayList<>();
-        List<CertificateDTO> entityCertificates = new ArrayList<>();
+    public ResponseEntity<List<CertificateDto>> getCertificates() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        List<CertificateDto> rootCertificates = new ArrayList<>();
+        List<CertificateDto> intermediateCertificates = new ArrayList<>();
+        List<CertificateDto> entityCertificates = new ArrayList<>();
         try{
             rootCertificates = certificationService.getAllCertificates("rootCertificates.jsk",
                     "sifra".toCharArray());

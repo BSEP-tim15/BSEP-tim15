@@ -15,15 +15,10 @@ const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
         role: ""
     })
 
-    useEffect(() => {
-        
-        setSubject(() => {return {...subject, username: username, role: role}});
-
-    }, [])
-
     const registerSubject = (e) => {
         e.preventDefault();
-        axios.post(SERVER_URL + "/users", subject)
+        var newSubject = {...subject, username:username, role:role}
+        axios.post(SERVER_URL + "/users", newSubject)
             .then(response => {
                 setModalIsOpen(false);
                 window.location.reload();
