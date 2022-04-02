@@ -69,7 +69,7 @@ public class CertificationService implements ICertificationService {
     }
 
     @Override
-    public List<CertificateDto> getAllCertificates(String fileName, char[] password) throws KeyStoreException,
+    public List<CertificateDto> getCertificates(String fileName, char[] password) throws KeyStoreException,
             NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException {
         KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
         keyStore.load(new FileInputStream(fileName), password);
@@ -83,6 +83,47 @@ public class CertificationService implements ICertificationService {
             entries.add(certificateDTO);
         }
         return entries;
+    }
+
+    @Override
+    public List<String> getIssuers(List<CertificateDto> certificates) {
+        List<String> issuers = new ArrayList<>();
+        for(CertificateDto certificate : certificates){
+            String issuer = certificate.getIssuer().replace("CN=", "");
+            if(!isIssuerAdded(issuers, issuer))
+                issuers.add(issuer);
+        }
+
+        return issuers;
+    }
+
+    private boolean isIssuerAdded(List<String> issuers, String issuer){
+        return issuers.contains(issuer);
+    }
+
+    @Override
+    public List<CertificateDto> getCertificatesBySubject(List<CertificateDto> allCertificates, String subject) {
+        List<CertificateDto> subjectCertificates = new ArrayList<>();
+        for(CertificateDto certificate : allCertificates){
+            String subjectUsername = "CN=" + subject;
+            if(Objects.equals(subjectUsername, certificate.getSubject())){
+                subjectCertificates.add(certificate);
+            }
+        }
+
+        return subjectCertificates;
+    }
+
+    @Override
+    public Date getMaxDateForCertificate(List<CertificateDto> issuerCertificates){
+        Date maxDate = issuerCertificates.get(0).getValidTo();
+        for (CertificateDto certificate : issuerCertificates) {
+            if(certificate.getValidTo().before(maxDate)){
+                maxDate = certificate.getValidTo();
+            }
+        }
+
+        return maxDate;
     }
 
 

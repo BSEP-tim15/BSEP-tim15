@@ -15,7 +15,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     const [minDate, setMinDate] = useState("");
 
     const certificateTypes = ["root", "intermediate", "end-entity"];
-    const [issuers, setIssuers] = useState(["issuer1", "issuer2"]);
+    const [issuers, setIssuers] = useState([]);
     const [certificate, setCertificate] = useState({
         certificateType: "",
         issuer: "",
@@ -53,31 +53,47 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const setCertificateType = (type) => {
         setCertificate(() => {return {...certificate, certificateType: type}});
-        //GET ISSUERS => setIssuers
+        axios.get(SERVER_URL + "/certificates/issuers")
+            .then(response => {
+                setIssuers(response.data);
+            })
     }
 
     const setIssuer = (issuer) => {
         setCertificate(() => {return {...certificate, issuer: issuer}});
-        //GET validTo of choosen issuer's certificate => setMaxDate
+        axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
+            .then(response => {
+                var maxDate = response.data;
+                console.log(maxDate)
+                maxDate = generateDate(new Date(maxDate));
+                console.log(maxDate)
+                setMaxDate(maxDate);
+            })
     }
 
     const createCertificate = (e) => {
         e.preventDefault();
-        axios.post(SERVER_URL + "/certificates", certificate)
-            .then(response => {
-          
-                axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
-                    .then(response => {
-                        if(response.data === false){
-                            setRegistration(true);
-                            setModalIsOpen(false);
-                        }
-                        else{
-                            window.location.reload();
-                        }
-                    })
-  
-            })
+
+        if(new Date(certificate.validFrom) >= new Date(certificate.validTo)){
+            addToast("Valid from date has to be before valid to date!", {appearance : "error"});
+        } 
+        else {
+            axios.post(SERVER_URL + "/certificates", certificate)
+                .then(response => {
+            
+                    axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
+                        .then(response => {
+                            if(response.data === false){
+                                setRegistration(true);
+                                setModalIsOpen(false);
+                            }
+                            else{
+                                window.location.reload();
+                            }
+                        })
+    
+                })
+        }
 
     }
 
@@ -85,7 +101,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         <div>
             {certificate.certificateType === "root" ? (
                 <input className='form-control' type="text" required
-                    value={certificate.issuer} onChange={(e) => setIssuer(e.target.value)}/>
+                    value={certificate.issuer} onChange={(e) => setCertificate(() => {return {...certificate, issuer: e.target.value}})}/>
             ) : (
                 <select className='form-select' required 
                     value={certificate.issuer} onChange={(e) => setIssuer(e.target.value)}>

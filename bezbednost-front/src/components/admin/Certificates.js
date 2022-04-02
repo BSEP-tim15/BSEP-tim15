@@ -16,9 +16,9 @@ const Certificates = () => {
         
         axios.get(SERVER_URL + "/certificates?certificateType=" + certificateType)
             .then(response => {
-                setCertificates(response.data)
-                console.log(response.data)
+                setCertificates(response.data);
             })
+
     }, [certificateType])
 
     const allCertificates = (
