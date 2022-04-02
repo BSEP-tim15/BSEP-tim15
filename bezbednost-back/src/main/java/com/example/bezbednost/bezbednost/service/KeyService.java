@@ -13,6 +13,7 @@ import java.security.cert.X509Certificate;
 @Service
 public class KeyService implements IKeyService {
     private KeyStore keyStore;
+
     public KeyService(){
         try {
             keyStore = KeyStore.getInstance("JKS", "SUN");
@@ -22,6 +23,7 @@ public class KeyService implements IKeyService {
             e.printStackTrace();
         }
     }
+
     @Override
     public KeyPair generateKeyPair() {
         try {
