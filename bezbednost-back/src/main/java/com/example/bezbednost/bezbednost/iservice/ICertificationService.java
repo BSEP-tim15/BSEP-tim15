@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 
 public interface ICertificationService {
@@ -20,5 +21,9 @@ public interface ICertificationService {
             IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 
     List<String> getIssuers(List<CertificateDto> certificates);
+
+    List<CertificateDto> getCertificatesBySubject(List<CertificateDto> allCertificates, String subject);
+
+    Date getMaxDateForCertificate(List<CertificateDto> issuerCertificates);
 
 }

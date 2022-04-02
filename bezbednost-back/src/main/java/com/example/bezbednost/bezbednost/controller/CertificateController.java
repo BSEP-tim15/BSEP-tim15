@@ -137,13 +137,7 @@ public class CertificateController {
     @GetMapping("/bySubject")
     public ResponseEntity<List<CertificateDto>> getCertificatesBySubject(@RequestParam String subject) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
-        List<CertificateDto> subjectCertificates = new ArrayList<>();
-        for(CertificateDto certificate : getAllCertificates()){
-            String subjectUsername = "CN=" + certificate.getSubject();
-            if(Objects.equals(subjectUsername, subject)){
-                subjectCertificates.add(certificate);
-            }
-        }
+        List<CertificateDto> subjectCertificates = certificationService.getCertificatesBySubject(getAllCertificates(), subject);
         return new ResponseEntity<>(subjectCertificates, HttpStatus.OK);
     }
 
@@ -151,5 +145,12 @@ public class CertificateController {
     public ResponseEntity<List<String>> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> certificates = getAllCertificates();
         return new ResponseEntity<>(certificationService.getIssuers(certificates), HttpStatus.OK);
+    }
+
+    @GetMapping("/maxDate")
+    public ResponseEntity<Date> getMaxDateForCertificate(@RequestParam String issuer) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        List<CertificateDto> issuerCertificates = certificationService.getCertificatesBySubject(getAllCertificates(), issuer);
+        return new ResponseEntity<>(certificationService.getMaxDateForCertificate(issuerCertificates), HttpStatus.OK);
     }
 }

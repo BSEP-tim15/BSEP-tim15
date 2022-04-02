@@ -6,6 +6,11 @@ const RegistrationQuestion = ({modalIsOpen, setModalIsOpen, username, role}) => 
 
     const [registration, setRegistration] = useState(false);
 
+    const closeModal = () => {
+        setModalIsOpen(false);
+        window.location.reload();
+    }
+
     const registerSubject = () => {
         setRegistration(true);
         setModalIsOpen(false);
@@ -21,7 +26,7 @@ const RegistrationQuestion = ({modalIsOpen, setModalIsOpen, username, role}) => 
                     <div className='card-body' style={{overflowY: "scroll"}}>
                         Do you want to register new subject?
                         <div style={{display: "flex"}}>
-                            <button  className='btn mt-4 w-25' onClick={() => setModalIsOpen(false)}
+                            <button  className='btn mt-4 w-25' onClick={() => closeModal()}
                                 style={{marginLeft: "23%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                                 No
                             </button>

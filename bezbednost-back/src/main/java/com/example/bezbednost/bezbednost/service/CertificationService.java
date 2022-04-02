@@ -101,6 +101,31 @@ public class CertificationService implements ICertificationService {
         return issuers.contains(issuer);
     }
 
+    @Override
+    public List<CertificateDto> getCertificatesBySubject(List<CertificateDto> allCertificates, String subject) {
+        List<CertificateDto> subjectCertificates = new ArrayList<>();
+        for(CertificateDto certificate : allCertificates){
+            String subjectUsername = "CN=" + subject;
+            if(Objects.equals(subjectUsername, certificate.getSubject())){
+                subjectCertificates.add(certificate);
+            }
+        }
+
+        return subjectCertificates;
+    }
+
+    @Override
+    public Date getMaxDateForCertificate(List<CertificateDto> issuerCertificates){
+        Date maxDate = issuerCertificates.get(0).getValidTo();
+        for (CertificateDto certificate : issuerCertificates) {
+            if(certificate.getValidTo().before(maxDate)){
+                maxDate = certificate.getValidTo();
+            }
+        }
+
+        return maxDate;
+    }
+
 
 
 }
