@@ -1,6 +1,7 @@
 package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
+import com.example.bezbednost.bezbednost.model.RevocationStatus;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.*;
@@ -90,7 +91,7 @@ public class RevocationService implements IRevocationService {
 
                 //System.out.println(alias);
                 X509Certificate cert = (X509Certificate)keyStore.getCertificate("1600674569228");
-                System.out.println(cert.getSerialNumber());
+                //System.out.println(cert.getSerialNumber());
                 OCSPReq ocspRequest = generateOcspRequest(cert, getIssuerCert());
                 OCSPResp ocspResponse = generateOcspResponse(getOcspUrl(cert), ocspRequest);
 
@@ -203,5 +204,10 @@ public class RevocationService implements IRevocationService {
         in = new ASN1InputStream(new ByteArrayInputStream(octetString.getOctets()));
 
         return in.readObject();
+    }
+
+    @Override
+    public RevocationStatus checkRevocationStatus(X509Certificate peerCert, X509Certificate issuerCert) {
+        return null;
     }
 }
