@@ -31,7 +31,7 @@ const Certificates = () => {
 
     const allCertificates = (
         certificates.map(certificate => (
-            <tr key={certificate.serialNumber} onClick={() => showSingleCertificate(certificate.serialNumber)}>
+            <tr className="tableRow" key={certificate.serialNumber} onClick={() => showSingleCertificate(certificate.serialNumber)}>
                 <td>{certificate.serialNumber}</td>
                 <td>{certificate.subject.substring(3)}</td>
                 <td>{certificate.issuer.substring(3)}</td>

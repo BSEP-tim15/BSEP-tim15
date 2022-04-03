@@ -1,8 +1,12 @@
 package com.example.bezbednost.bezbednost.service;
 
-public class KeyToolService {
+import com.example.bezbednost.bezbednost.iservice.IKeyToolService;
+import org.springframework.stereotype.Service;
 
-    public static void executeCommand(String command) {
+@Service
+public class KeyToolService implements IKeyToolService {
+
+    public void executeCommand(String command) {
         try {
             printCommand(command);
             sun.security.tools.keytool.Main.main(parse(command));

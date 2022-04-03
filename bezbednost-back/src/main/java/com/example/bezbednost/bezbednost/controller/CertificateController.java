@@ -3,7 +3,7 @@ package com.example.bezbednost.bezbednost.controller;
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
-import com.example.bezbednost.bezbednost.service.KeyToolService;
+import com.example.bezbednost.bezbednost.iservice.IKeyToolService;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -30,10 +30,12 @@ import java.util.stream.Stream;
 public class CertificateController {
     private final ICertificationService certificationService;
     private final IKeyService keyService;
+    private final IKeyToolService keyToolService;
 
-    public CertificateController(ICertificationService certificationService, IKeyService keyService) {
+    public CertificateController(ICertificationService certificationService, IKeyService keyService, IKeyToolService keyToolService) {
         this.certificationService = certificationService;
         this.keyService = keyService;
+        this.keyToolService = keyToolService;
         Security.addProvider(new BouncyCastleProvider());
     }
 
@@ -123,7 +125,7 @@ public class CertificateController {
         List<CertificateDto> endEntityCertificates = new ArrayList<>();
         try{
             System.out.println("Please enter file password (end-entityCertificates.jsk):");
-            Scanner scanner = new Scanner(System.in);
+            //Scanner scanner = new Scanner(System.in);
             //String password = scanner.nextLine();
             String password = "sifra";
             endEntityCertificates = certificationService.getCertificates("end-entityCertificates.jsk",
@@ -166,10 +168,10 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         CertificateDto certificate = certificationService.getCertificateBySerialNumber(getAllCertificates(), serialNumber);
         String keyStorePassword = "sifra";
-        String subjectName = serialNumber.toString();
-        String fileName = certificate.getCertificateType();
+        String certificateName = serialNumber.toString();
+        String keyStoreName = certificate.getCertificateType();
         String command = "-exportcert -alias " + serialNumber + " -storepass " + keyStorePassword + " -file " +
-                subjectName + ".cer -keystore " + fileName +  "Certificates.jsk";
-        KeyToolService.executeCommand(command);
+                certificateName + ".cer -keystore " + keyStoreName +  "Certificates.jsk";
+        keyToolService.executeCommand(command);
     }
 }

@@ -48,15 +48,17 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
                         <div className='title-underline'/>
                         <form className='mt-4' onSubmit={(e) => exportCertificate(e)}>
                             <label className='form-label mt-2'>Serial number</label>
-                            <input type="text" className='form-control' required value={serialNumber} disabled/>
+                            <input type="text" className='form-control' value={serialNumber} disabled/>
+                            <label className='form-label mt-3'>Certificate type</label>
+                            <input type="text" className='form-control' value={certificate.certificateType} disabled/>
                             <label className='form-label mt-3'>Subject</label>
-                            <input type="text" className='form-control' required value={certificate.subject} disabled/>
+                            <input type="text" className='form-control' value={certificate.subject} disabled/>
                             <label className='form-label mt-3'>Issuer</label>
-                            <input type="text" className='form-control' required value={certificate.issuer} disabled/>
+                            <input type="text" className='form-control' value={certificate.issuer} disabled/>
                             <label className='form-label mt-3'>Valid from</label>
-                            <input type="text" className='form-control' required value={certificate.validFrom} disabled/>
+                            <input type="text" className='form-control' value={certificate.validFrom} disabled/>
                             <label className='form-label mt-3'>Valid to</label>
-                            <input type="text" className='form-control' required value={certificate.validTo} disabled/>
+                            <input type="text" className='form-control' value={certificate.validTo} disabled/>
                             
                             <button type='submit' className='btn mt-5 w-25' 
                                 style={{marginLeft: "35%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
