@@ -11,7 +11,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const [registration, setRegistration] = useState(false);
 
-    const [maxDate, setMaxDate] = useState("");
     const [minDate, setMinDate] = useState("");
 
     const certificateTypes = ["root", "intermediate", "end-entity"];
@@ -28,7 +27,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     useEffect(() => {
 
-        setMaxDate(generateDate(new Date()));
         setMinDate(generateDate(new Date()));
 
     }, [])
@@ -61,21 +59,21 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const setIssuer = (issuer) => {
         setCertificate(() => {return {...certificate, issuer: issuer}});
-        axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
+
+        if(certificate.certificateType !== "root"){
+            axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
             .then(response => {
                 var maxDate = response.data;
                 maxDate = generateDate(new Date(maxDate));
-                setMaxDate(maxDate);
+                document.getElementById("validTo").max = maxDate;
             })
+        }
     }
 
     const createCertificate = (e) => {
         e.preventDefault();
 
-        if(new Date(certificate.validFrom) >= new Date(certificate.validTo)){
-            addToast("Valid from date has to be before valid to date!", {appearance : "error"});
-        } 
-        else {
+        if(isCertificateValid()){
             axios.post(SERVER_URL + "/certificates", certificate)
                 .then(response => {
             
@@ -93,6 +91,20 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                 })
         }
 
+    }
+
+    const isCertificateValid = () => {
+        if(new Date(certificate.validFrom) >= new Date(certificate.validTo)){
+            addToast("Valid from date has to be before valid to date!", {appearance : "error"});
+            return false;
+        } 
+        if(certificate.certificateType === "root"){
+            if(certificate.issuer !== certificate.subject){
+                addToast("For root (self signed) certificates subject and issuer have to be same!", {appearance : "error"});
+                return false;
+            }
+        }
+        return true;
     }
 
     const issuerForm = (
@@ -136,7 +148,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                             <input className='form-control' type="date" required min={minDate}
                                 value={certificate.validFrom} onChange={(e) => setCertificate(() => {return {...certificate, validFrom: e.target.value}})}/>
                             <label className='form-label mt-3'>Valid to</label>
-                            <input className='form-control' type="date" required max={maxDate}
+                            <input id="validTo" className='form-control' type="date" required min={minDate}
                                 value={certificate.validTo} onChange={(e) => setCertificate(() => {return {...certificate, validTo: e.target.value}})}/>
                             <label className='form-label mt-3'>Certificate's purpose</label>
                             <textarea className='form-control' type="text" required 
