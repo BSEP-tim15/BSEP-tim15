@@ -4,6 +4,7 @@ import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import org.bouncycastle.operator.OperatorCreationException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -25,5 +26,7 @@ public interface ICertificationService {
     List<CertificateDto> getCertificatesBySubject(List<CertificateDto> allCertificates, String subject);
 
     Date getMaxDateForCertificate(List<CertificateDto> issuerCertificates);
+
+    CertificateDto getCertificateBySerialNumber(List<CertificateDto> allCertificates, BigInteger alias);
 
 }

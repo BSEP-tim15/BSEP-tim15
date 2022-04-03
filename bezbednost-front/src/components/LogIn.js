@@ -7,7 +7,7 @@ const LogIn = () => {
     const navigate = useNavigate();
 
     const logIn = () => {
-        navigate("/admin");
+        navigate("/certificates");
     }
 
     return (

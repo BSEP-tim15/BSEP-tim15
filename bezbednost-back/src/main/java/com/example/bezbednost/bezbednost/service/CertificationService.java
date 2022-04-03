@@ -80,9 +80,22 @@ public class CertificationService implements ICertificationService {
             X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
             CertificateDto certificateDTO = new CertificateDto(cert.getSerialNumber(), cert.getIssuerDN().toString(),
                     cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter());
+            certificateDTO.setCertificateType(getCertificateType(fileName));
             entries.add(certificateDTO);
         }
         return entries;
+    }
+
+    private String getCertificateType(String fileName) {
+        if(fileName.contains("root")) {
+            return "root";
+        }
+        else if(fileName.contains("intermediate")) {
+            return "intermediate";
+        }
+        else {
+            return "end-entity";
+        }
     }
 
     @Override
@@ -91,6 +104,18 @@ public class CertificationService implements ICertificationService {
         for(CertificateDto certificate : certificates){
             String issuer = certificate.getIssuer().replace("CN=", "");
             if(!isIssuerAdded(issuers, issuer))
+                issuers.add(issuer);
+        }
+        issuers.addAll(getIntermediateCertificatesSubjects(certificates));
+
+        return issuers;
+    }
+
+    private List<String> getIntermediateCertificatesSubjects(List<CertificateDto> certificates){
+        List<String> issuers = new ArrayList<>();
+        for(CertificateDto certificate : certificates){
+            String issuer = certificate.getSubject().replace("CN=", "");
+            if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer))
                 issuers.add(issuer);
         }
 
@@ -124,6 +149,17 @@ public class CertificationService implements ICertificationService {
         }
 
         return maxDate;
+    }
+
+    @Override
+    public CertificateDto getCertificateBySerialNumber(List<CertificateDto> allCertificates, BigInteger alias) {
+        for(CertificateDto certificate : allCertificates){
+            if(Objects.equals(certificate.getSerialNumber(), alias)){
+                return certificate;
+            }
+        }
+
+        return null;
     }
 
 

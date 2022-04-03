@@ -1,9 +1,9 @@
 import './App.css';
 import LogIn from './components/LogIn';
-import AdminHomePage from './components/admin/AdminHomePage';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Certificates from './components/admin/Certificates';
 import { ToastProvider } from "react-toast-notifications";
+import UserProfile from './components/UserProfile';
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route exact path="/" element={<LogIn/>} />
-            <Route exact path="/admin" element={<AdminHomePage/>} />
+            <Route exact path="/profile" element={<UserProfile/>} />
             <Route exact path="/certificates" element={<Certificates/>} />
           </Routes>
         </div>

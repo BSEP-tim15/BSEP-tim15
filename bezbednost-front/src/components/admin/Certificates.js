@@ -4,16 +4,24 @@ import { format } from 'date-fns';
 import NavBar from "../NavBar";
 import validImg from "../../images/valid.png";
 import invalidImg from "../../images/invalid.png";
+import SingleCertificate from "./SingleCertificate";
+import { useToasts } from "react-toast-notifications";
 
 const Certificates = () => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
 
+    const {addToast} = useToasts();
+
     const [certificateType, setCertificateType] = useState("");
     const [certificates, setCertificates] = useState([]);
+    const [showCertificate, setShowCetificate] = useState(false);
+    const [serialNumber, setSerialNumber] = useState(0);
 
     useEffect(() => {
         
+        addToast("Please enter password for keystore files in console!", { appearance: "info" });
+
         axios.get(SERVER_URL + "/certificates?certificateType=" + certificateType)
             .then(response => {
                 setCertificates(response.data);
@@ -21,14 +29,19 @@ const Certificates = () => {
 
     }, [certificateType])
 
+    const showSingleCertificate = (serialNumber) => {
+        setSerialNumber(serialNumber);
+        setShowCetificate(true);
+    }
+
     const allCertificates = (
         certificates.map(certificate => (
-            <tr key={certificate.serialNumber}>
+            <tr className="tableRow" key={certificate.serialNumber} onClick={() => showSingleCertificate(certificate.serialNumber)}>
                 <td>{certificate.serialNumber}</td>
-                <td>{certificate.issuer.split('=')[1]}</td>
-                <td>{certificate.subject.split('=')[1]}</td>
-                <td>{format(certificate.validFrom, 'dd.MM.yyyy. kk:mm')}</td>
-                <td>{format(certificate.validTo, 'dd.MM.yyyy. kk:mm')}</td>
+                <td>{certificate.subject.substring(3)}</td>
+                <td>{certificate.issuer.substring(3)}</td>
+                <td>{format(certificate.validFrom, 'dd.MM.yyyy.')}</td>
+                <td>{format(certificate.validTo, 'dd.MM.yyyy.')}</td>
                 <td><img className="icon ms-2" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
             </tr>
         ))
@@ -60,8 +73,8 @@ const Certificates = () => {
                         <thead>
                             <tr>
                                 <th style={{width: "18%"}}>Certificate ID</th>
-                                <th style={{width: "18%"}}>Issuer</th>
                                 <th style={{width: "18%"}}>Subject</th>
+                                <th style={{width: "18%"}}>Issuer</th>
                                 <th style={{width: "18%"}}>Valid from</th>
                                 <th style={{width: "18%"}}>Valid to</th>
                                 <th style={{width: "18%"}}>Status</th>
@@ -73,6 +86,8 @@ const Certificates = () => {
                     </table>
                 </div>
             </div>
+
+            <SingleCertificate modalIsOpen={showCertificate} setModalIsOpen={setShowCetificate} serialNumber={serialNumber} />
         </div>
     )
 

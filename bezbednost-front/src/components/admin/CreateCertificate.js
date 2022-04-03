@@ -11,7 +11,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const [registration, setRegistration] = useState(false);
 
-    const [maxDate, setMaxDate] = useState("");
     const [minDate, setMinDate] = useState("");
 
     const certificateTypes = ["root", "intermediate", "end-entity"];
@@ -28,7 +27,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     useEffect(() => {
 
-        setMaxDate(generateDate(new Date()));
         setMinDate(generateDate(new Date()));
 
     }, [])
@@ -61,26 +59,25 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const setIssuer = (issuer) => {
         setCertificate(() => {return {...certificate, issuer: issuer}});
-        axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
+
+        if(certificate.certificateType !== "root"){
+            axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
             .then(response => {
                 var maxDate = response.data;
-                console.log(maxDate)
                 maxDate = generateDate(new Date(maxDate));
-                console.log(maxDate)
-                setMaxDate(maxDate);
+                document.getElementById("validTo").max = maxDate;
             })
+        }
     }
 
     const createCertificate = (e) => {
         e.preventDefault();
 
-        if(new Date(certificate.validFrom) >= new Date(certificate.validTo)){
-            addToast("Valid from date has to be before valid to date!", {appearance : "error"});
-        } 
-        else {
+        if(isCertificateValid()){
+            addToast("Please enter password for keystore files in console!", { appearance: "info" });
             axios.post(SERVER_URL + "/certificates", certificate)
                 .then(response => {
-            
+
                     axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
                         .then(response => {
                             if(response.data === false){
@@ -95,6 +92,20 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                 })
         }
 
+    }
+
+    const isCertificateValid = () => {
+        if(new Date(certificate.validFrom) >= new Date(certificate.validTo)){
+            addToast("Valid from date has to be before valid to date!", {appearance : "error"});
+            return false;
+        } 
+        if(certificate.certificateType === "root"){
+            if(certificate.issuer !== certificate.subject){
+                addToast("For root (self signed) certificates subject and issuer have to be same!", {appearance : "error"});
+                return false;
+            }
+        }
+        return true;
     }
 
     const issuerForm = (
@@ -132,13 +143,13 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                             <label className='form-label mt-3'>Issuer</label>
                             {issuerForm}
                             <label className='form-label mt-3'>Subject</label>
-                            <input className='form-control' type="text" reqired 
+                            <input className='form-control' type="text" required 
                                 value={certificate.subject} onChange={(e) => setCertificate(() => {return {...certificate, subject: e.target.value}})} />
-                            <label className='form-label'>Valid from</label>
+                            <label className='form-label mt-3'>Valid from</label>
                             <input className='form-control' type="date" required min={minDate}
                                 value={certificate.validFrom} onChange={(e) => setCertificate(() => {return {...certificate, validFrom: e.target.value}})}/>
                             <label className='form-label mt-3'>Valid to</label>
-                            <input className='form-control' type="date" required max={maxDate}
+                            <input id="validTo" className='form-control' type="date" required min={minDate}
                                 value={certificate.validTo} onChange={(e) => setCertificate(() => {return {...certificate, validTo: e.target.value}})}/>
                             <label className='form-label mt-3'>Certificate's purpose</label>
                             <textarea className='form-control' type="text" required 
