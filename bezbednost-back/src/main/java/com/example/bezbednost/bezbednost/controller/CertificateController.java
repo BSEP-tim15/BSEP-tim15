@@ -3,6 +3,7 @@ package com.example.bezbednost.bezbednost.controller;
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.ICertificationService;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
+import com.example.bezbednost.bezbednost.service.KeyToolService;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -36,7 +38,6 @@ public class CertificateController {
     }
 
     @PostMapping
-
     public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws
             CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException {
         KeyPair keyPair = keyService.generateKeyPair();
@@ -152,5 +153,23 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> issuerCertificates = certificationService.getCertificatesBySubject(getAllCertificates(), issuer);
         return new ResponseEntity<>(certificationService.getMaxDateForCertificate(issuerCertificates), HttpStatus.OK);
+    }
+
+    @GetMapping("/certificate")
+    public ResponseEntity<CertificateDto> getCertificate(@RequestParam BigInteger serialNumber) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        return new ResponseEntity<>(certificationService.getCertificateBySerialNumber(getAllCertificates(), serialNumber), HttpStatus.OK);
+    }
+
+    @PostMapping("/exportCertificate")
+    public void exportCertificate(@RequestParam BigInteger serialNumber) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        CertificateDto certificate = certificationService.getCertificateBySerialNumber(getAllCertificates(), serialNumber);
+        String keyStorePassword = "sifra";
+        String subjectName = serialNumber.toString();
+        String fileName = certificate.getCertificateType();
+        String command = "-exportcert -alias " + serialNumber + " -storepass " + keyStorePassword + " -file " +
+                subjectName + ".cer -keystore " + fileName +  "Certificates.jsk";
+        KeyToolService.executeCommand(command);
     }
 }
