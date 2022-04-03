@@ -64,9 +64,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
             .then(response => {
                 var maxDate = response.data;
-                console.log(maxDate)
                 maxDate = generateDate(new Date(maxDate));
-                console.log(maxDate)
                 setMaxDate(maxDate);
             })
     }
@@ -132,9 +130,9 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                             <label className='form-label mt-3'>Issuer</label>
                             {issuerForm}
                             <label className='form-label mt-3'>Subject</label>
-                            <input className='form-control' type="text" reqired 
+                            <input className='form-control' type="text" required 
                                 value={certificate.subject} onChange={(e) => setCertificate(() => {return {...certificate, subject: e.target.value}})} />
-                            <label className='form-label'>Valid from</label>
+                            <label className='form-label mt-3'>Valid from</label>
                             <input className='form-control' type="date" required min={minDate}
                                 value={certificate.validFrom} onChange={(e) => setCertificate(() => {return {...certificate, validFrom: e.target.value}})}/>
                             <label className='form-label mt-3'>Valid to</label>

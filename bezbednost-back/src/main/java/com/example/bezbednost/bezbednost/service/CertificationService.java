@@ -106,6 +106,18 @@ public class CertificationService implements ICertificationService {
             if(!isIssuerAdded(issuers, issuer))
                 issuers.add(issuer);
         }
+        issuers.addAll(getIntermediateCertificatesSubjects(certificates));
+
+        return issuers;
+    }
+
+    private List<String> getIntermediateCertificatesSubjects(List<CertificateDto> certificates){
+        List<String> issuers = new ArrayList<>();
+        for(CertificateDto certificate : certificates){
+            String issuer = certificate.getSubject().replace("CN=", "");
+            if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer))
+                issuers.add(issuer);
+        }
 
         return issuers;
     }
@@ -141,7 +153,6 @@ public class CertificationService implements ICertificationService {
 
     @Override
     public CertificateDto getCertificateBySerialNumber(List<CertificateDto> allCertificates, BigInteger alias) {
-        List<CertificateDto> subjectCertificates = new ArrayList<>();
         for(CertificateDto certificate : allCertificates){
             if(Objects.equals(certificate.getSerialNumber(), alias)){
                 return certificate;
