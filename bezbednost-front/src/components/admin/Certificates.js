@@ -5,10 +5,13 @@ import NavBar from "../NavBar";
 import validImg from "../../images/valid.png";
 import invalidImg from "../../images/invalid.png";
 import SingleCertificate from "./SingleCertificate";
+import { useToasts } from "react-toast-notifications";
 
 const Certificates = () => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
+
+    const {addToast} = useToasts();
 
     const [certificateType, setCertificateType] = useState("");
     const [certificates, setCertificates] = useState([]);
@@ -17,6 +20,8 @@ const Certificates = () => {
 
     useEffect(() => {
         
+        addToast("Please enter password for keystore files in console!", { appearance: "info" });
+
         axios.get(SERVER_URL + "/certificates?certificateType=" + certificateType)
             .then(response => {
                 setCertificates(response.data);

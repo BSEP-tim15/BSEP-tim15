@@ -28,6 +28,7 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
 
     const exportCertificate = (e) => {
         e.preventDefault();
+        addToast("Please enter password for keystore files in console!", { appearance: "info" });
         axios.post(SERVER_URL + "/certificates/exportCertificate?serialNumber=" + serialNumber)
             .then(response => {
                 addToast("Certificate is successfully exported!", { appearance: "success" });

@@ -74,9 +74,10 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         e.preventDefault();
 
         if(isCertificateValid()){
+            addToast("Please enter password for keystore files in console!", { appearance: "info" });
             axios.post(SERVER_URL + "/certificates", certificate)
                 .then(response => {
-            
+
                     axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
                         .then(response => {
                             if(response.data === false){
