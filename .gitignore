@@ -8,3 +8,5 @@ dist
 /bezbednost-back/rootCertificates.jsk
 /bezbednost-back/intermediateCertificates.jsk
 /bezbednost-back/end-entityCertificates.jsk
+
+/bezbednost-back/*.cer
