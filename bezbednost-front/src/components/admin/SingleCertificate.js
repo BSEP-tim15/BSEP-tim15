@@ -4,16 +4,28 @@ import { useToasts } from "react-toast-notifications";
 import axios from "axios";
 import { format } from 'date-fns';
 import print from "../../images/print.png";
+import { Link, useNavigate } from 'react-router-dom';
+import Certificates from './Certificates';
 
-const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
+const SingleCertificate = () => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
 
     const {addToast} = useToasts();
 
+    const navigate = useNavigate();
+    const url = window.location.href;
+
+    const [modalIsOpen, setModalIsOpen] = useState(true);
+    const [serialNumber, setSerialNumber] = useState(0);
     const [certificate, setCertificate] = useState({});
 
     useEffect(() => {
+        const splitted = url.split("/")
+        var serialNumber = splitted[splitted.length-1];
+        serialNumber = parseInt(serialNumber);
+        setSerialNumber(serialNumber);
+
         axios.get(SERVER_URL + "/certificates/certificate?serialNumber=" + serialNumber)
             .then(response => {
                 var certificate = response.data;
@@ -24,7 +36,15 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
                 setCertificate(certificate);
             })
 
-    }, [modalIsOpen])
+    }, [url])
+
+    const getSerialNumberOfParentCertificate = () => {
+        
+    }
+
+    const closeModal = () => {
+        navigate("/certificates");
+    }
 
     const exportCertificate = (e) => {
         e.preventDefault();
@@ -33,17 +53,18 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
             .then(response => {
                 addToast("Certificate is successfully exported!", { appearance: "success" });
                 setTimeout(() => {
-                    setModalIsOpen(false);
+                    closeModal();
                 }, 2500);
             })
     }
 
     return (
         <div>
-            <Modal className="fullscreen" isOpen={modalIsOpen} shouldCloseOnEsc={true} onRequestClose={() => setModalIsOpen(false) } ariaHideApp={false}>
+            <Certificates/>
+            <Modal className="fullscreen" isOpen={modalIsOpen} shouldCloseOnEsc={true} onRequestClose={() => closeModal() } ariaHideApp={false}>
                 <div className='card w-50 mb-5' 
                     style={{marginLeft: "25%", maxHeight: "600px", marginTop: "4%", borderColor: "#4a6560"}}>
-                    <button className="btn-close ms-auto mt-2 me-2" onClick={() => setModalIsOpen(false)}/>
+                    <button className="btn-close ms-auto mt-2 me-2" onClick={() => closeModal()}/>
                     <div className='card-body' style={{overflowY: "scroll"}}>
                         <h4 className='card-title' style={{marginTop: "-20px"}}>Certificate: {serialNumber}</h4>
                         <div className='title-underline'/>
@@ -59,7 +80,9 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
                             <label className='form-label mt-3'>Valid from</label>
                             <input type="text" className='form-control' value={certificate.validFrom} disabled/>
                             <label className='form-label mt-3'>Valid to</label>
-                            <input type="text" className='form-control' value={certificate.validTo} disabled/>
+                            <input type="text" className='form-control' value={certificate.validTo} disabled/><br/>
+
+                            <Link to={"/certificate/" + 2056761352549} >View parent certificate</Link><br/>
                             
                             <button type='submit' className='btn mt-5 w-25' 
                                 style={{marginLeft: "35%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
@@ -71,6 +94,7 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber}) => {
                     </div>
                 </div>
             </Modal>
+
         </div>
     )
 
