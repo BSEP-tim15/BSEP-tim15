@@ -35,7 +35,8 @@ public class CertificateController {
 
     @PostMapping
     public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws
-            CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException {
+            CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException,
+            SignatureException, InvalidKeyException, NoSuchProviderException {
         postCertificateService.createCertificate(certificateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
