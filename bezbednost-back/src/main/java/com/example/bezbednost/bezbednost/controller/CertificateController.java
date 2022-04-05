@@ -1,9 +1,9 @@
 package com.example.bezbednost.bezbednost.controller;
 
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
+import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
-import com.example.bezbednost.bezbednost.iservice.IKeyToolService;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 @RestController
@@ -26,16 +28,19 @@ import java.util.*;
 public class CertificateController {
     private final IPostCertificateService postCertificateService;
     private final IGetCertificateService getCertificateService;
+    private final IKeyService keyService;
 
-    public CertificateController(IPostCertificateService postCertificateService, IGetCertificateService getCertificateService) {
+    public CertificateController(IPostCertificateService postCertificateService, IGetCertificateService getCertificateService, IKeyService keyService) {
         this.postCertificateService = postCertificateService;
         this.getCertificateService = getCertificateService;
+        this.keyService = keyService;
         Security.addProvider(new BouncyCastleProvider());
     }
 
     @PostMapping
     public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws
-            CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException {
+            CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException,
+            SignatureException, InvalidKeyException, NoSuchProviderException, UnrecoverableKeyException {
         postCertificateService.createCertificate(certificateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -74,4 +79,5 @@ public class CertificateController {
         postCertificateService.exportCertificate(serialNumber);
         return new ResponseEntity<>(serialNumber, HttpStatus.CREATED);
     }
+
 }

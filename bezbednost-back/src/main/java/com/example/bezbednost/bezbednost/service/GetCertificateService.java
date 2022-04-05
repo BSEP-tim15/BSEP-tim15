@@ -2,12 +2,19 @@ package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -71,7 +78,9 @@ public class GetCertificateService implements IGetCertificateService {
                 String alias = aliases.nextElement();
                 X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
                 CertificateDto certificateDTO = new CertificateDto(cert.getSerialNumber(), cert.getIssuerDN().toString(),
-                        cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter());
+                        cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter(),
+                        getExtension(cert, "issuerAlternativeName"), getExtension(cert, "subjectAlternativeName"));
+
                 certificateDTO.setCertificateType(getCertificateType(fileName));
                 certificates.add(certificateDTO);
             }
@@ -80,6 +89,49 @@ public class GetCertificateService implements IGetCertificateService {
         }
 
         return certificates;
+    }
+
+    private String getExtension(X509Certificate certificate, String extensionType) throws IOException {
+        byte[] v = checkExtensionType(certificate, extensionType);
+        GeneralNames gn = null;
+        try{
+            gn = GeneralNames.getInstance(X509ExtensionUtil.fromExtensionValue(v));
+        }
+        catch(NullPointerException e){
+            return "";
+        }
+        try{
+            GeneralName[] names = gn.getNames();
+            for (GeneralName name : names) {
+                if (name.getTagNo() == GeneralName.otherName) {
+                    ASN1Sequence seq = ASN1Sequence.getInstance(name.getName());
+                    ASN1Integer value = (ASN1Integer) seq.getObjectAt(1);
+                    byte[] extensionBytes = value.getValue().toByteArray();
+                    String extension = new String(extensionBytes, StandardCharsets.UTF_8);
+                    return extension;
+                }
+            }
+        }
+        catch(NumberFormatException e){
+            return "";
+        }
+        return "";
+    }
+
+    private byte[] checkExtensionType(X509Certificate certificate, String extensionType){
+        if(extensionType.equals("reasonCode")){
+            return certificate.getExtensionValue(Extension.reasonCode.getId());
+        }
+        else if(extensionType.equals("issuerAlternativeName")){
+            return certificate.getExtensionValue(Extension.issuerAlternativeName.getId());
+        }
+        else if(extensionType.equals("subjectAlternativeName")){
+            return certificate.getExtensionValue(Extension.subjectAlternativeName.getId());
+        }
+        else if(extensionType.equals("keyUsage")){
+            return certificate.getExtensionValue(Extension.keyUsage.getId());
+        }
+        return null;
     }
 
     private char[] getFilePassword(String file){

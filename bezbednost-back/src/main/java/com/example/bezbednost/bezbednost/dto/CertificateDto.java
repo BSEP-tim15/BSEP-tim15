@@ -24,6 +24,12 @@ public class CertificateDto {
 
     @Getter @Setter private String purpose;
 
+    @Getter @Setter private String keyUsage;
+
+    @Getter @Setter private String issuerAlternativeName;
+
+    @Getter @Setter private String subjectAlternativeName;
+
 
     public CertificateDto() { }
 
@@ -36,12 +42,15 @@ public class CertificateDto {
         this.purpose = purpose;
     }
 
-    public CertificateDto(BigInteger serialNumber, String issuer, String subject, Date validFrom, Date validTo) {
+    public CertificateDto(BigInteger serialNumber, String issuer, String subject, Date validFrom, Date validTo,
+                          String issuerAlternativeName, String subjectAlternativeName) {
         this.serialNumber = serialNumber;
         this.issuer = issuer;
         this.subject = subject;
         this.validFrom = validFrom;
         this.validTo = validTo;
+        this.issuerAlternativeName = issuerAlternativeName;
+        this.subjectAlternativeName = subjectAlternativeName;
     }
 
 }
