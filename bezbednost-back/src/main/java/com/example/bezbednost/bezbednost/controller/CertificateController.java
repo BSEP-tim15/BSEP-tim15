@@ -4,6 +4,7 @@ import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
+import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -28,12 +29,14 @@ public class CertificateController {
     private final IPostCertificateService postCertificateService;
     private final IGetCertificateService getCertificateService;
     private final IKeyService keyService;
+    private final IRevocationService revocationService;
 
-    public CertificateController(IPostCertificateService postCertificateService, IGetCertificateService getCertificateService, IKeyService keyService) {
+    public CertificateController(IPostCertificateService postCertificateService, IGetCertificateService getCertificateService, IKeyService keyService, IRevocationService revocationService) {
         this.postCertificateService = postCertificateService;
         this.getCertificateService = getCertificateService;
         this.keyService = keyService;
         Security.addProvider(new BouncyCastleProvider());
+        this.revocationService = revocationService;
     }
 
     @PostMapping
@@ -79,10 +82,30 @@ public class CertificateController {
         return new ResponseEntity<>(serialNumber, HttpStatus.CREATED);
     }
 
+
     @GetMapping("/parentCertificateSerialNumber")
     public ResponseEntity<BigInteger> getSerialNumberOfParentCertificate(@RequestParam BigInteger serialNumber) throws
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(serialNumber), HttpStatus.OK);
+    }
+
+    @GetMapping("/ocsp")
+    public String checkRevocation() {
+        String p12 = "intermediateCertificates.jsk";
+        String pdw = "sifra";
+        int checkStatus = revocationService.checkCertificateStatus(p12, pdw, 3);
+        String data = "Unknown";
+        if (checkStatus == 0) {
+            data = "Certificate valid";
+        } else if (checkStatus == 1) {
+            data = "Certificate unknown";
+        } else if (checkStatus == -1) {
+            data = "Certificate revocation";
+        } else if (checkStatus == -2) {
+            data = "Verify exception";
+        }
+
+        return data;
     }
 
 }
