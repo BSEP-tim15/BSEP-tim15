@@ -18,7 +18,6 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.*;
 
 @RestController
@@ -81,6 +80,13 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         postCertificateService.exportCertificate(serialNumber);
         return new ResponseEntity<>(serialNumber, HttpStatus.CREATED);
+    }
+
+
+    @GetMapping("/parentCertificateSerialNumber")
+    public ResponseEntity<BigInteger> getSerialNumberOfParentCertificate(@RequestParam BigInteger serialNumber) throws
+            CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(serialNumber), HttpStatus.OK);
     }
 
     @GetMapping("/ocsp")

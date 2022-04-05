@@ -6,13 +6,15 @@ import validImg from "../../images/valid.png";
 import invalidImg from "../../images/invalid.png";
 import SingleCertificate from "./SingleCertificate";
 import { useToasts } from "react-toast-notifications";
-import { Link } from "react-router-dom";
 
 const Certificates = () => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
 
     const {addToast} = useToasts();
+
+    const [singleCertificate, setSingleCertificate] = useState(false);
+    const [serialNumber, setSerialNumber] = useState(0);
 
     const [certificateType, setCertificateType] = useState("");
     const [certificates, setCertificates] = useState([]);
@@ -28,39 +30,20 @@ const Certificates = () => {
 
     }, [certificateType])
 
+    const showSingleCertificate = (serialNumber) => {
+        setSerialNumber(serialNumber);
+        setSingleCertificate(true);
+    }
+
     const allCertificates = (
         certificates.map(certificate => (
                 <tr className="tableRow" key={certificate.serialNumber} >
-                    <td>
-                        <Link style={{textDecoration: "none", color: "black"}} to={"/certificate/" + certificate.serialNumber}>
-                            {certificate.serialNumber}
-                        </Link>
-                    </td>
-                    <td>
-                        <Link style={{textDecoration: "none", color: "black"}} to={"/certificate/" + certificate.serialNumber}>
-                            {certificate.subject.substring(3)}
-                        </Link>
-                    </td>
-                    <td>
-                        <Link style={{textDecoration: "none", color: "black"}} to={"/certificate/" + certificate.serialNumber}>
-                            {certificate.issuer.substring(3)}
-                        </Link>
-                    </td>
-                    <td>
-                        <Link style={{textDecoration: "none", color: "black"}} to={"/certificate/" + certificate.serialNumber}>
-                            {format(certificate.validFrom, 'dd.MM.yyyy.')}
-                        </Link>
-                    </td>
-                    <td>
-                        <Link style={{textDecoration: "none", color: "black"}} to={"/certificate/" + certificate.serialNumber}>
-                            {format(certificate.validTo, 'dd.MM.yyyy.')}
-                        </Link>
-                    </td>
-                    <td>
-                        <Link style={{textDecoration: "none", color: "black"}} to={"/certificate/" + certificate.serialNumber}>
-                            <img className="icon ms-2" src={`${certificate.valid ? validImg : invalidImg}`}/>
-                        </Link>
-                    </td>
+                    <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{certificate.serialNumber}</td>
+                    <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{certificate.subject.substring(3)}</td>
+                    <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{certificate.issuer.substring(3)}</td>
+                    <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{format(certificate.validFrom, 'dd.MM.yyyy.')}</td>
+                    <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{format(certificate.validTo, 'dd.MM.yyyy.')}</td>
+                    <td onClick={() => showSingleCertificate(certificate.serialNumber)}><img className="icon ms-2" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
                 </tr>
         ))
     )
@@ -105,6 +88,7 @@ const Certificates = () => {
                 </div>
             </div>
 
+            <SingleCertificate modalIsOpen={singleCertificate} setModalIsOpen={setSingleCertificate} serialNumber={serialNumber} setSerialNumber={setSerialNumber} />
         </div>
     )
 

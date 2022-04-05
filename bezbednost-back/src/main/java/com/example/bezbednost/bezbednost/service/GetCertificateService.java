@@ -19,6 +19,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 
 @Service
 public class GetCertificateService implements IGetCertificateService {
+    private final KeyService keyService = new KeyService();
 
     @Override
     public List<CertificateDto> getCertificates(String certificateType) throws KeyStoreException,
@@ -221,6 +223,26 @@ public class GetCertificateService implements IGetCertificateService {
         }
 
         return null;
+    }
+
+    @Override
+    public BigInteger getSerialNumberOfParentCertificate(BigInteger serialNumber) throws
+            CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        Certificate[] certificates = getCertificateChain(serialNumber);
+        X509Certificate parentCertificate = (X509Certificate)certificates[1];
+        return parentCertificate.getSerialNumber();
+    }
+
+    private Certificate[] getCertificateChain(BigInteger serialNumber) throws
+            CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        Certificate[] certificates = keyService.getChain(serialNumber.toString(), "rootCertificates.jsk");
+        if(certificates == null){
+            certificates = keyService.getChain(serialNumber.toString(), "intermediateCertificates.jsk");
+            if(certificates == null){
+                certificates = keyService.getChain(serialNumber.toString(), "end-entityCertificates.jsk");
+            }
+        }
+        return certificates;
     }
 
 }
