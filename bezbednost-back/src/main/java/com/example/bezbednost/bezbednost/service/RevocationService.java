@@ -2,7 +2,6 @@ package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import com.example.bezbednost.bezbednost.model.RevocationStatus;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -147,6 +146,8 @@ public class RevocationService implements IRevocationService {
     private String getOcspUrl(X509Certificate certificate) throws IOException{
         ASN1Primitive obj;
         try {
+            System.out.println(Extension.authorityInfoAccess.getId()); // nije nyll
+            System.out.println(Extension.subjectAlternativeName.getId());
             obj = getExtensionValue(certificate, Extension.authorityInfoAccess.getId());
         } catch (IOException ex) {
             return null;
@@ -173,6 +174,7 @@ public class RevocationService implements IRevocationService {
     }
 
     private ASN1Primitive getExtensionValue(X509Certificate certificate, String id) throws IOException {
+        System.out.println(id);
         byte[] bytes = certificate.getExtensionValue(id);
         if (bytes == null) return null;
 
