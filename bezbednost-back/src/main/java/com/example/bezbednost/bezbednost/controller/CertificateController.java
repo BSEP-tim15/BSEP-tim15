@@ -79,4 +79,10 @@ public class CertificateController {
         return new ResponseEntity<>(serialNumber, HttpStatus.CREATED);
     }
 
+    @GetMapping("/parentCertificateSerialNumber")
+    public ResponseEntity<BigInteger> getSerialNumberOfParentCertificate(@RequestParam BigInteger serialNumber) throws
+            CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(serialNumber), HttpStatus.OK);
+    }
+
 }

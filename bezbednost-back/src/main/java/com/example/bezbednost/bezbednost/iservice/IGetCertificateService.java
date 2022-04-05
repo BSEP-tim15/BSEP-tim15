@@ -28,4 +28,6 @@ public interface IGetCertificateService {
     CertificateDto getCertificateBySerialNumber(BigInteger serialNumber) throws CertificateException, IOException,
             NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 
+    BigInteger getSerialNumberOfParentCertificate(BigInteger serialNumber) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
+
 }
