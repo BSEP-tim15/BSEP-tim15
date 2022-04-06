@@ -20,4 +20,6 @@ public interface IKeyService {
     void writeToKeyStore(String alias, PrivateKey privateKey, char[] password, X509Certificate[] certificates) throws KeyStoreException;
 
     PrivateKey readPrivateKey(String keyStoreFile, String keyStorePass, String alias, String pass) throws KeyStoreException, NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
+
+    Certificate readCertificate(String keyStoreFile, String keyStorePass, String alias);
 }

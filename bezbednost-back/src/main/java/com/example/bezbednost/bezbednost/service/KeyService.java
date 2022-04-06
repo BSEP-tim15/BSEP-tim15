@@ -3,10 +3,7 @@ package com.example.bezbednost.bezbednost.service;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -89,5 +86,20 @@ public class KeyService implements IKeyService {
         return null;
     }
 
+    @Override
+    public Certificate readCertificate(String keyStoreFile, String keyStorePass, String alias) {
+        try {
+            keyStore = KeyStore.getInstance("JKS", "SUN");
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
+            keyStore.load(in, keyStorePass.toCharArray());
 
+            if (keyStore.isKeyEntry(alias)) {
+                return keyStore.getCertificate(alias);
+            }
+
+        } catch (KeyStoreException | CertificateException | NoSuchProviderException | IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

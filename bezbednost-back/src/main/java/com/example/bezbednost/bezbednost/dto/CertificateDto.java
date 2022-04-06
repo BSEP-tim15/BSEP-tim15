@@ -8,9 +8,7 @@ import java.util.Date;
 
 public class CertificateDto {
 
-    @Getter
-    @Setter
-    private BigInteger serialNumber;
+    @Getter @Setter private BigInteger serialNumber;
 
     @Getter @Setter private String certificateType;
 
