@@ -89,23 +89,4 @@ public class CertificateController {
         return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(serialNumber), HttpStatus.OK);
     }
 
-    @GetMapping("/ocsp")
-    public String checkRevocation() {
-        String p12 = "intermediateCertificates.jsk";
-        String pdw = "sifra";
-        int checkStatus = revocationService.checkCertificateStatus(p12, pdw, 3);
-        String data = "Unknown";
-        if (checkStatus == 0) {
-            data = "Certificate valid";
-        } else if (checkStatus == 1) {
-            data = "Certificate unknown";
-        } else if (checkStatus == -1) {
-            data = "Certificate revocation";
-        } else if (checkStatus == -2) {
-            data = "Verify exception";
-        }
-
-        return data;
-    }
-
 }
