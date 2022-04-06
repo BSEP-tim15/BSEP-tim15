@@ -13,7 +13,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.springframework.stereotype.Service;
-import sun.misc.BASE64Decoder;
+//import sun.misc.BASE64Decoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -51,7 +51,7 @@ public class RevocationService implements IRevocationService {
         while (retry > 0) {
             try {
 
-                byte[] p12Byte = new BASE64Decoder().decodeBuffer(certificate);
+                //byte[] p12Byte = new BASE64Decoder().decodeBuffer(certificate);
                 KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
                 //keyStore.load(new ByteInputStream(p12Byte, p12Byte.length), pwd.toCharArray());
                 keyStore.load(new FileInputStream(certificate), pwd.toCharArray());
