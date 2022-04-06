@@ -1,11 +1,13 @@
 package com.example.bezbednost.bezbednost.controller;
 
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
+import com.example.bezbednost.bezbednost.dto.SerialNumberDto;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.http.HttpStatus;
@@ -89,4 +91,25 @@ public class CertificateController {
         return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(serialNumber), HttpStatus.OK);
     }
 
+    @GetMapping("/validate/{serialNumber}")
+    public ResponseEntity<?> validateCertificate(@PathVariable BigInteger serialNumber) {
+        try {
+            boolean isValid = revocationService.checkIfCertificateIsValid(serialNumber);
+            return ResponseEntity.ok(isValid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/revoke")
+    public ResponseEntity<?> revokeCertificate(@RequestBody SerialNumberDto serialNumberDto) {
+        try {
+            revocationService.revokeCertificate(serialNumberDto.getSerialNumber());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

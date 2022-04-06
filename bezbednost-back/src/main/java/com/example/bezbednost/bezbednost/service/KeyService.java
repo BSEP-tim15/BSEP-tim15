@@ -95,6 +95,12 @@ public class KeyService implements IKeyService {
 
             if (keyStore.isKeyEntry(alias)) {
                 return keyStore.getCertificate(alias);
+            } else {
+                in = new BufferedInputStream(new FileInputStream("rootCertificates.jsk"));
+                keyStore.load(in, keyStorePass.toCharArray());
+                if (keyStore.isKeyEntry(alias)) {
+                    return  keyStore.getCertificate(alias);
+                }
             }
 
         } catch (KeyStoreException | CertificateException | NoSuchProviderException | IOException | NoSuchAlgorithmException e) {

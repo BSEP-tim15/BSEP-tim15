@@ -2,6 +2,7 @@ package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
+import com.example.bezbednost.bezbednost.model.CustomCertificate;
 import com.example.bezbednost.bezbednost.repository.ICustomCertificateRepository;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.*;
@@ -17,9 +18,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class RevocationService implements IRevocationService {
@@ -32,31 +33,75 @@ public class RevocationService implements IRevocationService {
         this.customCertificateRepository = customCertificateRepository;
     }
 
-    public boolean checkIfCertificateIsValid(BigInteger serialNumber) {
-        return false;
+    @Override
+    public boolean checkIfCertificateIsValid(BigInteger serialNumber) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException {
+        CustomCertificate certificate = customCertificateRepository.getBySerialNumber(serialNumber);
+        if (checkIfCertificateIsRevoked(serialNumber)) return false;
+
+        if (certificate.getIssuerSerialNumber().longValue() == 0)
+            return isRootCertificateValid(certificate);
+        else
+            return isCertificateValid(certificate);
     }
 
-    public boolean checkIfCertificateIsRevoked(BigInteger serialNumber) {
-        return false;
+    @Override
+    public boolean checkIfCertificateIsRevoked(BigInteger serialNumber) throws OperatorCreationException, CertificateException, IOException, OCSPException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
+        X509Certificate certificate = getCertificateBySerialNumber(serialNumber);
+
+        DigestCalculatorProvider digestCalculatorProvider = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
+
+        CertificateID id = new CertificateID(digestCalculatorProvider.get(CertificateID.HASH_SHA1), new X509CertificateHolder(certificate.getEncoded()), certificate.getSerialNumber());
+        OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
+        reqBuilder.addRequest(id);
+
+        OCSPReq request = reqBuilder.build();
+        BasicOCSPResp response = getOCSPResponse(request);
+
+        System.out.println(response.getResponses()[0].getCertStatus() != null ? "Revoked" : "Good");
+
+        return response.getResponses()[0].getCertStatus() != CertificateStatus.GOOD;
     }
 
+    @Override
     public void revokeCertificate(BigInteger serialNumber) {
-
+        CustomCertificate certificate = customCertificateRepository.getBySerialNumber(serialNumber);
+        certificate.setRevoked(true);
+        revokeSignedCertificates(serialNumber);
+        customCertificateRepository.save(certificate);
     }
 
-    private boolean isRootCertificateValid(/* prima Certificate certificate */) {
+    private boolean isRootCertificateValid(CustomCertificate certificate) {
+        X509Certificate cert = getCertificateBySerialNumber(certificate.getSerialNumber());
+        try {
+            cert.checkValidity(new Date());
+            return true;
+        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    private boolean isCertificateValid(/* prima Certificate certificate */) {
-        return false;
+    private boolean isCertificateValid(CustomCertificate certificate) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException {
+        do {
+            CustomCertificate issuer = customCertificateRepository.getBySerialNumber(certificate.getIssuerSerialNumber());
+            if (checkIfCertificateIsRevoked(issuer.getSerialNumber())) return false;
+
+            certificate = issuer;
+        } while(certificate.getIssuerSerialNumber().longValue() != 0);
+
+        return true;
     }
 
     private void revokeSignedCertificates(BigInteger serialNumber) {
-
+        List<CustomCertificate> signedCertificates = customCertificateRepository.getIssuedCertificates(serialNumber);
+        for (CustomCertificate certificate : signedCertificates) {
+            certificate.setRevoked(true);
+            customCertificateRepository.save(certificate);
+            revokeSignedCertificates(certificate.getSerialNumber());
+        }
     }
 
-    private BasicOCSPResp getOCSPResponse(OCSPReq request) throws OperatorCreationException, OCSPException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+    private BasicOCSPResp getOCSPResponse(OCSPReq request) throws OCSPException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException {
         BigInteger serialNumber = request.getRequestList()[0].getCertID().getSerialNumber();
         X509Certificate certificate = getCertificateBySerialNumber(serialNumber);
 
@@ -71,8 +116,13 @@ public class RevocationService implements IRevocationService {
 
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
         builder.setProvider("BC");
+        ContentSigner contentSigner;
+        try {
+            contentSigner = builder.build(keyService.readPrivateKey("intermediateCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+        } catch (OperatorCreationException e) {
+            contentSigner = builder.build(keyService.readPrivateKey("rootCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+        }
 
-        ContentSigner contentSigner = builder.build(keyService.readPrivateKey("intermediateCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
 
         X509CertificateHolder[] responseList = new X509CertificateHolder[1];
         responseList[0] = new X509CertificateHolder(certificate.getEncoded());

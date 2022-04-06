@@ -28,14 +28,18 @@ public class CustomCertificate {
     @Column(name = "valid_to")
     @Getter @Setter private Date validTo;
 
+    @Column(name = "issuer_ser_num")
+    @Getter @Setter private BigInteger issuerSerialNumber;
+
     public CustomCertificate() {
     }
 
-    public CustomCertificate(Integer id, BigInteger serialNumber, boolean isRevoked, Date validFrom, Date validTo) {
+    public CustomCertificate(Integer id, BigInteger serialNumber, boolean isRevoked, Date validFrom, Date validTo, BigInteger issuerSerialNumber) {
         this.id = id;
         this.serialNumber = serialNumber;
         this.isRevoked = isRevoked;
         this.validFrom = validFrom;
         this.validTo = validTo;
+        this.issuerSerialNumber = issuerSerialNumber;
     }
 }
