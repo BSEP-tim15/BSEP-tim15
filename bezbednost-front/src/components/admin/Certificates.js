@@ -6,6 +6,7 @@ import validImg from "../../images/valid.png";
 import invalidImg from "../../images/invalid.png";
 import SingleCertificate from "./SingleCertificate";
 import { useToasts } from "react-toast-notifications";
+import Passwords from "../modals/Passwords";
 
 const Certificates = () => {
 
@@ -13,6 +14,7 @@ const Certificates = () => {
 
     const {addToast} = useToasts();
 
+    const [passwordsModal, setPasswordsModal] = useState(false);
     const [singleCertificate, setSingleCertificate] = useState(false);
     const [serialNumber, setSerialNumber] = useState(0);
 
@@ -22,15 +24,25 @@ const Certificates = () => {
     const [revoked, setRevoked] = useState(false);
 
     useEffect(() => {
-        
-        addToast("Please enter password for keystore files in console!", { appearance: "info" });
 
-        axios.get(SERVER_URL + "/certificates?certificateType=" + certificateType)
+        setCertificates([]);
+        setPasswordsModal(true);
+
+    }, [])
+
+    useEffect(() => {
+
+        var certificate = {
+            certificateType: certificateType, 
+            rootPassword: localStorage.rootPassword, 
+            intermediatePassword: localStorage.intermediatePassword, 
+            endEntityPassword: localStorage.endEntityPassword
+        }
+
+        axios.post(SERVER_URL + "/certificates/certificates", certificate)
             .then(response => {
                 setCertificates(response.data);
             })
-
-
 
     }, [certificateType, revoked])
 
@@ -60,7 +72,7 @@ const Certificates = () => {
                     <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{format(certificate.validFrom, 'dd.MM.yyyy.')}</td>
                     <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{format(certificate.validTo, 'dd.MM.yyyy.')}</td>
                     <td onClick={() => showSingleCertificate(certificate.serialNumber)}><img className="icon ms-2" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
-                    <td> { certificate.valid && <button className='btn mt-3 ms-3 w-25' style={{width: "20%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}
+                    <td> { certificate.valid && <button className='btn' style={{height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "15px"}}
                             onClick={() => revokeCertificate(certificate.serialNumber)}> Revoke </button> } </td>
                 </tr>
         ))
@@ -91,13 +103,13 @@ const Certificates = () => {
                     <table className="table mt-4">
                         <thead>
                             <tr>
-                                <th style={{width: "18%"}}>Certificate ID</th>
-                                <th style={{width: "18%"}}>Subject</th>
-                                <th style={{width: "18%"}}>Issuer</th>
-                                <th style={{width: "18%"}}>Valid from</th>
-                                <th style={{width: "18%"}}>Valid to</th>
-                                <th style={{width: "18%"}}>Status</th>
-                                <th style={{width: "18%"}}>Revocation</th>
+                                <th style={{width: "13%"}}>Certificate ID</th>
+                                <th style={{width: "13%"}}>Subject</th>
+                                <th style={{width: "13%"}}>Issuer</th>
+                                <th style={{width: "13%"}}>Valid from</th>
+                                <th style={{width: "13%"}}>Valid to</th>
+                                <th style={{width: "13%"}}>Status</th>
+                                <th style={{width: "13%"}}>Revocation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -107,6 +119,7 @@ const Certificates = () => {
                 </div>
             </div>
 
+            <Passwords modalIsOpen={passwordsModal} setModalIsOpen={setPasswordsModal} />
             <SingleCertificate modalIsOpen={singleCertificate} setModalIsOpen={setSingleCertificate} serialNumber={serialNumber} setSerialNumber={setSerialNumber} />
         </div>
     )

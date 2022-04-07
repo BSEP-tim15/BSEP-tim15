@@ -55,9 +55,8 @@ public class KeyService implements IKeyService {
     }
 
     @Override
-    public Certificate[] getChain(String alias, String fileName) throws KeyStoreException, NoSuchProviderException,
+    public Certificate[] getChain(String alias, String fileName, String password) throws KeyStoreException, NoSuchProviderException,
             IOException, CertificateException, NoSuchAlgorithmException {
-        String password = "sifra";
         KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
         keyStore.load(new FileInputStream(fileName), password.toCharArray());
         if(keyStore.getCertificateChain(alias) != null);

@@ -14,7 +14,7 @@ public interface IKeyService {
     void saveKeyStore(String fileName, char[] password) throws IOException, CertificateException, KeyStoreException,
             NoSuchAlgorithmException;
 
-    Certificate[] getChain(String alias, String fileName) throws KeyStoreException, NoSuchProviderException,
+    Certificate[] getChain(String alias, String fileName, String password) throws KeyStoreException, NoSuchProviderException,
             IOException, CertificateException, NoSuchAlgorithmException;
 
     void writeToKeyStore(String alias, PrivateKey privateKey, char[] password, X509Certificate[] certificates) throws KeyStoreException;

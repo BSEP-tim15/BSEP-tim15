@@ -10,5 +10,5 @@ import java.security.cert.X509Certificate;
 
 public interface ICustomCertificateService {
 
-    void createCustomCertificate(X509Certificate certificate) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
+    void createCustomCertificate(X509Certificate certificate, String type, String password) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
 }

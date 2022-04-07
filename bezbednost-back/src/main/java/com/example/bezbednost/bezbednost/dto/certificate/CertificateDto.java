@@ -1,4 +1,4 @@
-package com.example.bezbednost.bezbednost.dto;
+package com.example.bezbednost.bezbednost.dto.certificate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,16 +30,33 @@ public class CertificateDto {
 
     @Getter @Setter private boolean valid;
 
+    @Getter @Setter private String rootPassword;
+
+    @Getter @Setter private String intermediatePassword;
+
+    @Getter @Setter private String endEntityPassword;
+
 
     public CertificateDto() { }
 
-    public CertificateDto(String certificateType, String issuer, String subject, Date validFrom, Date validTo, String purpose) {
+    public CertificateDto(BigInteger serialNumber, String certificateType, String issuer, String subject, Date validFrom,
+                          Date validTo, String purpose, String keyUsage, String issuerAlternativeName,
+                          String subjectAlternativeName, boolean valid, String rootPassword, String intermediatePassword,
+                          String endEntityPassword) {
+        this.serialNumber = serialNumber;
         this.certificateType = certificateType;
         this.issuer = issuer;
         this.subject = subject;
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.purpose = purpose;
+        this.keyUsage = keyUsage;
+        this.issuerAlternativeName = issuerAlternativeName;
+        this.subjectAlternativeName = subjectAlternativeName;
+        this.valid = valid;
+        this.rootPassword = rootPassword;
+        this.intermediatePassword = intermediatePassword;
+        this.endEntityPassword = endEntityPassword;
     }
 
     public CertificateDto(BigInteger serialNumber, String issuer, String subject, Date validFrom, Date validTo,

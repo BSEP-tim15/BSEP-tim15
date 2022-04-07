@@ -1,7 +1,11 @@
 package com.example.bezbednost.bezbednost.service;
 
-import com.example.bezbednost.bezbednost.dto.CertificateDto;
-import com.example.bezbednost.bezbednost.iservice.ICustomCertificateService;
+import com.example.bezbednost.bezbednost.dto.FileDto;
+import com.example.bezbednost.bezbednost.dto.PasswordsDto;
+import com.example.bezbednost.bezbednost.dto.certificate.CertificateDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateBySomeoneDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -37,50 +41,50 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     @Override
-    public List<CertificateDto> getCertificates(String certificateType) throws KeyStoreException,
+    public List<CertificateDto> getCertificates(GetCertificateDto certificate) throws KeyStoreException,
             NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException {
-        String fileName = getFileName(certificateType);
-        if(fileName.equals("all")){
-            return getAllCertificates();
+        FileDto file = getFileInfo(certificate);
+        if(file.getFileName().equals("all")){
+            return getAllCertificates(new PasswordsDto(certificate.getRootPassword(), certificate.getIntermediatePassword(), certificate.getEndEntityPassword()));
         }
         else {
-            return getCertificatesFromFile(fileName);
+            return getCertificatesFromFile(file);
         }
     }
 
-    private List<CertificateDto> getAllCertificates() throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException {
+    private List<CertificateDto> getAllCertificates(PasswordsDto passwords) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         String rootFile = "rootCertificates.jsk";
         String intermediateFile = "intermediateCertificates.jsk";
         String endEntityFile = "end-entityCertificates.jsk";
 
-        return Stream.of(getCertificatesFromFile(rootFile), getCertificatesFromFile(intermediateFile), getCertificatesFromFile(endEntityFile))
+        return Stream.of(getCertificatesFromFile(new FileDto(rootFile, passwords.getRootPassword())),
+                        getCertificatesFromFile(new FileDto(intermediateFile, passwords.getIntermediatePassword())),
+                        getCertificatesFromFile(new FileDto(endEntityFile, passwords.getEndEntityPassword())))
                 .flatMap(Collection::stream).collect(Collectors.toList());
     }
 
-    private String getFileName(String certificateType){
-        if(Objects.equals(certificateType, "root")){
-            return "rootCertificates.jsk";
+    private FileDto getFileInfo(GetCertificateDto certificate){
+        if(Objects.equals(certificate.getCertificateType(), "root")){
+            return new FileDto("rootCertificates.jsk", certificate.getRootPassword());
         }
-        else if(Objects.equals(certificateType, "intermediate")){
-            return "intermediateCertificates.jsk";
+        else if(Objects.equals(certificate.getCertificateType(), "intermediate")){
+            return new FileDto("intermediateCertificates.jsk", certificate.getIntermediatePassword());
         }
-        else if(Objects.equals(certificateType, "end-entity")){
-            return "end-entityCertificates.jsk";
+        else if(Objects.equals(certificate.getCertificateType(), "end-entity")){
+            return new FileDto("end-entityCertificates.jsk", certificate.getEndEntityPassword());
         }
         else {
-            return "all";
+            return new FileDto("all", "");
         }
     }
 
-    private List<CertificateDto> getCertificatesFromFile(String fileName) throws
+    private List<CertificateDto> getCertificatesFromFile(FileDto file) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> certificates = new ArrayList<>();
         try{
-            //char[] password = getFilePassword(fileName);
-            char[] password = "sifra".toCharArray();
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
-            keyStore.load(new FileInputStream(fileName), password);
+            keyStore.load(new FileInputStream(file.getFileName()), file.getPassword().toCharArray());
             Enumeration<String> aliases = keyStore.aliases();
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
@@ -90,7 +94,7 @@ public class GetCertificateService implements IGetCertificateService {
                         getExtension(cert, "issuerAlternativeName"), getExtension(cert, "subjectAlternativeName"),
                         revocationService.checkIfCertificateIsValid(cert.getSerialNumber()));
 
-                certificateDTO.setCertificateType(getCertificateType(fileName));
+                certificateDTO.setCertificateType(getCertificateType(file.getFileName()));
                 certificates.add(certificateDTO);
             }
         } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e){
@@ -143,13 +147,6 @@ public class GetCertificateService implements IGetCertificateService {
         return null;
     }
 
-    private char[] getFilePassword(String file){
-        System.out.println("Please enter file password (" + file + ") :");
-        Scanner scanner = new Scanner(System.in);
-        String password = scanner.nextLine();
-        return password.toCharArray();
-    }
-
     private String getCertificateType(String fileName) {
         if(fileName.contains("root")) {
             return "root";
@@ -163,23 +160,23 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     @Override
-    public List<String> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException,
+    public List<String> getIssuers(PasswordsDto passwords) throws CertificateException, IOException, NoSuchAlgorithmException,
             KeyStoreException, NoSuchProviderException {
         List<String> issuers = new ArrayList<>();
-        for(CertificateDto certificate : getAllCertificates()){
+        for(CertificateDto certificate : getAllCertificates(passwords)){
             String issuer = certificate.getIssuer().replace("CN=", "");
             if(!isIssuerAdded(issuers, issuer))
                 issuers.add(issuer);
         }
-        issuers.addAll(getIntermediateCertificatesSubjects());
+        issuers.addAll(getIntermediateCertificatesSubjects(passwords));
 
         return issuers;
     }
 
-    private List<String> getIntermediateCertificatesSubjects() throws CertificateException, IOException, NoSuchAlgorithmException,
+    private List<String> getIntermediateCertificatesSubjects(PasswordsDto passwords) throws CertificateException, IOException, NoSuchAlgorithmException,
             KeyStoreException, NoSuchProviderException {
         List<String> issuers = new ArrayList<>();
-        for(CertificateDto certificate : getAllCertificates()){
+        for(CertificateDto certificate : getAllCertificates(passwords)){
             String issuer = certificate.getSubject().replace("CN=", "");
             if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer))
                 issuers.add(issuer);
@@ -193,11 +190,12 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     @Override
-    public List<CertificateDto> getCertificatesBySubject(String subject) throws CertificateException, IOException,
-            NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+    public List<CertificateDto> getCertificatesBySubject(GetCertificateBySomeoneDto certificateDto) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> subjectCertificates = new ArrayList<>();
-        for(CertificateDto certificate : getAllCertificates()){
-            String subjectUsername = "CN=" + subject;
+        for(CertificateDto certificate :
+                getAllCertificates(new PasswordsDto(certificateDto.getRootPassword(), certificateDto.getIntermediatePassword(), certificateDto.getEndEntityPassword()))){
+            String subjectUsername = "CN=" + certificateDto.getSomeone();
             if(Objects.equals(subjectUsername, certificate.getSubject())){
                 subjectCertificates.add(certificate);
             }
@@ -207,9 +205,9 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     @Override
-    public Date getMaxDateForCertificate(String issuer) throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException {
-        List<CertificateDto> issuerCertificates = getCertificatesBySubject(issuer);
+    public Date getMaxDateForCertificate(GetCertificateBySomeoneDto certificateDto) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        List<CertificateDto> issuerCertificates = getCertificatesBySubject(certificateDto);
         Date maxDate = issuerCertificates.get(0).getValidTo();
         for (CertificateDto certificate : issuerCertificates) {
             if(certificate.getValidTo().before(maxDate)){
@@ -221,10 +219,11 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     @Override
-    public CertificateDto getCertificateBySerialNumber(BigInteger serialNumber) throws CertificateException, IOException,
-            NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
-        for(CertificateDto certificate : getAllCertificates()){
-            if(Objects.equals(certificate.getSerialNumber(), serialNumber)){
+    public CertificateDto getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) throws
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+        for(CertificateDto certificate :
+                getAllCertificates(new PasswordsDto(certificateDto.getRootPassword(), certificateDto.getIntermediatePassword(), certificateDto.getEndEntityPassword()))){
+            if(Objects.equals(certificate.getSerialNumber(), certificateDto.getSerialNumber())){
                 return certificate;
             }
         }
@@ -233,20 +232,20 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     @Override
-    public BigInteger getSerialNumberOfParentCertificate(BigInteger serialNumber) throws
+    public BigInteger getSerialNumberOfParentCertificate(GetSingleCertificateDto certificateDto) throws
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
-        Certificate[] certificates = getCertificateChain(serialNumber);
+        Certificate[] certificates = getCertificateChain(certificateDto);
         X509Certificate parentCertificate = (X509Certificate)certificates[1];
         return parentCertificate.getSerialNumber();
     }
 
-    private Certificate[] getCertificateChain(BigInteger serialNumber) throws
+    private Certificate[] getCertificateChain(GetSingleCertificateDto certificateDto) throws
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
-        Certificate[] certificates = keyService.getChain(serialNumber.toString(), "rootCertificates.jsk");
+        Certificate[] certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "rootCertificates.jsk", certificateDto.getRootPassword());
         if(certificates == null){
-            certificates = keyService.getChain(serialNumber.toString(), "intermediateCertificates.jsk");
+            certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "intermediateCertificates.jsk", certificateDto.getIntermediatePassword());
             if(certificates == null){
-                certificates = keyService.getChain(serialNumber.toString(), "end-entityCertificates.jsk");
+                certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "end-entityCertificates.jsk", certificateDto.getEndEntityPassword());
             }
         }
         return certificates;

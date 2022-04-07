@@ -1,6 +1,10 @@
 package com.example.bezbednost.bezbednost.iservice;
 
-import com.example.bezbednost.bezbednost.dto.CertificateDto;
+import com.example.bezbednost.bezbednost.dto.PasswordsDto;
+import com.example.bezbednost.bezbednost.dto.certificate.CertificateDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateBySomeoneDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -13,21 +17,21 @@ import java.util.List;
 
 public interface IGetCertificateService {
 
-    List<CertificateDto> getCertificates(String certificateType) throws CertificateException,
+    List<CertificateDto> getCertificates(GetCertificateDto certificate) throws CertificateException,
             IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 
-    List<String> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException,
+    List<String> getIssuers(PasswordsDto passwords) throws CertificateException, IOException, NoSuchAlgorithmException,
             KeyStoreException, NoSuchProviderException;
 
-    List<CertificateDto> getCertificatesBySubject(String subject) throws CertificateException, IOException,
+    List<CertificateDto> getCertificatesBySubject(GetCertificateBySomeoneDto certificateDto) throws CertificateException, IOException,
             NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 
-    Date getMaxDateForCertificate(String issuer) throws CertificateException, IOException, NoSuchAlgorithmException,
+    Date getMaxDateForCertificate(GetCertificateBySomeoneDto certificateDto) throws CertificateException, IOException, NoSuchAlgorithmException,
             KeyStoreException, NoSuchProviderException;
 
-    CertificateDto getCertificateBySerialNumber(BigInteger serialNumber) throws CertificateException, IOException,
+    CertificateDto getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) throws CertificateException, IOException,
             NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 
-    BigInteger getSerialNumberOfParentCertificate(BigInteger serialNumber) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
+    BigInteger getSerialNumberOfParentCertificate(GetSingleCertificateDto certificateDto) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
 
 }
