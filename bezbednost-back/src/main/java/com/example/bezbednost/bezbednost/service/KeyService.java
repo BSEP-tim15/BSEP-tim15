@@ -87,20 +87,15 @@ public class KeyService implements IKeyService {
     }
 
     @Override
-    public Certificate readCertificate(String keyStoreFile, String keyStorePass, String alias) {
+    public Certificate readCertificate(String fileName, String alias) {
+        String keyStorePass = "sifra";
         try {
-            keyStore = KeyStore.getInstance("JKS", "SUN");
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
+            KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
             keyStore.load(in, keyStorePass.toCharArray());
 
             if (keyStore.isKeyEntry(alias)) {
                 return keyStore.getCertificate(alias);
-            } else {
-                in = new BufferedInputStream(new FileInputStream("rootCertificates.jsk"));
-                keyStore.load(in, keyStorePass.toCharArray());
-                if (keyStore.isKeyEntry(alias)) {
-                    return  keyStore.getCertificate(alias);
-                }
             }
 
         } catch (KeyStoreException | CertificateException | NoSuchProviderException | IOException | NoSuchAlgorithmException e) {

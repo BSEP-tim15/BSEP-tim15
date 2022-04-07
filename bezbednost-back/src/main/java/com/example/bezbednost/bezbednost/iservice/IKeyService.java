@@ -21,5 +21,5 @@ public interface IKeyService {
 
     PrivateKey readPrivateKey(String keyStoreFile, String keyStorePass, String alias, String pass) throws KeyStoreException, NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
 
-    Certificate readCertificate(String keyStoreFile, String keyStorePass, String alias);
+    Certificate readCertificate(String fileName, String alias);
 }

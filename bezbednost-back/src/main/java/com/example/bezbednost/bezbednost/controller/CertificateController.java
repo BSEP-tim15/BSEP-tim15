@@ -91,14 +91,24 @@ public class CertificateController {
         return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(serialNumber), HttpStatus.OK);
     }
 
+//    @GetMapping("/validate/{serialNumber}")
+//    public ResponseEntity<?> validateCertificate(@PathVariable BigInteger serialNumber) {
+//        try {
+//            boolean isValid = revocationService.checkIfCertificateIsValid(serialNumber);
+//            return ResponseEntity.ok(isValid);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
     @GetMapping("/validate/{serialNumber}")
-    public ResponseEntity<?> validateCertificate(@PathVariable BigInteger serialNumber) {
+    public boolean validateCertificate(@PathVariable BigInteger serialNumber) {
         try {
-            boolean isValid = revocationService.checkIfCertificateIsValid(serialNumber);
-            return ResponseEntity.ok(isValid);
+            return revocationService.checkIfCertificateIsValid(serialNumber);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return false;
         }
     }
 

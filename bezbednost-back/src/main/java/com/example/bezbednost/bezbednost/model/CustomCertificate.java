@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.util.Date;
 
 @Entity
 @Table(name = "certificates")
@@ -22,24 +21,22 @@ public class CustomCertificate {
     @Column(name = "is_revoked")
     @Getter @Setter private boolean isRevoked;
 
-    @Column(name = "valid_from")
-    @Getter @Setter private Date validFrom;
-
-    @Column(name = "valid_to")
-    @Getter @Setter private Date validTo;
-
     @Column(name = "issuer_ser_num")
     @Getter @Setter private BigInteger issuerSerialNumber;
 
     public CustomCertificate() {
     }
 
-    public CustomCertificate(Integer id, BigInteger serialNumber, boolean isRevoked, Date validFrom, Date validTo, BigInteger issuerSerialNumber) {
+    public CustomCertificate(Integer id, BigInteger serialNumber, boolean isRevoked, BigInteger issuerSerialNumber) {
         this.id = id;
         this.serialNumber = serialNumber;
         this.isRevoked = isRevoked;
-        this.validFrom = validFrom;
-        this.validTo = validTo;
+        this.issuerSerialNumber = issuerSerialNumber;
+    }
+
+    public CustomCertificate(BigInteger serialNumber, boolean isRevoked, BigInteger issuerSerialNumber) {
+        this.serialNumber = serialNumber;
+        this.isRevoked = isRevoked;
         this.issuerSerialNumber = issuerSerialNumber;
     }
 }

@@ -1,12 +1,16 @@
 package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.dto.CertificateDto;
+import com.example.bezbednost.bezbednost.iservice.ICustomCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
+import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -29,6 +30,11 @@ import java.util.stream.Stream;
 @Service
 public class GetCertificateService implements IGetCertificateService {
     private final KeyService keyService = new KeyService();
+    private final IRevocationService revocationService;
+
+    public GetCertificateService(IRevocationService revocationService) {
+        this.revocationService = revocationService;
+    }
 
     @Override
     public List<CertificateDto> getCertificates(String certificateType) throws KeyStoreException,
@@ -81,12 +87,19 @@ public class GetCertificateService implements IGetCertificateService {
                 X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
                 CertificateDto certificateDTO = new CertificateDto(cert.getSerialNumber(), cert.getIssuerDN().toString(),
                         cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter(),
-                        getExtension(cert, "issuerAlternativeName"), getExtension(cert, "subjectAlternativeName"));
+                        getExtension(cert, "issuerAlternativeName"), getExtension(cert, "subjectAlternativeName"),
+                        revocationService.checkIfCertificateIsValid(cert.getSerialNumber()));
 
                 certificateDTO.setCertificateType(getCertificateType(fileName));
                 certificates.add(certificateDTO);
             }
         } catch (FileNotFoundException e){
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (OCSPException e) {
+            e.printStackTrace();
+        } catch (OperatorCreationException e) {
             e.printStackTrace();
         }
 

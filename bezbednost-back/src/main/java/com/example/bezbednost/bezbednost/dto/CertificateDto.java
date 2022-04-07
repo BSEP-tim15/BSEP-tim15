@@ -28,6 +28,8 @@ public class CertificateDto {
 
     @Getter @Setter private String subjectAlternativeName;
 
+    @Getter @Setter private boolean valid;
+
 
     public CertificateDto() { }
 
@@ -49,6 +51,18 @@ public class CertificateDto {
         this.validTo = validTo;
         this.issuerAlternativeName = issuerAlternativeName;
         this.subjectAlternativeName = subjectAlternativeName;
+    }
+
+    public CertificateDto(BigInteger serialNumber, String issuer, String subject, Date validFrom, Date validTo,
+                          String issuerAlternativeName, String subjectAlternativeName, boolean valid) {
+        this.serialNumber = serialNumber;
+        this.issuer = issuer;
+        this.subject = subject;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.issuerAlternativeName = issuerAlternativeName;
+        this.subjectAlternativeName = subjectAlternativeName;
+        this.valid = valid;
     }
 
 }

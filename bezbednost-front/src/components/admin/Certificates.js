@@ -19,6 +19,8 @@ const Certificates = () => {
     const [certificateType, setCertificateType] = useState("");
     const [certificates, setCertificates] = useState([]);
 
+    const [valid, setValid] = useState(false);
+
     useEffect(() => {
         
         addToast("Please enter password for keystore files in console!", { appearance: "info" });
@@ -28,12 +30,23 @@ const Certificates = () => {
                 setCertificates(response.data);
             })
 
+
+
     }, [certificateType])
 
     const showSingleCertificate = (serialNumber) => {
         setSerialNumber(serialNumber);
         setSingleCertificate(true);
     }
+
+    // function checkIsValid(serialNumber) {
+    //     axios.get(SERVER_URL + "/certificates/validate/" + serialNumber)
+    //     .then(response => {
+    //         console.log(response.data)
+    //         return response.data
+            
+    //     })
+    // }
 
     const allCertificates = (
         certificates.map(certificate => (

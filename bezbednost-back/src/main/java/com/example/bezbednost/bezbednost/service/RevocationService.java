@@ -132,7 +132,15 @@ public class RevocationService implements IRevocationService {
     }
 
     private X509Certificate getCertificateBySerialNumber(BigInteger serialNumber) {
-        return (X509Certificate) keyService.readCertificate("intermediateCertificates.jsk", "sifra", serialNumber.toString());
+        X509Certificate certificate = (X509Certificate) keyService.readCertificate("rootCertificates.jsk", serialNumber.toString());
+        if (certificate == null) {
+            if (keyService.readCertificate("intermediateCertificates.jsk", serialNumber.toString()) != null) {
+                certificate = (X509Certificate) keyService.readCertificate("intermediateCertificates.jsk", serialNumber.toString());
+            }
+            return certificate;
+        } else {
+            return certificate;
+        }
     }
 
     private boolean isCertificateRevoked(BigInteger serialNumber) {
