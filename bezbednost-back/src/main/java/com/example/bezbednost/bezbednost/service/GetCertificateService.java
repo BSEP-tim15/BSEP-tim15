@@ -93,13 +93,7 @@ public class GetCertificateService implements IGetCertificateService {
                 certificateDTO.setCertificateType(getCertificateType(fileName));
                 certificates.add(certificateDTO);
             }
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
-        } catch (OCSPException e) {
-            e.printStackTrace();
-        } catch (OperatorCreationException e) {
+        } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e){
             e.printStackTrace();
         }
 

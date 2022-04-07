@@ -5,7 +5,6 @@ import com.example.bezbednost.bezbednost.iservice.ICustomCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IKeyToolService;
 import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
-import com.example.bezbednost.bezbednost.model.CustomCertificate;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -15,12 +14,10 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -86,7 +83,6 @@ public class PostCertificateService implements IPostCertificateService {
             throw new CertificateException("Certificate not trusted",e);
         }
         System.out.println("\nValidacija uspesna :)");
-        //customCertificateService.save(new CustomCertificate(certificateDTO.getSerialNumber(), false, ));
         saveCertificate(certificate, keyPair.getPrivate(), certificateDTO.getCertificateType());
     }
 
@@ -129,22 +125,6 @@ public class PostCertificateService implements IPostCertificateService {
                 chainAlias = alias;
                 PrivateKey privateKey = keyService.readPrivateKey(fileName, password, alias, password);
                 return new KeyPair(cert.getPublicKey(), privateKey);
-            }
-        }
-        return null;
-    }
-
-    private BigInteger findIssuerSerialNumber(String issuer) throws KeyStoreException, NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException {
-        String password = "sifra";
-        KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream("rootCertificates.jsk"));
-        keyStore.load(in, password.toCharArray());
-        Enumeration<String> aliases = keyStore.aliases();
-        while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
-            if (certificate.getSubjectDN().toString().equals("CN=" + issuer)) {
-                //return
             }
         }
         return null;
@@ -223,6 +203,7 @@ public class PostCertificateService implements IPostCertificateService {
         keyService.writeToKeyStore(String.valueOf(certificate.getSerialNumber()), privateKey,
                 password, certificates);
         keyService.saveKeyStore(fileName, password);
+        customCertificateService.createCustomCertificate(certificate);
     }
 
     private char[] getFilePassword(String file){

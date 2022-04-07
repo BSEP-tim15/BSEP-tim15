@@ -120,7 +120,11 @@ public class RevocationService implements IRevocationService {
         try {
             contentSigner = builder.build(keyService.readPrivateKey("intermediateCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
         } catch (OperatorCreationException e) {
-            contentSigner = builder.build(keyService.readPrivateKey("rootCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+            try {
+                contentSigner = builder.build(keyService.readPrivateKey("rootCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+            } catch (OperatorCreationException ex) {
+                contentSigner = builder.build(keyService.readPrivateKey("end-entityCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+            }
         }
 
 
@@ -136,6 +140,8 @@ public class RevocationService implements IRevocationService {
         if (certificate == null) {
             if (keyService.readCertificate("intermediateCertificates.jsk", serialNumber.toString()) != null) {
                 certificate = (X509Certificate) keyService.readCertificate("intermediateCertificates.jsk", serialNumber.toString());
+            } else {
+                certificate = (X509Certificate) keyService.readCertificate("end-entityCertificates.jsk", serialNumber.toString());
             }
             return certificate;
         } else {

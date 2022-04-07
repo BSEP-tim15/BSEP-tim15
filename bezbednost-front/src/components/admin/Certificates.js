@@ -19,7 +19,7 @@ const Certificates = () => {
     const [certificateType, setCertificateType] = useState("");
     const [certificates, setCertificates] = useState([]);
 
-    const [valid, setValid] = useState(false);
+    const [revoked, setRevoked] = useState(false);
 
     useEffect(() => {
         
@@ -32,21 +32,24 @@ const Certificates = () => {
 
 
 
-    }, [certificateType])
+    }, [certificateType, revoked])
 
     const showSingleCertificate = (serialNumber) => {
         setSerialNumber(serialNumber);
         setSingleCertificate(true);
     }
 
-    // function checkIsValid(serialNumber) {
-    //     axios.get(SERVER_URL + "/certificates/validate/" + serialNumber)
-    //     .then(response => {
-    //         console.log(response.data)
-    //         return response.data
-            
-    //     })
-    // }
+    const revokeCertificate = (serialNumber) => {
+        var serialNumberDto = {
+            serialNumber: serialNumber
+        }
+
+        axios.post(SERVER_URL + "/certificates/revoke", serialNumberDto)
+            .then(response => {
+                console.log(response.data);
+                setRevoked(!revoked);
+            });
+    }
 
     const allCertificates = (
         certificates.map(certificate => (
@@ -57,6 +60,8 @@ const Certificates = () => {
                     <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{format(certificate.validFrom, 'dd.MM.yyyy.')}</td>
                     <td onClick={() => showSingleCertificate(certificate.serialNumber)}>{format(certificate.validTo, 'dd.MM.yyyy.')}</td>
                     <td onClick={() => showSingleCertificate(certificate.serialNumber)}><img className="icon ms-2" src={`${certificate.valid ? validImg : invalidImg}`}/></td>
+                    <td> { certificate.valid && <button className='btn mt-3 ms-3 w-25' style={{width: "20%", height: "35px", backgroundColor: "#4a6560", color: "white", borderRadius: "20px"}}
+                            onClick={() => revokeCertificate(certificate.serialNumber)}> Revoke </button> } </td>
                 </tr>
         ))
     )
@@ -92,6 +97,7 @@ const Certificates = () => {
                                 <th style={{width: "18%"}}>Valid from</th>
                                 <th style={{width: "18%"}}>Valid to</th>
                                 <th style={{width: "18%"}}>Status</th>
+                                <th style={{width: "18%"}}>Revocation</th>
                             </tr>
                         </thead>
                         <tbody>
