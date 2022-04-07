@@ -61,7 +61,7 @@ public class CertificateController {
     }
 
     @GetMapping("/issuers")
-    public ResponseEntity<List<String>> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+    public ResponseEntity<List<String>> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         return new ResponseEntity<>(getCertificateService.getIssuers(), HttpStatus.OK);
     }
 

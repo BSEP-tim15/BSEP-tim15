@@ -164,11 +164,11 @@ public class GetCertificateService implements IGetCertificateService {
 
     @Override
     public List<String> getIssuers() throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException {
+            KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         List<String> issuers = new ArrayList<>();
         for(CertificateDto certificate : getAllCertificates()){
             String issuer = certificate.getIssuer().replace("CN=", "");
-            if(!isIssuerAdded(issuers, issuer))
+            if(!isIssuerAdded(issuers, issuer) && revocationService.checkIfCertificateIsValid(certificate.getSerialNumber()))
                 issuers.add(issuer);
         }
         issuers.addAll(getIntermediateCertificatesSubjects());
@@ -177,11 +177,12 @@ public class GetCertificateService implements IGetCertificateService {
     }
 
     private List<String> getIntermediateCertificatesSubjects() throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException {
+            KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         List<String> issuers = new ArrayList<>();
         for(CertificateDto certificate : getAllCertificates()){
             String issuer = certificate.getSubject().replace("CN=", "");
-            if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer))
+            if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer) &&
+                    revocationService.checkIfCertificateIsValid(certificate.getSerialNumber()))
                 issuers.add(issuer);
         }
 
