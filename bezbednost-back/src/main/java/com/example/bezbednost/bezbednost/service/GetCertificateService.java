@@ -170,25 +170,30 @@ public class GetCertificateService implements IGetCertificateService {
 
     @Override
     public List<String> getIssuers(PasswordsDto passwords) throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException {
+            KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         List<String> issuers = new ArrayList<>();
         for(CertificateDto certificate : getAllCertificates(passwords)){
             String issuer = certificate.getIssuer().replace("CN=", "");
-            if(!isIssuerAdded(issuers, issuer) && revocationService.checkIfCertificateIsValid(certificate.getSerialNumber()))
+            GetSingleCertificateDto certificateDto = new GetSingleCertificateDto(
+                    certificate.getSerialNumber(), passwords.getRootPassword(), passwords.getIntermediatePassword(), passwords.getEndEntityPassword()
+            );
+            if(!isIssuerAdded(issuers, issuer) && revocationService.checkIfCertificateIsValid(certificateDto))
                 issuers.add(issuer);
         }
-        issuers.addAll(getIntermediateCertificatesSubjects(passwords));
+        issuers = getIntermediateCertificatesSubjects(passwords, issuers);
 
         return issuers;
     }
 
-    private List<String> getIntermediateCertificatesSubjects(PasswordsDto passwords) throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException {
-        List<String> issuers = new ArrayList<>();
+    private List<String> getIntermediateCertificatesSubjects(PasswordsDto passwords, List<String> issuers) throws CertificateException, IOException, NoSuchAlgorithmException,
+            KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         for(CertificateDto certificate : getAllCertificates(passwords)){
             String issuer = certificate.getSubject().replace("CN=", "");
+            GetSingleCertificateDto certificateDto = new GetSingleCertificateDto(
+                    certificate.getSerialNumber(), passwords.getRootPassword(), passwords.getIntermediatePassword(), passwords.getEndEntityPassword()
+            );
             if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer) &&
-                    revocationService.checkIfCertificateIsValid(certificate.getSerialNumber()))
+                    revocationService.checkIfCertificateIsValid(certificateDto))
                 issuers.add(issuer);
         }
 

@@ -5,7 +5,6 @@ import com.example.bezbednost.bezbednost.dto.certificate.CertificateDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateBySomeoneDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
-import com.example.bezbednost.bezbednost.dto.CertificateDto;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.operator.OperatorCreationException;
 
@@ -25,7 +24,7 @@ public interface IGetCertificateService {
             IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;
 
     List<String> getIssuers(PasswordsDto passwords) throws CertificateException, IOException, NoSuchAlgorithmException,
-            KeyStoreException, NoSuchProviderException;
+            KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException;
 
     List<CertificateDto> getCertificatesBySubject(GetCertificateBySomeoneDto certificateDto) throws CertificateException, IOException,
             NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException;

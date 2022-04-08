@@ -14,7 +14,6 @@ const Certificates = () => {
 
     const {addToast} = useToasts();
 
-    const [passwordsModal, setPasswordsModal] = useState(false);
     const [singleCertificate, setSingleCertificate] = useState(false);
     const [serialNumber, setSerialNumber] = useState(0);
 
@@ -22,13 +21,6 @@ const Certificates = () => {
     const [certificates, setCertificates] = useState([]);
 
     const [revoked, setRevoked] = useState(false);
-
-    useEffect(() => {
-
-        setCertificates([]);
-        setPasswordsModal(true);
-
-    }, [])
 
     useEffect(() => {
 
@@ -53,7 +45,10 @@ const Certificates = () => {
 
     const revokeCertificate = (serialNumber) => {
         var serialNumberDto = {
-            serialNumber: serialNumber
+            serialNumber: serialNumber,
+            rootPassword: localStorage.rootPassword, 
+            intermediatePassword: localStorage.intermediatePassword, 
+            endEntityPassword: localStorage.endEntityPassword
         }
 
         axios.post(SERVER_URL + "/certificates/revoke", serialNumberDto)
@@ -119,7 +114,6 @@ const Certificates = () => {
                 </div>
             </div>
 
-            <Passwords modalIsOpen={passwordsModal} setModalIsOpen={setPasswordsModal} />
             <SingleCertificate modalIsOpen={singleCertificate} setModalIsOpen={setSingleCertificate} serialNumber={serialNumber} setSerialNumber={setSerialNumber} />
         </div>
     )

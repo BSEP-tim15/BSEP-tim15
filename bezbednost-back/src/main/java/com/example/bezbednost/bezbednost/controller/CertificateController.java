@@ -11,6 +11,7 @@ import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ public class CertificateController {
 
     @PostMapping("/issuers")
     public ResponseEntity<List<String>> getIssuers(@RequestBody PasswordsDto passwords) throws
-            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         return new ResponseEntity<>(getCertificateService.getIssuers(passwords), HttpStatus.OK);
     }
 

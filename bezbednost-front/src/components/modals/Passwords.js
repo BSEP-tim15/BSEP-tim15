@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
+import { useNavigate } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
+import axios from 'axios';
 
-const Passwords = ({modalIsOpen, setModalIsOpen}) => {
+const Passwords = ({modalIsOpen, setModalIsOpen, credentials}) => {
+
+    const navigate = useNavigate();
 
     const [passwords, setPasswords] = useState({root: "", intermediate: "", endEntity: ""});
 
@@ -17,6 +22,8 @@ const Passwords = ({modalIsOpen, setModalIsOpen}) => {
         localStorage.setItem('intermediatePassword', passwords.intermediate);
         localStorage.setItem('endEntityPassword', passwords.endEntity);
         setModalIsOpen(false);
+        navigate("/certificates");
+        
     }
 
     return (
@@ -29,13 +36,13 @@ const Passwords = ({modalIsOpen, setModalIsOpen}) => {
                         <h4 className='card-title' style={{marginTop: "-20px"}}>Passwords</h4>
                         <div className='title-underline'/>
                         <form onSubmit={(e) => submitPasswords(e)}>
-                            <label className='form-label mt-5'>Password for file with root certificates</label>
+                            <label className='form-label mt-5'>Password for file with <b>root certificates</b></label>
                             <input className='form-control' type="password" required 
                                 value={passwords.root} onChange={(e) => setPasswords(() => {return {...passwords, root: e.target.value}})} />
-                            <label className='form-label mt-3'>Password for file with intermediate certificates</label>
+                            <label className='form-label mt-3'>Password for file with <b>intermediate certificates</b></label>
                             <input className='form-control' type="password" required 
                                 value={passwords.intermediate} onChange={(e) => setPasswords(() => {return {...passwords, intermediate: e.target.value}})} />
-                                <label className='form-label mt-3'>Password for file with end-entity certificates</label>
+                                <label className='form-label mt-3'>Password for file with <b>end-entity certificates</b></label>
                             <input className='form-control' type="password" required 
                                 value={passwords.endEntity} onChange={(e) => setPasswords(() => {return {...passwords, endEntity: e.target.value}})} />
                             <button  className='btn mt-5 w-25' 
