@@ -24,4 +24,10 @@ public class GetSingleCertificateDto {
         this.intermediatePassword = intermediatePassword;
         this.endEntityPassword = endEntityPassword;
     }
+
+    public GetSingleCertificateDto(String rootPassword, String intermediatePassword, String endEntityPassword) {
+        this.rootPassword = rootPassword;
+        this.intermediatePassword = intermediatePassword;
+        this.endEntityPassword = endEntityPassword;
+    }
 }

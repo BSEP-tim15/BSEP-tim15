@@ -93,9 +93,9 @@ public class CertificateController {
     }
 
     @GetMapping("/validate/{serialNumber}")
-    public ResponseEntity<?> validateCertificate(@PathVariable BigInteger serialNumber) {
+    public ResponseEntity<?> validateCertificate(@PathVariable GetSingleCertificateDto certificateDto) {
         try {
-            boolean isValid = revocationService.checkIfCertificateIsValid(serialNumber);
+            boolean isValid = revocationService.checkIfCertificateIsValid(certificateDto);
             return ResponseEntity.ok(isValid);
         } catch (Exception e) {
             e.printStackTrace();

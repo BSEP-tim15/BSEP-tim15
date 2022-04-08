@@ -1,5 +1,7 @@
 package com.example.bezbednost.bezbednost.service;
 
+import com.example.bezbednost.bezbednost.dto.PasswordsDto;
+import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
 import com.example.bezbednost.bezbednost.model.CustomCertificate;
@@ -34,19 +36,20 @@ public class RevocationService implements IRevocationService {
     }
 
     @Override
-    public boolean checkIfCertificateIsValid(BigInteger serialNumber) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException {
-        CustomCertificate certificate = customCertificateRepository.getBySerialNumber(serialNumber);
-        if (checkIfCertificateIsRevoked(serialNumber)) return false;
+    public boolean checkIfCertificateIsValid(GetSingleCertificateDto certificateDto) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException {
+        CustomCertificate certificate = customCertificateRepository.getBySerialNumber(certificateDto.getSerialNumber());
+        if (checkIfCertificateIsRevoked(certificateDto)) return false;
 
         if (certificate.getIssuerSerialNumber().longValue() == 0)
-            return isRootCertificateValid(certificate);
+            return isRootCertificateValid(certificateDto);
         else
-            return isCertificateValid(certificate);
+            return isCertificateValid(certificate, certificateDto);
     }
 
     @Override
-    public boolean checkIfCertificateIsRevoked(BigInteger serialNumber) throws OperatorCreationException, CertificateException, IOException, OCSPException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
-        X509Certificate certificate = getCertificateBySerialNumber(serialNumber);
+    public boolean checkIfCertificateIsRevoked(GetSingleCertificateDto certificateDto) throws
+            OperatorCreationException, CertificateException, IOException, OCSPException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException {
+        X509Certificate certificate = getCertificateBySerialNumber(certificateDto);
 
         DigestCalculatorProvider digestCalculatorProvider = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
 
@@ -55,7 +58,7 @@ public class RevocationService implements IRevocationService {
         reqBuilder.addRequest(id);
 
         OCSPReq request = reqBuilder.build();
-        BasicOCSPResp response = getOCSPResponse(request);
+        BasicOCSPResp response = getOCSPResponse(request, certificateDto);
 
         System.out.println(response.getResponses()[0].getCertStatus() != null ? "Revoked" : "Good");
 
@@ -70,8 +73,8 @@ public class RevocationService implements IRevocationService {
         customCertificateRepository.save(certificate);
     }
 
-    private boolean isRootCertificateValid(CustomCertificate certificate) {
-        X509Certificate cert = getCertificateBySerialNumber(certificate.getSerialNumber());
+    private boolean isRootCertificateValid(GetSingleCertificateDto certificateDto) {
+        X509Certificate cert = getCertificateBySerialNumber(certificateDto);
         try {
             cert.checkValidity(new Date());
             return true;
@@ -81,10 +84,13 @@ public class RevocationService implements IRevocationService {
         return false;
     }
 
-    private boolean isCertificateValid(CustomCertificate certificate) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException {
+    private boolean isCertificateValid(CustomCertificate certificate, GetSingleCertificateDto certificateDto) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException {
         do {
             CustomCertificate issuer = customCertificateRepository.getBySerialNumber(certificate.getIssuerSerialNumber());
-            if (checkIfCertificateIsRevoked(issuer.getSerialNumber())) return false;
+            GetSingleCertificateDto issuerCertificate = new GetSingleCertificateDto(
+                    issuer.getSerialNumber(), certificateDto.getRootPassword(), certificateDto.getIntermediatePassword(), certificateDto.getEndEntityPassword()
+            );
+            if (checkIfCertificateIsRevoked(issuerCertificate)) return false;
 
             certificate = issuer;
         } while(certificate.getIssuerSerialNumber().longValue() != 0);
@@ -101,9 +107,9 @@ public class RevocationService implements IRevocationService {
         }
     }
 
-    private BasicOCSPResp getOCSPResponse(OCSPReq request) throws OCSPException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException {
+    private BasicOCSPResp getOCSPResponse(OCSPReq request, GetSingleCertificateDto certificateDto) throws OCSPException, UnrecoverableKeyException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException {
         BigInteger serialNumber = request.getRequestList()[0].getCertID().getSerialNumber();
-        X509Certificate certificate = getCertificateBySerialNumber(serialNumber);
+        X509Certificate certificate = getCertificateBySerialNumber(certificateDto);
 
         DigestCalculatorProvider digestCalculatorProvider = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
         BasicOCSPRespBuilder respBuilder = new JcaBasicOCSPRespBuilder(certificate.getPublicKey(), digestCalculatorProvider.get(RespID.HASH_SHA1));
@@ -118,12 +124,15 @@ public class RevocationService implements IRevocationService {
         builder.setProvider("BC");
         ContentSigner contentSigner;
         try {
-            contentSigner = builder.build(keyService.readPrivateKey("intermediateCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+            contentSigner = builder.build(keyService.readPrivateKey(
+                    "intermediateCertificates.jsk", certificateDto.getIntermediatePassword(), serialNumber.toString(), certificateDto.getIntermediatePassword()));
         } catch (OperatorCreationException e) {
             try {
-                contentSigner = builder.build(keyService.readPrivateKey("rootCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+                contentSigner = builder.build(keyService.readPrivateKey(
+                        "rootCertificates.jsk", certificateDto.getRootPassword(), serialNumber.toString(), certificateDto.getRootPassword()));
             } catch (OperatorCreationException ex) {
-                contentSigner = builder.build(keyService.readPrivateKey("end-entityCertificates.jsk", "sifra", serialNumber.toString(), "sifra"));
+                contentSigner = builder.build(keyService.readPrivateKey(
+                        "end-entityCertificates.jsk", certificateDto.getEndEntityPassword(), serialNumber.toString(), certificateDto.getEndEntityPassword()));
             }
         }
 
@@ -135,13 +144,14 @@ public class RevocationService implements IRevocationService {
         return response;
     }
 
-    private X509Certificate getCertificateBySerialNumber(BigInteger serialNumber) {
-        X509Certificate certificate = (X509Certificate) keyService.readCertificate("rootCertificates.jsk", serialNumber.toString());
+    private X509Certificate getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) {
+        X509Certificate certificate = (X509Certificate) keyService.readCertificate(
+                "rootCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getRootPassword());
         if (certificate == null) {
-            if (keyService.readCertificate("intermediateCertificates.jsk", serialNumber.toString()) != null) {
-                certificate = (X509Certificate) keyService.readCertificate("intermediateCertificates.jsk", serialNumber.toString());
+            if (keyService.readCertificate("intermediateCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getIntermediatePassword()) != null) {
+                certificate = (X509Certificate) keyService.readCertificate("intermediateCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getIntermediatePassword());
             } else {
-                certificate = (X509Certificate) keyService.readCertificate("end-entityCertificates.jsk", serialNumber.toString());
+                certificate = (X509Certificate) keyService.readCertificate("end-entityCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getEndEntityPassword());
             }
             return certificate;
         } else {

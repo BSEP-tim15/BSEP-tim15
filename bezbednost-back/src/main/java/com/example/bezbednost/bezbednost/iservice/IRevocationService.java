@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.iservice;
 
+import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.operator.OperatorCreationException;
 
@@ -13,10 +14,10 @@ import java.security.cert.CertificateException;
 
 public interface IRevocationService {
 
-    boolean checkIfCertificateIsRevoked(BigInteger serialNumber) throws OperatorCreationException, CertificateException, IOException, OCSPException,
+     boolean checkIfCertificateIsRevoked(GetSingleCertificateDto certificateDto) throws OperatorCreationException, CertificateException, IOException, OCSPException,
             UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException;
 
     void revokeCertificate(BigInteger serialNumber);
 
-    boolean checkIfCertificateIsValid(BigInteger serialNumber) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException;
+    boolean checkIfCertificateIsValid(GetSingleCertificateDto certificateDto) throws UnrecoverableKeyException, OCSPException, CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, OperatorCreationException, NoSuchProviderException;
 }

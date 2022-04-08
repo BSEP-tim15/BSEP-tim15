@@ -86,12 +86,11 @@ public class KeyService implements IKeyService {
     }
 
     @Override
-    public Certificate readCertificate(String fileName, String alias) {
-        String keyStorePass = "sifra";
+    public Certificate readCertificate(String fileName, String alias, String password) {
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
-            keyStore.load(in, keyStorePass.toCharArray());
+            keyStore.load(in, password.toCharArray());
 
             if (keyStore.isKeyEntry(alias)) {
                 return keyStore.getCertificate(alias);
