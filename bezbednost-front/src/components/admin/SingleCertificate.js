@@ -15,7 +15,14 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
 
     useEffect(() => {
 
-        axios.get(SERVER_URL + "/certificates/certificate?serialNumber=" + serialNumber)
+        var certificate = {
+            serialNumber: serialNumber, 
+            rootPassword: localStorage.rootPassword, 
+            intermediatePassword: localStorage.intermediatePassword, 
+            endEntityPassword: localStorage.endEntityPassword
+        }
+
+        axios.post(SERVER_URL + "/certificates/singleCertificate", certificate)
             .then(response => {
                 var certificate = response.data;
                 certificate.subject = certificate.subject.substring(3);
@@ -28,7 +35,15 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
     }, [serialNumber])
 
     const getSerialNumberOfParentCertificate = () => {
-        axios.get(SERVER_URL + "/certificates/parentCertificateSerialNumber?serialNumber=" + serialNumber)
+
+        var certificate = {
+            serialNumber: serialNumber,
+            rootPassword: localStorage.rootPassword,
+            intermediatePassword: localStorage.intermediatePassword,
+            endEntityPassword: localStorage.endEntityPassword
+        }
+
+        axios.post(SERVER_URL + "/certificates/parentCertificateSerialNumber", certificate)
             .then(response => {
                 setSerialNumber(response.data);
             })
@@ -36,8 +51,15 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
 
     const exportCertificate = (e) => {
         e.preventDefault();
-        addToast("Please enter password for keystore files in console!", { appearance: "info" });
-        axios.post(SERVER_URL + "/certificates/exportCertificate?serialNumber=" + serialNumber)
+
+        var certificate = {
+            serialNumber: serialNumber, 
+            rootPassword: localStorage.rootPassword, 
+            intermediatePassword: localStorage.intermediatePassword, 
+            endEntityPassword: localStorage.endEntityPassword
+        }
+
+        axios.post(SERVER_URL + "/certificates/exportCertificate", certificate)
             .then(response => {
                 addToast("Certificate is successfully exported!", { appearance: "success" });
                 setTimeout(() => {

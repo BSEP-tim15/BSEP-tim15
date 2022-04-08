@@ -15,6 +15,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const certificateTypes = ["root", "intermediate", "end-entity"];
     const [issuers, setIssuers] = useState([]);
+    const [type, setType] = useState("");
     const [certificate, setCertificate] = useState({
         certificateType: "",
         issuer: "",
@@ -53,7 +54,15 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const setCertificateType = (type) => {
         setCertificate(() => {return {...certificate, certificateType: type}});
-        axios.get(SERVER_URL + "/certificates/issuers")
+        setType(type);
+
+        var passwords = {
+            rootPassword: localStorage.rootPassword, 
+            intermediatePassword: localStorage.intermediatePassword, 
+            endEntityPassword: localStorage.endEntityPassword
+        }
+
+        axios.post(SERVER_URL + "/certificates/issuers", passwords)
             .then(response => {
                 setIssuers(response.data);
             })
@@ -62,13 +71,22 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     const setIssuer = (issuer) => {
         setCertificate(() => {return {...certificate, issuer: issuer}});
 
-        if(certificate.certificateType !== "root"){
-            axios.get(SERVER_URL + "/certificates/maxDate?issuer=" + issuer)
-            .then(response => {
-                var maxDate = response.data;
-                maxDate = generateDate(new Date(maxDate));
-                document.getElementById("validTo").max = maxDate;
-            })
+        if(type !== "root"){
+
+            var certificate = {
+                someone: issuer, 
+                rootPassword: localStorage.rootPassword, 
+                intermediatePassword: localStorage.intermediatePassword, 
+                endEntityPassword: localStorage.endEntityPassword
+            }
+
+            axios.post(SERVER_URL + "/certificates/maxDate", certificate)
+                .then(response => {
+                    
+                    var maxDate = response.data;
+                    maxDate = generateDate(new Date(maxDate));
+                    document.getElementById("validTo").max = maxDate;
+                })
         }
     }
 
@@ -76,8 +94,25 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         e.preventDefault();
 
         if(isCertificateValid()){
-            addToast("Please enter password for keystore files in console!", { appearance: "info" });
-            axios.post(SERVER_URL + "/certificates", certificate)
+
+            console.log(type);
+
+            var cert = {
+                certificateType: type,
+                issuer: certificate.issuer,
+                subject: certificate.subject,
+                validFrom : certificate.validTo,
+                validTo: certificate.validTo,
+                purpose: certificate.purpose,
+                issuerAlternativeName: certificate.issuerAlternativeName,
+                subjectAlternativeName:certificate.subjectAlternativeName,
+                rootPassword: localStorage.rootPassword,
+                intermediatePassword: localStorage.intermediatePassword,
+                endEntityPassword: localStorage.endEntityPassword,
+            };
+            
+
+            axios.post(SERVER_URL + "/certificates/createCertificate", cert)
                 .then(response => {
 
                     axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
@@ -101,7 +136,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
             addToast("Valid from date has to be before valid to date!", {appearance : "error"});
             return false;
         } 
-        if(certificate.certificateType === "root"){
+        if(type === "root"){
             if(certificate.issuer !== certificate.subject){
                 addToast("For root (self signed) certificates subject and issuer have to be same!", {appearance : "error"});
                 return false;

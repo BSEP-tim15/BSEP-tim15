@@ -14,12 +14,12 @@ public interface IKeyService {
     void saveKeyStore(String fileName, char[] password) throws IOException, CertificateException, KeyStoreException,
             NoSuchAlgorithmException;
 
-    Certificate[] getChain(String alias, String fileName) throws KeyStoreException, NoSuchProviderException,
+    Certificate[] getChain(String alias, String fileName, String password) throws KeyStoreException, NoSuchProviderException,
             IOException, CertificateException, NoSuchAlgorithmException;
 
     void writeToKeyStore(String alias, PrivateKey privateKey, char[] password, X509Certificate[] certificates) throws KeyStoreException;
 
     PrivateKey readPrivateKey(String keyStoreFile, String keyStorePass, String alias, String pass) throws KeyStoreException, NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
 
-    Certificate readCertificate(String fileName, String alias);
+    Certificate readCertificate(String fileName, String alias, String password);
 }

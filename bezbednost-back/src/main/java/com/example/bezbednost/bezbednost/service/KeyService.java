@@ -55,9 +55,8 @@ public class KeyService implements IKeyService {
     }
 
     @Override
-    public Certificate[] getChain(String alias, String fileName) throws KeyStoreException, NoSuchProviderException,
+    public Certificate[] getChain(String alias, String fileName, String password) throws KeyStoreException, NoSuchProviderException,
             IOException, CertificateException, NoSuchAlgorithmException {
-        String password = "sifra";
         KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
         keyStore.load(new FileInputStream(fileName), password.toCharArray());
         if(keyStore.getCertificateChain(alias) != null);
@@ -87,12 +86,11 @@ public class KeyService implements IKeyService {
     }
 
     @Override
-    public Certificate readCertificate(String fileName, String alias) {
-        String keyStorePass = "sifra";
+    public Certificate readCertificate(String fileName, String alias, String password) {
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
-            keyStore.load(in, keyStorePass.toCharArray());
+            keyStore.load(in, password.toCharArray());
 
             if (keyStore.isKeyEntry(alias)) {
                 return keyStore.getCertificate(alias);
