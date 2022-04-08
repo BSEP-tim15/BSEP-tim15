@@ -31,6 +31,8 @@ const LogIn = () => {
             })
             .catch(error => {
                 addToast("Wrong username or password. Please try again.", { appearance: "error" });
+                setUsername("");
+                setPassword("");
             });
         
     }
@@ -52,7 +54,7 @@ const LogIn = () => {
                 </form>
             </div>
 
-            <Passwords modalIsOpen={passwordsModal} setModalIsOpen={setPasswordsModal} credentials={credentials} />
+            <Passwords modalIsOpen={passwordsModal} setModalIsOpen={setPasswordsModal} />
         </div>
     )
 

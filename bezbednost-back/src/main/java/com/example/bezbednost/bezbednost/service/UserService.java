@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserService implements IUserService {
@@ -53,9 +54,18 @@ public class UserService implements IUserService {
             return "organization";
         } else if(Objects.equals(role, "intermediate")){
             return "service";
-        } else {
+        } else if(Objects.equals(role, "end-entity")) {
             return "user";
+        } else {
+            return "admin";
         }
+    }
+
+    @Override
+    public String findUserRole(Integer id) {
+        Optional<User> user = this.userRepository.findById(id);
+        List<Role> roles = user.get().getRoles();
+        return roles.get(0).getName();
     }
 
 }
