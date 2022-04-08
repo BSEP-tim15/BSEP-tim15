@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import axios from 'axios';
 
-const Passwords = ({modalIsOpen, setModalIsOpen, credentials}) => {
+const Passwords = ({modalIsOpen, setModalIsOpen}) => {
+
+    const SERVER_URL = process.env.REACT_APP_API;
 
     const navigate = useNavigate();
 
@@ -22,8 +24,28 @@ const Passwords = ({modalIsOpen, setModalIsOpen, credentials}) => {
         localStorage.setItem('intermediatePassword', passwords.intermediate);
         localStorage.setItem('endEntityPassword', passwords.endEntity);
         setModalIsOpen(false);
-        navigate("/certificates");
-        
+        redirect();
+    }
+
+    const redirect = () => {
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+            axios.get(SERVER_URL + "/users", { headers: headers})
+            .then(response => {
+                var user = response.data;
+
+                axios.get(SERVER_URL + `/users/getRole/${user.id}`, {headers:headers})
+                .then(response => {
+                    console.log(response.data);
+                    var role = response.data;
+                    if(role === "admin"){
+                        navigate("/certificates");
+                    } else if(role === "service"){
+                        navigate("/intermediateCertificates");
+                    } else {
+                        navigate("/endEntityCertificates");
+                    }
+                });
+            });
     }
 
     return (

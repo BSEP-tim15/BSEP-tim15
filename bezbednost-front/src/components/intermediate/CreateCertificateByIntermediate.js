@@ -4,7 +4,7 @@ import { useToasts } from "react-toast-notifications";
 import axios from "axios";
 import RegistrationQuestion from '../modals/RegistrationQuestion';
 
-const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
+const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
 
     const SERVER_URL = process.env.REACT_APP_API; 
     const {addToast} = useToasts();
@@ -13,8 +13,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const [minDate, setMinDate] = useState("");
 
-    const certificateTypes = ["root", "intermediate", "end-entity"];
-    const [issuers, setIssuers] = useState([]);
+    const certificateTypes = ["intermediate", "end-entity"];
     const [type, setType] = useState("");
     const [certificate, setCertificate] = useState({
         certificateType: "",
@@ -29,6 +28,28 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     
 
     useEffect(() => {
+
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+            axios.get(SERVER_URL + "/users", { headers: headers})
+                .then(response => {
+                    var user = response.data;
+                    setCertificate(() => {return {...certificate, issuer: user.username}})
+
+                    var cert = {
+                        someone: user.username, 
+                        rootPassword: localStorage.rootPassword, 
+                        intermediatePassword: localStorage.intermediatePassword, 
+                        endEntityPassword: localStorage.endEntityPassword
+                    }
+
+                    axios.post(SERVER_URL + "/certificates/maxDate", cert)
+                        .then(response => {
+                            
+                            var maxDate = response.data;
+                            maxDate = generateDate(new Date(maxDate));
+                            document.getElementById("validTo").max = maxDate;
+                        })
+                });
 
         setMinDate(generateDate(new Date()));
 
@@ -55,47 +76,12 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     const setCertificateType = (type) => {
         setCertificate(() => {return {...certificate, certificateType: type}});
         setType(type);
-
-        var passwords = {
-            rootPassword: localStorage.rootPassword, 
-            intermediatePassword: localStorage.intermediatePassword, 
-            endEntityPassword: localStorage.endEntityPassword
-        }
-
-        axios.post(SERVER_URL + "/certificates/issuers", passwords)
-            .then(response => {
-                setIssuers(response.data);
-            })
-    }
-
-    const setIssuer = (issuer) => {
-        setCertificate(() => {return {...certificate, issuer: issuer}});
-
-        if(type !== "root"){
-
-            var certificate = {
-                someone: issuer, 
-                rootPassword: localStorage.rootPassword, 
-                intermediatePassword: localStorage.intermediatePassword, 
-                endEntityPassword: localStorage.endEntityPassword
-            }
-
-            axios.post(SERVER_URL + "/certificates/maxDate", certificate)
-                .then(response => {
-                    
-                    var maxDate = response.data;
-                    maxDate = generateDate(new Date(maxDate));
-                    document.getElementById("validTo").max = maxDate;
-                })
-        }
     }
 
     const createCertificate = (e) => {
         e.preventDefault();
 
         if(isCertificateValid()){
-
-            console.log(type);
 
             var cert = {
                 certificateType: type,
@@ -145,21 +131,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         return true;
     }
 
-    const issuerForm = (
-        <div>
-            {certificate.certificateType === "root" ? (
-                <input className='form-control' type="text" required
-                    value={certificate.issuer} onChange={(e) => setCertificate(() => {return {...certificate, issuer: e.target.value}})}/>
-            ) : (
-                <select className='form-select' required 
-                    value={certificate.issuer} onChange={(e) => setIssuer(e.target.value)}>
-                    <option></option>
-                    {issuers.map(issuer => ( <option key={issuer}>{issuer}</option> ))}
-                </select>
-            )}
-        </div>
-    )
-
 
     return (
         <div>
@@ -178,7 +149,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                                 {certificateTypes.map(type => ( <option key={type}>{type}</option> ))}
                             </select>
                             <label className='form-label mt-3'>Issuer</label>
-                            {issuerForm}
+                            <input className='form-control' type="text" required value={certificate.issuer} disabled/>
                             <label className='form-label mt-3'>Subject</label>
                             <input className='form-control' type="text" required 
                                 value={certificate.subject} onChange={(e) => setCertificate(() => {return {...certificate, subject: e.target.value}})} />
@@ -212,4 +183,4 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
 }
 
-export default CreateCertificate;
+export default CreateCertificateByIntermediate;

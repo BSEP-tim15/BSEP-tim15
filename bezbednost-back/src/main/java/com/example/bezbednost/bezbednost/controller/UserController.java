@@ -36,4 +36,7 @@ public class UserController {
     public boolean isUserRegistered(@RequestParam String username){
         return userService.isUserRegistered(username);
     }
+
+    @GetMapping("/getRole/{id}")
+    public String getUserRole(@PathVariable Integer id) { return this.userService.findUserRole(id); }
 }

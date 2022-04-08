@@ -9,4 +9,6 @@ public interface IUserService {
     User save(UserDto userDto);
 
     boolean isUserRegistered(String username);
+
+    String findUserRole(Integer id);
 }
