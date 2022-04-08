@@ -174,7 +174,7 @@ public class GetCertificateService implements IGetCertificateService {
         List<String> issuers = new ArrayList<>();
         for(CertificateDto certificate : getAllCertificates(passwords)){
             String issuer = certificate.getIssuer().replace("CN=", "");
-            if(!isIssuerAdded(issuers, issuer))
+            if(!isIssuerAdded(issuers, issuer) && revocationService.checkIfCertificateIsValid(certificate.getSerialNumber()))
                 issuers.add(issuer);
         }
         issuers.addAll(getIntermediateCertificatesSubjects(passwords));
@@ -187,7 +187,8 @@ public class GetCertificateService implements IGetCertificateService {
         List<String> issuers = new ArrayList<>();
         for(CertificateDto certificate : getAllCertificates(passwords)){
             String issuer = certificate.getSubject().replace("CN=", "");
-            if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer))
+            if(Objects.equals(certificate.getCertificateType(), "intermediate") && !isIssuerAdded(issuers, issuer) &&
+                    revocationService.checkIfCertificateIsValid(certificate.getSerialNumber()))
                 issuers.add(issuer);
         }
 
