@@ -101,7 +101,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                 certificateType: type,
                 issuer: certificate.issuer,
                 subject: certificate.subject,
-                validFrom : certificate.validTo,
+                validFrom : certificate.validFrom,
                 validTo: certificate.validTo,
                 purpose: certificate.purpose,
                 issuerAlternativeName: certificate.issuerAlternativeName,

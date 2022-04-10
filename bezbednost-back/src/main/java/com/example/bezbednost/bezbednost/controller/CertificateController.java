@@ -124,4 +124,5 @@ public class CertificateController {
     public ResponseEntity<List<CertificateDto>> getCertificatesForEndEntity(@RequestBody GetCertificateDto certificate, @PathVariable String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         return new ResponseEntity<>(getCertificateService.getCertificatesForEndEntity(certificate, username), HttpStatus.OK);
     }
+
 }
