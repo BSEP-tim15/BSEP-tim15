@@ -114,4 +114,14 @@ public class CertificateController {
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PostMapping("intermediateCertificates/{username}")
+    public ResponseEntity<List<CertificateDto>> getCertificatesForIntermediate(@RequestBody GetCertificateDto certificate, @PathVariable String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        return new ResponseEntity<>(getCertificateService.getCertificatesForIntermediate(certificate, username), HttpStatus.OK);
+    }
+
+    @PostMapping("endEntityCertificates/{username}")
+    public ResponseEntity<List<CertificateDto>> getCertificatesForEndEntity(@RequestBody GetCertificateDto certificate, @PathVariable String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        return new ResponseEntity<>(getCertificateService.getCertificatesForEndEntity(certificate, username), HttpStatus.OK);
+    }
 }
