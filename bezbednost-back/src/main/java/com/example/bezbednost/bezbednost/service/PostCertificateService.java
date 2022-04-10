@@ -141,11 +141,16 @@ public class PostCertificateService implements IPostCertificateService {
         return GeneralNames.getInstance(new DERSequence(namesList.toArray(new GeneralName[] {})));
     }
 
-    private X509v3CertificateBuilder generateCertificateBuilder(PublicKey publicKey, CertificateDto certificateDTO){
+    private X509v3CertificateBuilder generateCertificateBuilder(PublicKey publicKey, CertificateDto certificateDTO)
+            throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         X500NameBuilder issuer = new X500NameBuilder(BCStyle.INSTANCE);
         issuer.addRDN(BCStyle.CN, certificateDTO.getIssuer());
         X500NameBuilder subject = new X500NameBuilder(BCStyle.INSTANCE);
         subject.addRDN(BCStyle.CN, certificateDTO.getSubject());
+        BigInteger serialNumber = createSerialNumber();
+        while(getCertificateService.getSerialNumbers().contains(serialNumber)){
+            serialNumber = createSerialNumber();
+        }
         X509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(issuer.build(),
                 createSerialNumber(),
                 certificateDTO.getValidFrom(),
