@@ -40,4 +40,7 @@ public interface IGetCertificateService {
     List<CertificateDto> getCertificatesForEndEntity(GetCertificateDto certificate, String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
 
     List<CertificateDto> getCertificatesForIntermediate(GetCertificateDto certificate, String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException;
+
+    List<BigInteger> getSerialNumbers() throws CertificateException, IOException, NoSuchAlgorithmException,
+            KeyStoreException, NoSuchProviderException;
 }
