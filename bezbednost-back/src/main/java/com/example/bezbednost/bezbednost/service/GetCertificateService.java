@@ -58,6 +58,28 @@ public class GetCertificateService implements IGetCertificateService {
         }
     }
 
+    @Override
+    public List<CertificateDto> getCertificatesForEndEntity(GetCertificateDto certificate, String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        List<CertificateDto> endEntityCertificates = new ArrayList<CertificateDto>();
+        for (CertificateDto certificateDto : getCertificates(certificate)) {
+            if (certificateDto.getSubject().equals("CN=" + username)) {
+                endEntityCertificates.add(certificateDto);
+            }
+        }
+        return endEntityCertificates;
+    }
+
+    @Override
+    public List<CertificateDto> getCertificatesForIntermediate(GetCertificateDto certificate, String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        List<CertificateDto> intermediateCertificates = new ArrayList<CertificateDto>();
+        for (CertificateDto certificateDto : getCertificates(certificate)) {
+            if (certificateDto.getSubject().equals("CN=" + username) || certificateDto.getIssuer().equals("CN=" + username)) {
+                intermediateCertificates.add(certificateDto);
+            }
+        }
+        return intermediateCertificates;
+    }
+
     private List<CertificateDto> getAllCertificates(PasswordsDto passwords) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         String rootFile = "rootCertificates.jsk";

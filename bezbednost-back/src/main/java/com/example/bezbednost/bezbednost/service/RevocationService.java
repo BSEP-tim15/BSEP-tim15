@@ -91,11 +91,31 @@ public class RevocationService implements IRevocationService {
                     issuer.getSerialNumber(), certificateDto.getRootPassword(), certificateDto.getIntermediatePassword(), certificateDto.getEndEntityPassword()
             );
             if (checkIfCertificateIsRevoked(issuerCertificate)) return false;
+            if (!validateDatesAndKeys(certificateDto, issuerCertificate)) return false;
 
             certificate = issuer;
         } while(certificate.getIssuerSerialNumber().longValue() != 0);
 
         return true;
+    }
+
+    private boolean validateDatesAndKeys(GetSingleCertificateDto certificateDto, GetSingleCertificateDto certificateIssuerDto) {
+        X509Certificate cert = getCertificateBySerialNumber(certificateDto);
+        X509Certificate issuerCertificate = getCertificateBySerialNumber(certificateIssuerDto);
+
+        try {
+            cert.checkValidity(new Date());
+            issuerCertificate.checkValidity(new Date());
+        } catch (CertificateNotYetValidException | CertificateExpiredException e) {
+            return false;
+        }
+
+        try {
+            cert.verify(issuerCertificate.getPublicKey());
+            return true;
+        } catch (CertificateException | NoSuchAlgorithmException | SignatureException | InvalidKeyException | NoSuchProviderException e) {
+            return false;
+        }
     }
 
     private void revokeSignedCertificates(BigInteger serialNumber) {
@@ -123,6 +143,7 @@ public class RevocationService implements IRevocationService {
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
         builder.setProvider("BC");
         ContentSigner contentSigner;
+
         try {
             contentSigner = builder.build(keyService.readPrivateKey(
                     "intermediateCertificates.jsk", certificateDto.getIntermediatePassword(), serialNumber.toString(), certificateDto.getIntermediatePassword()));
@@ -135,7 +156,6 @@ public class RevocationService implements IRevocationService {
                         "end-entityCertificates.jsk", certificateDto.getEndEntityPassword(), serialNumber.toString(), certificateDto.getEndEntityPassword()));
             }
         }
-
 
         X509CertificateHolder[] responseList = new X509CertificateHolder[1];
         responseList[0] = new X509CertificateHolder(certificate.getEncoded());
