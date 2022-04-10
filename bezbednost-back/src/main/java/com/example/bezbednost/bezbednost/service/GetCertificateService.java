@@ -288,4 +288,16 @@ public class GetCertificateService implements IGetCertificateService {
         return certificates;
     }
 
+    @Override
+    public List<BigInteger> getSerialNumbers() throws CertificateException, IOException, NoSuchAlgorithmException,
+            KeyStoreException, NoSuchProviderException {
+        List<BigInteger> serialNumbers = new ArrayList<>();
+        PasswordsDto passwordsDto = new PasswordsDto("sifra","sifra","sifra");
+        List<CertificateDto> certificates = getAllCertificates(passwordsDto);
+        for(CertificateDto certificate: certificates) {
+            serialNumbers.add(certificate.getSerialNumber());
+        }
+        return serialNumbers;
+    }
+
 }
