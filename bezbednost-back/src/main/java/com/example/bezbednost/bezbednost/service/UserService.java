@@ -50,11 +50,11 @@ public class UserService implements IUserService {
     }
 
     private String getUserRole(String role){
-        if(Objects.equals(role, "root")){
+        if(role.contains("root")){
             return "organization";
-        } else if(Objects.equals(role, "intermediate")){
+        } else if(role.contains("intermediate")){
             return "service";
-        } else if(Objects.equals(role, "end-entity")) {
+        } else if(role.contains("end-entity")) {
             return "user";
         } else {
             return "admin";
