@@ -35,15 +35,11 @@ const IntermediateCertificates = () => {
             .then(response => {
                 var user = response.data;
 
-                /*axios.post(SERVER_URL + "/certificates/intermediateCertificates/" + user.id, certificate)
-                    .then(response => {
-                        setCertificates(response.data);
-                    })*/
-
-                axios.post(SERVER_URL + "/certificates/certificates", certificate)
+                axios.post(SERVER_URL + "/certificates/intermediateCertificates/" + user.username, certificate)
                     .then(response => {
                         setCertificates(response.data);
                     })
+
             });
 
     }, [certificateType, revoked])
