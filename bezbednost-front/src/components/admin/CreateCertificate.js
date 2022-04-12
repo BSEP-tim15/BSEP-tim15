@@ -206,7 +206,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                 </div>
             </Modal>
 
-            <RegistrationQuestion modalIsOpen={registration} setModalIsOpen={setRegistration} username={certificate.subject} role={certificate.certificateType} />
+            <RegistrationQuestion modalIsOpen={registration} setModalIsOpen={setRegistration} username={certificate.subject} role={type} />
         </div>
     )
 
