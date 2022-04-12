@@ -90,7 +90,10 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
                             <input type="text" className='form-control' value={certificate.validFrom} disabled/>
                             <label className='form-label mt-3'>Valid to</label>
                             <input type="text" className='form-control' value={certificate.validTo} disabled/><br/>
-
+                            <label className='form-label'>Issuer alternative name</label>
+                            <input type="text" className='form-control' value={certificate.issuerAlternativeName} disabled/><br/>
+                            <label className='form-label'>Subject alternative name</label>
+                            <input type="text" className='form-control' value={certificate.subjectAlternativeName} disabled/><br/>
                             {certificate.certificateType != "root" && (
                                 <div>
                                     <a style={{color: "blue", textDecoration: "underline"}} onClick={() => getSerialNumberOfParentCertificate()}>View parent certificate</a><br/>

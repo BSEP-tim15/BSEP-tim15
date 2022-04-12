@@ -22,7 +22,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
         subject: "",
         validFrom : new Date(),
         validTo: new Date(),
-        purpose: "",
         issuerAlternativeName: "",
         subjectAlternativeName:""
     });
@@ -103,7 +102,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                 subject: certificate.subject,
                 validFrom : certificate.validFrom,
                 validTo: certificate.validTo,
-                purpose: certificate.purpose,
                 issuerAlternativeName: certificate.issuerAlternativeName,
                 subjectAlternativeName:certificate.subjectAlternativeName,
                 rootPassword: localStorage.rootPassword,
@@ -188,9 +186,6 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                             <label className='form-label mt-3'>Valid to</label>
                             <input id="validTo" className='form-control' type="date" required min={minDate}
                                 value={certificate.validTo} onChange={(e) => setCertificate(() => {return {...certificate, validTo: e.target.value}})}/>
-                            <label className='form-label mt-3'>Certificate's purpose</label>
-                            <textarea className='form-control' type="text"  
-                                value={certificate.purpose} onChange={(e) => setCertificate(() => {return {...certificate, purpose: e.target.value}})}/>
                             <label className='form-label mt-3'>Issuer alternative name</label>
                             <textarea className='form-control' type="text"  
                                 value={certificate.subjectAlternativeName} onChange={(e) => setCertificate(() => {return {...certificate, subjectAlternativeName: e.target.value}})}/>

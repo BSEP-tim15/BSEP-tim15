@@ -135,6 +135,9 @@ public class PostCertificateService implements IPostCertificateService {
 
     private GeneralNames setExtension(String extension){
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier("1.2.3.4.5.6.7.8.9"); // some arbitrary non-existent OID number
+        if(extension == null){
+            extension = "";
+        }
         DERSequence seq = new DERSequence(new ASN1Encodable[] { oid, new ASN1Integer(extension.getBytes(StandardCharsets.UTF_8)) });
         ArrayList<GeneralName> namesList = new ArrayList<>();
         namesList.add(new GeneralName(GeneralName.otherName, seq));
