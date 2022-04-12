@@ -20,8 +20,6 @@ public class CertificateDto {
 
     @Getter @Setter private Date validTo;
 
-    @Getter @Setter private String purpose;
-
     @Getter @Setter private String keyUsage;
 
     @Getter @Setter private String issuerAlternativeName;
@@ -40,7 +38,7 @@ public class CertificateDto {
     public CertificateDto() { }
 
     public CertificateDto(BigInteger serialNumber, String certificateType, String issuer, String subject, Date validFrom,
-                          Date validTo, String purpose, String keyUsage, String issuerAlternativeName,
+                          Date validTo, String keyUsage, String issuerAlternativeName,
                           String subjectAlternativeName, boolean valid, String rootPassword, String intermediatePassword,
                           String endEntityPassword) {
         this.serialNumber = serialNumber;
@@ -49,7 +47,6 @@ public class CertificateDto {
         this.subject = subject;
         this.validFrom = validFrom;
         this.validTo = validTo;
-        this.purpose = purpose;
         this.keyUsage = keyUsage;
         this.issuerAlternativeName = issuerAlternativeName;
         this.subjectAlternativeName = subjectAlternativeName;
