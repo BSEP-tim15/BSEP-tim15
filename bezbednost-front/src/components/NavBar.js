@@ -15,7 +15,7 @@ const NavBar = () => {
     const [createCertifikate, setCreateCertificate] = useState(false);
     const [createIntermediateCertifikate, setCreateIntermediateCertificate] = useState(false);
 
-    const [canCreateCertificate, setCanCreateCertificate] = useState(true);
+    const [user, setUser] = useState({});
 
     useEffect(() => {
 
@@ -23,39 +23,43 @@ const NavBar = () => {
             axios.get(SERVER_URL + "/users", { headers: headers})
             .then(response => {
                 var user = response.data;
-
+                setUser(user);
                 axios.get(SERVER_URL + `/users/getRole/${user.id}`, {headers:headers})
                     .then(response => {
                         setRole(response.data);
+
+                        
                     });
-
-                var certificate = {
-                    certificateType: "", 
-                    rootPassword: localStorage.rootPassword, 
-                    intermediatePassword: localStorage.intermediatePassword, 
-                    endEntityPassword: localStorage.endEntityPassword
-                }
-
-                axios.post(SERVER_URL + `/certificates/canUserCreateCertificate/${user.username}`, certificate, {headers:headers})
-                    .then(response => {
-                        console.log(response.data);
-                        setCanCreateCertificate(response.data);
-                    });
-
-
             });
 
-    })
+    }, [])
 
     const createCertificate = () => {
-        if(canCreateCertificate === true){
-            if(role === "service" || role === "organization"){
-                setCreateIntermediateCertificate(true);
-            } else {
-                setCreateCertificate(true)
-            }
+        var certificate = {
+            certificateType: "", 
+            rootPassword: localStorage.rootPassword, 
+            intermediatePassword: localStorage.intermediatePassword, 
+            endEntityPassword: localStorage.endEntityPassword
+        }
+
+        if(role !== "admin"){
+            const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+            axios.post(SERVER_URL + `/certificates/canUserCreateCertificate/${user.username}`, certificate, {headers:headers})
+                .then(response => {
+                        var valid = response.data;
+                        if(valid === true){
+                            if(role === "service" || role === "organization"){
+                                setCreateIntermediateCertificate(true);
+                            } else {
+                                setCreateCertificate(true)
+                            }
+                        } else {
+                            addToast("Your certificate is invalid (expired or revoked), so you don't have right to create certificates!", {appearance : "error"});
+                        }
+
+                });
         } else {
-            addToast("Your certificate is invalid (expired or revoked), so you don't have right to create certificates!", {appearance : "error"});
+            setCreateCertificate(true)
         }
     }
 
