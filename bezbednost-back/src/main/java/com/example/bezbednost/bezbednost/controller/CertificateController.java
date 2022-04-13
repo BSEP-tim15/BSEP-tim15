@@ -93,13 +93,12 @@ public class CertificateController {
         return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(certificate), HttpStatus.OK);
     }
 
-    @GetMapping("/validate/{serialNumber}")
-    public ResponseEntity<?> validateCertificate(@PathVariable GetSingleCertificateDto certificateDto) {
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateCertificate(@RequestBody GetSingleCertificateDto certificateDto) {
         try {
             boolean isValid = revocationService.checkIfCertificateIsValid(certificateDto);
             return ResponseEntity.ok(isValid);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -113,6 +112,16 @@ public class CertificateController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/revoked")
+    public ResponseEntity<?> isRevoked(@RequestBody GetSingleCertificateDto certificateDto) {
+        try {
+            boolean isRevoked = revocationService.checkIfCertificateIsRevoked(certificateDto);
+            return ResponseEntity.ok(isRevoked);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("intermediateCertificates/{username}")
