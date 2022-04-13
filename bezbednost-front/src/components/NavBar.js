@@ -27,8 +27,6 @@ const NavBar = () => {
                 axios.get(SERVER_URL + `/users/getRole/${user.id}`, {headers:headers})
                     .then(response => {
                         setRole(response.data);
-
-                        
                     });
             });
 
