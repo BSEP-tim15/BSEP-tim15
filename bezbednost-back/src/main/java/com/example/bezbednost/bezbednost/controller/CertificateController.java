@@ -103,6 +103,16 @@ public class CertificateController {
         }
     }
 
+    @PostMapping("/canUserCreateCertificate/{username}")
+    public ResponseEntity<?> canUserCreateCertificate(@RequestBody GetCertificateDto certificateDto, @PathVariable String username) {
+        try {
+            boolean isValid = getCertificateService.canUserCreateCertificate(certificateDto, username);
+            return ResponseEntity.ok(isValid);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/revoke")
     public ResponseEntity<?> revokeCertificate(@RequestBody SerialNumberDto serialNumberDto) {
         try {
