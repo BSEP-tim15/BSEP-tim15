@@ -39,7 +39,10 @@ const Passwords = ({modalIsOpen, setModalIsOpen}) => {
                     var role = response.data;
                     if(role === "admin"){
                         navigate("/certificates");
-                    } else if(role === "service"){
+                    } else if(role === "organization"){
+                        navigate("/rootCertificates");
+                    } 
+                    else if(role === "service"){
                         navigate("/intermediateCertificates");
                     } else {
                         navigate("/endEntityCertificates");

@@ -80,6 +80,20 @@ public class GetCertificateService implements IGetCertificateService {
         return intermediateCertificates;
     }
 
+    @Override
+    public boolean canUserCreateCertificate(GetCertificateDto certificate, String username) throws
+            CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException,
+            UnrecoverableKeyException, OCSPException, OperatorCreationException {
+        for (CertificateDto certificateDto : getCertificates(certificate)) {
+            if (certificateDto.getSubject().equals("CN=" + username) && (certificateDto.getCertificateType() == "root" || certificateDto.getCertificateType() == "intermediate")) {
+                GetSingleCertificateDto singleCertificate = new GetSingleCertificateDto(certificateDto.getSerialNumber(),
+                        certificate.getRootPassword(), certificate.getIntermediatePassword(), certificate.getEndEntityPassword());
+                if(revocationService.checkIfCertificateIsValid(singleCertificate)) return true;
+            }
+        }
+        return false;
+    }
+
     private List<CertificateDto> getAllCertificates(PasswordsDto passwords) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         String rootFile = "rootCertificates.jsk";

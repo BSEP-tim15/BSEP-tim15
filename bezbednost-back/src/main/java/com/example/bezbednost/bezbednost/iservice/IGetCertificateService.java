@@ -43,4 +43,8 @@ public interface IGetCertificateService {
 
     List<BigInteger> getSerialNumbers() throws CertificateException, IOException, NoSuchAlgorithmException,
             KeyStoreException, NoSuchProviderException;
+
+    boolean canUserCreateCertificate(GetCertificateDto certificate, String username) throws
+            CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException,
+            UnrecoverableKeyException, OCSPException, OperatorCreationException;
 }

@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import NavBar from "../NavBar";
 import validImg from "../../images/valid.png";
 import invalidImg from "../../images/invalid.png";
-import SingleCertificate from "./SingleCertificate";
+import SingleCertificate from "../modals/SingleCertificate";
 import { useToasts } from "react-toast-notifications";
 import Passwords from "../modals/Passwords";
 
@@ -76,7 +76,7 @@ const Certificates = () => {
     return (
         <div>
             <NavBar/>
-            <div className='card' style={{marginLeft: "5%", width: "90%", maxHeight: "550px", marginTop: "1%", borderColor: "#4a6560"}}>
+            <div className='card' style={{marginLeft: "5%", width: "90%", maxHeight: "100vh", marginTop: "1%", borderColor: "#4a6560"}}>
                 <div className='card-body' style={{overflowY: "scroll"}}>
                     <h4 className='card-title'>Certificates</h4>
                     <div className='title-underline'/>

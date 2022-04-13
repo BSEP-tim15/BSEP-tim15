@@ -12,6 +12,7 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
     const [registration, setRegistration] = useState(false);
 
     const [minDate, setMinDate] = useState("");
+    const [maxDate, setMaxDate] = useState("");
 
     const certificateTypes = ["intermediate", "end-entity"];
     const [type, setType] = useState("");
@@ -21,7 +22,6 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
         subject: "",
         validFrom : new Date(),
         validTo: new Date(),
-        purpose: "",
         issuerAlternativeName: "",
         subjectAlternativeName:""
     });
@@ -44,16 +44,17 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
 
                     axios.post(SERVER_URL + "/certificates/maxDate", cert)
                         .then(response => {
-                            
+                            console.log(user.username);
+                            console.log(response.data);
                             var maxDate = response.data;
                             maxDate = generateDate(new Date(maxDate));
-                            document.getElementById("validTo").max = maxDate;
+                            setMaxDate(maxDate);
                         })
                 });
 
         setMinDate(generateDate(new Date()));
 
-    }, [])
+    }, [modalIsOpen])
 
 
     const generateDate = (date) => {
@@ -89,7 +90,6 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
                 subject: certificate.subject,
                 validFrom : certificate.validFrom,
                 validTo: certificate.validTo,
-                purpose: certificate.purpose,
                 issuerAlternativeName: certificate.issuerAlternativeName,
                 subjectAlternativeName:certificate.subjectAlternativeName,
                 rootPassword: localStorage.rootPassword,
@@ -157,17 +157,14 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
                             <input className='form-control' type="date" required min={minDate}
                                 value={certificate.validFrom} onChange={(e) => setCertificate(() => {return {...certificate, validFrom: e.target.value}})}/>
                             <label className='form-label mt-3'>Valid to</label>
-                            <input id="validTo" className='form-control' type="date" required min={minDate}
+                            <input id="validTo" className='form-control' type="date" required min={minDate} max={maxDate}
                                 value={certificate.validTo} onChange={(e) => setCertificate(() => {return {...certificate, validTo: e.target.value}})}/>
-                            <label className='form-label mt-3'>Certificate's purpose</label>
-                            <textarea className='form-control' type="text"  
-                                value={certificate.purpose} onChange={(e) => setCertificate(() => {return {...certificate, purpose: e.target.value}})}/>
                             <label className='form-label mt-3'>Issuer alternative name</label>
                             <textarea className='form-control' type="text"  
-                                value={certificate.subjectAlternativeName} onChange={(e) => setCertificate(() => {return {...certificate, subjectAlternativeName: e.target.value}})}/>
+                                value={certificate.issuerAlternativeName} onChange={(e) => setCertificate(() => {return {...certificate, issuerAlternativeName: e.target.value}})}/>
                             <label className='form-label mt-3'>Subject alternative name</label>
                             <textarea className='form-control' type="text"  
-                                value={certificate.issuerAlternativeName} onChange={(e) => setCertificate(() => {return {...certificate, issuerAlternativeName: e.target.value}})}/>                                           
+                                value={certificate.subjectAlternativeName} onChange={(e) => setCertificate(() => {return {...certificate, subjectAlternativeName: e.target.value}})}/>                                           
                             <button type='submit' className='btn mt-4 w-25' 
                                 style={{marginLeft: "35%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                                 Submit
