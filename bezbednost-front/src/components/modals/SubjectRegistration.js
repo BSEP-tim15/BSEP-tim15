@@ -10,6 +10,7 @@ const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
     const [subject, setSubject] = useState({
         name: "",
         username: "",
+        password: "",
         country: "",
         email: "",
         role: ""
@@ -19,6 +20,7 @@ const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
         e.preventDefault();
         var newSubject = {...subject, username:username, role:role}
         axios.post(SERVER_URL + "/users", newSubject)
+        //axios.post(SERVER_URL + "/auth/signup", newSubject)
             .then(response => {
                 setModalIsOpen(false);
                 window.location.reload();
@@ -41,6 +43,9 @@ const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
                                 value={subject.name} onChange={(e) => setSubject(() => {return {...subject, name: e.target.value}})}/>
                             <label className='form-label mt-2'>Username</label>
                             <input className='form-control' type="text" required disabled value={username}/>
+                            <label className='form-label mt-2'>Password</label>
+                            <input className='form-control' type="password" required
+                                value={subject.password} onChange={(e) => setSubject(() => {return {...subject, password: e.target.value}})}/>
                             <label className='form-label mt-2'>Email</label>
                             <input className='form-control' type="text" required
                                 value={subject.email} onChange={(e) => setSubject(() => {return {...subject, email: e.target.value}})}/>                          

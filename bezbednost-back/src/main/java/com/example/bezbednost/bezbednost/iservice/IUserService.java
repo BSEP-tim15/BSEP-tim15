@@ -11,4 +11,8 @@ public interface IUserService {
     boolean isUserRegistered(String username);
 
     String findUserRole(Integer id);
+
+    void sendVerificationEmail(User user);
+
+    boolean verify(String verificationCode);
 }

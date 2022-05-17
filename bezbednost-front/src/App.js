@@ -7,6 +7,8 @@ import UserProfile from './components/UserProfile';
 import IntermediateCertificates from './components/intermediate/IntermediateCertificates';
 import EndEntityCertificates from './components/endEntity/EndEntityCertificates';
 import RootCertificates from './components/root/rootCertificates';
+import ForgotPassword from './components/ForgotPassword';
+import Verification from './components/Verification';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
             <Route exact path="/rootCertificates" element={<RootCertificates/>} />
             <Route exact path="/intermediateCertificates" element={<IntermediateCertificates/>} />
             <Route exact path="/endEntityCertificates" element={<EndEntityCertificates/>} />
+            <Route exact path="/forgotPassword" element={<ForgotPassword/>} />
+            <Route exact path="/verify/:code"element={<Verification/>} />
           </Routes>
         </div>
       </Router>

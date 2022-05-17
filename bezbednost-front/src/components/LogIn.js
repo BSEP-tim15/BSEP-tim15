@@ -51,6 +51,7 @@ const LogIn = () => {
                         style={{marginLeft: "38%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                         Log in
                     </button>
+                    
                 </form>
             </div>
 

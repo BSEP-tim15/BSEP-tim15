@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,34 +12,38 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@Data
 public class User implements UserDetails {
 
     @Id
     @Column(name = "user_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter @Setter private Integer id;
+    private Integer id;
 
     @Column(name = "name")
-    @Getter @Setter private String name;
+    private String name;
 
     @Column(name = "username")
-    @Getter @Setter private String username;
+    private String username;
 
     @Column(name = "password")
-    @Getter @Setter private String password;
+    private String password;
 
     @Column(name = "country")
-    @Getter @Setter private String country;
+    private String country;
 
     @Column(name = "email")
-    @Getter @Setter private String email;
+    private String email;
 
     @Column(name = "is_approved")
-    @Getter @Setter private boolean isApproved;
+    private boolean isApproved;
 
     @ManyToMany(targetEntity = Role.class, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Column(name = "role_id")
-    @Getter @Setter private List<Role> roles;
+    private List<Role> roles;
+
+    @Column(name = "verification_code", updatable = false)
+    private String verificationCode;
 
     public User() { }
 
