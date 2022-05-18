@@ -22,4 +22,9 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u FROM User u WHERE u.email=?1")
     User findByEmail(String email);
+
+    @Modifying
+    @Transactional
+    @Query("update User u set u.password=?2 where u.email=?1")
+    void changePassword(String email, String password);
 }

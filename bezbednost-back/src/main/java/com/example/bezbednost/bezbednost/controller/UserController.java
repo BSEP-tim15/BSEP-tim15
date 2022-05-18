@@ -1,6 +1,7 @@
 package com.example.bezbednost.bezbednost.controller;
 
 import com.example.bezbednost.bezbednost.dto.EmailDto;
+import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.model.User;
@@ -50,9 +51,30 @@ public class UserController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity resetPassword(@RequestBody EmailDto email){
-        System.out.println(email);
-        userService.resetPassword(email.getEmail());
+    public ResponseEntity resetPassword(@RequestBody EmailDto emailDto){
+        System.out.println(emailDto);
+        userService.resetPassword(emailDto.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/validateToken")
+    public ResponseEntity validateToken(@Param("token") String token){
+        String result = userService.validatePasswordResetToken(token);
+        if(result != null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity changePassword(@RequestBody PasswordDto passwordDto){
+        String result = userService.validatePasswordResetToken(passwordDto.getToken());
+        if(result != null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            userService.changePassword(passwordDto);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 }

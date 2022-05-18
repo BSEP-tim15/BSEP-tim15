@@ -1,7 +1,7 @@
 package com.example.bezbednost.bezbednost.service;
 
+import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
-import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
 import com.example.bezbednost.bezbednost.iservice.IRoleService;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.mapper.UserMapper;
@@ -12,8 +12,6 @@ import com.example.bezbednost.bezbednost.repository.IPasswordResetTokenRepositor
 import com.example.bezbednost.bezbednost.repository.IUserRepository;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -33,12 +31,6 @@ public class UserService implements IUserService {
     private final IRoleService roleService;
     private final JavaMailSender mailSender;
     private final IPasswordResetTokenRepository passwordResetTokenRepository;
-
-   /* public UserService(IUserRepository userRepository, PasswordEncoder passwordEncoder, IRoleService roleService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.roleService = roleService;
-    }*/
 
     @Override
     public User findByUsername(String username) {
@@ -132,7 +124,7 @@ public class UserService implements IUserService {
         String sender = "Public key infrastructure";
         String content = "<p>Dear " + user.getName() + ", <p>";
         String resetURL = "http://localhost:3000/resetPassword/token=" + token;
-        content += "Reset password: <h3><a href=\"" + resetURL + "\">link</a></h3>";
+        content += "Reset password: <a href=\"" + resetURL + "\">link</a>";
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -159,7 +151,31 @@ public class UserService implements IUserService {
         sendRecoveryURL(email, token);
     }
 
-    public void createPasswordResetTokenForUser(User user, String token) {
+    @Override
+    public String validatePasswordResetToken(String token) {
+        final PasswordResetToken passToken = passwordResetTokenRepository.findByToken(token);
+        return !isTokenFound(passToken) ? "invalidToken"
+                : isTokenExpired(passToken) ? "expired"
+                : null;
+    }
+
+    private boolean isTokenFound(PasswordResetToken passToken) {
+        return passToken != null;
+    }
+
+    private boolean isTokenExpired(PasswordResetToken passToken) {
+        final Calendar cal = Calendar.getInstance();
+        return passToken.getExpiryDate().before(cal.getTime());
+    }
+
+    @Override
+    public void changePassword(PasswordDto passwordDto) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(passwordDto.getToken());
+        passwordDto.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
+        userRepository.changePassword(passwordResetToken.getUser().getEmail(), passwordDto.getPassword());
+    }
+
+    private void createPasswordResetTokenForUser(User user, String token) {
         PasswordResetToken myToken = new PasswordResetToken(token, user);
         passwordResetTokenRepository.save(myToken);
     }

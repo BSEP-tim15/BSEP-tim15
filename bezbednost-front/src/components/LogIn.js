@@ -50,7 +50,8 @@ const LogIn = () => {
                     <button type='submit' className='btn mt-4 w-25' 
                         style={{marginLeft: "38%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                         Log in
-                    </button>
+                    </button> <br />
+                    <Link to="/forgotPassword" style={{marginLeft: "42%", fontSize: "13px"}}>Forgot password?</Link>
                     
                 </form>
             </div>

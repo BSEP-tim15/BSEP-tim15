@@ -9,6 +9,7 @@ import EndEntityCertificates from './components/endEntity/EndEntityCertificates'
 import RootCertificates from './components/root/rootCertificates';
 import ForgotPassword from './components/ForgotPassword';
 import Verification from './components/Verification';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route exact path="/endEntityCertificates" element={<EndEntityCertificates/>} />
             <Route exact path="/forgotPassword" element={<ForgotPassword/>} />
             <Route exact path="/verify/:code"element={<Verification/>} />
+            <Route exact path="/resetPassword/:token" element={<ResetPassword/>}/>
           </Routes>
         </div>
       </Router>

@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.iservice;
 
+import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.model.User;
 
@@ -21,4 +22,8 @@ public interface IUserService {
     void sendRecoveryURL(String email, String token);
 
     void resetPassword(String email);
+
+    String validatePasswordResetToken(String token);
+
+    void changePassword(PasswordDto passwordDto);
 }

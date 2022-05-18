@@ -16,7 +16,7 @@ const ForgotPassword = () => {
         e.preventDefault();
         console.log(SERVER_URL + "/users/resetPassword")
         console.log(emailDto)
-        axios.post(SERVER_URL + "/users/resetPassword", emailDto)
+        axios.post(SERVER_URL + "/users/resetPassword", {email: email})
             .then(response => {
                 addToast("Code is sent to your email!", { appearance: "success" });
              })
