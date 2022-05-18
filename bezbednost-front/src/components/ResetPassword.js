@@ -44,7 +44,7 @@ const ResetPassword = () => {
     const resetPassword = (e) => {
         e.preventDefault();
         if(!passwordMatches()) return
-        axios.put(SERVER_URL + "/users/changePassword", changePasswordDto)
+        axios.put(SERVER_URL + "/users/resetPassword", changePasswordDto)
             .then(
                 response => {
                     if(response.status == 204) {

@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.service;
 
+import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
 import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.iservice.IRoleService;
@@ -169,10 +170,22 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void changePassword(PasswordDto passwordDto) {
+    public void resetPassword(PasswordDto passwordDto) {
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(passwordDto.getToken());
         passwordDto.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
         userRepository.changePassword(passwordResetToken.getUser().getEmail(), passwordDto.getPassword());
+    }
+
+    @Override
+    public String changePassword(User user, ChangePasswordDto changePasswordDto) {
+        if(!passwordMatches(changePasswordDto.getOldPassword(), user.getPassword())) return "Passwords don't match!";
+        String newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
+        userRepository.changePassword(user.getEmail(), newPassword);
+        return "OK";
+    }
+
+    private boolean passwordMatches(String oldPassword, String encodedPassword){
+        return passwordEncoder.matches(oldPassword, encodedPassword);
     }
 
     private void createPasswordResetTokenForUser(User user, String token) {

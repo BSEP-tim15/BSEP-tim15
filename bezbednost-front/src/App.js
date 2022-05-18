@@ -10,6 +10,7 @@ import RootCertificates from './components/root/rootCertificates';
 import ForgotPassword from './components/ForgotPassword';
 import Verification from './components/Verification';
 import ResetPassword from './components/ResetPassword';
+import ChangePassword from './components/ChangePassword';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route exact path="/forgotPassword" element={<ForgotPassword/>} />
             <Route exact path="/verify/:code"element={<Verification/>} />
             <Route exact path="/resetPassword/:token" element={<ResetPassword/>}/>
+            <Route exact path="/changePassword" element={<ChangePassword/>} />
           </Routes>
         </div>
       </Router>

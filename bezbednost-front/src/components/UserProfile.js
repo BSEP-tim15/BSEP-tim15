@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import NavBar from './NavBar';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const UserProfile = () => {
 
@@ -44,6 +45,8 @@ const UserProfile = () => {
                     <hr className="bg-light border-3 border-top mt-0" />
                     <label className='form-label mt-1'><h6>Coutry: </h6></label>
                     <label className='form-label mt-1 ms-3'>{user.country}</label>
+                    <hr className="bg-light border-3 border-top mt-0" />
+                    <Link to="/changePassword" style={{ color: "#4a6560" }}>Change password</Link>
                     <hr className="bg-light border-3 border-top mt-0" />
                 </div>
             </div>
