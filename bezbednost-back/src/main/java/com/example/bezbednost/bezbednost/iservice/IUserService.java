@@ -29,4 +29,6 @@ public interface IUserService {
     void resetPassword(PasswordDto passwordDto);
 
     String changePassword(User user, ChangePasswordDto changePasswordDto);
+
+    void sendLoginEmail(String email);
 }

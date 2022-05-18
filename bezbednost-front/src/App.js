@@ -11,6 +11,7 @@ import ForgotPassword from './components/ForgotPassword';
 import Verification from './components/Verification';
 import ResetPassword from './components/ResetPassword';
 import ChangePassword from './components/ChangePassword';
+import PasswordlessLogin from './components/passwordlessLogin';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route exact path="/verify/:code"element={<Verification/>} />
             <Route exact path="/resetPassword/:token" element={<ResetPassword/>}/>
             <Route exact path="/changePassword" element={<ChangePassword/>} />
+            <Route exact path="/passwordlessLogin/:token" element={<PasswordlessLogin/>} />
           </Routes>
         </div>
       </Router>

@@ -7,9 +7,11 @@ import com.example.bezbednost.bezbednost.iservice.IRoleService;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.mapper.UserMapper;
 import com.example.bezbednost.bezbednost.model.PasswordResetToken;
+import com.example.bezbednost.bezbednost.model.PasswordlessLoginToken;
 import com.example.bezbednost.bezbednost.model.Role;
 import com.example.bezbednost.bezbednost.model.User;
 import com.example.bezbednost.bezbednost.repository.IPasswordResetTokenRepository;
+import com.example.bezbednost.bezbednost.repository.IPasswordlessLoginTokenRepository;
 import com.example.bezbednost.bezbednost.repository.IUserRepository;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
@@ -32,6 +34,7 @@ public class UserService implements IUserService {
     private final IRoleService roleService;
     private final JavaMailSender mailSender;
     private final IPasswordResetTokenRepository passwordResetTokenRepository;
+    private final IPasswordlessLoginTokenRepository passwordlessLoginTokenRepository;
 
     @Override
     public User findByUsername(String username) {
@@ -182,6 +185,44 @@ public class UserService implements IUserService {
         String newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
         userRepository.changePassword(user.getEmail(), newPassword);
         return "OK";
+    }
+
+    @Override
+    public void sendLoginEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        String token = UUID.randomUUID().toString();
+
+        createPasswordlessLoginTokenForUser(user, token);
+
+        sendLoginEmail(email, token);
+    }
+    
+    private void sendLoginEmail(String email, String token){
+        User user = userRepository.findByEmail(email);
+        String subject = "Log in to your account";
+        String sender = "Public key infrastructure";
+        String content = "<p>Dear " + user.getName() + ", <p>";
+        String loginURL = "http://localhost:3000/passwordlessLogin/token=" + token;
+        content += "Click on link to log in into your account: <a href=\"" + loginURL + "\">link</a>";
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setFrom("publickeyinfrastructuresomn@gmail.com", sender);
+            helper.setTo(user.getEmail());
+            helper.setSubject(subject);
+            helper.setText(content, true);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        mailSender.send(message);
+    }
+    
+    private void createPasswordlessLoginTokenForUser(User user, String token) {
+        PasswordlessLoginToken userToken = new PasswordlessLoginToken(token, user);
+        passwordlessLoginTokenRepository.save(userToken);
     }
 
     private boolean passwordMatches(String oldPassword, String encodedPassword){

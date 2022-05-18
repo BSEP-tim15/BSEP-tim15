@@ -53,7 +53,6 @@ public class UserController {
 
     @PostMapping("/resetPassword")
     public ResponseEntity resetPassword(@RequestBody EmailDto emailDto){
-        System.out.println(emailDto);
         userService.resetPassword(emailDto.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -86,5 +85,11 @@ public class UserController {
         if(result == "OK")
             return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/sendLoginEmail/{email}")
+    public ResponseEntity sendLoginEmail(@PathVariable String email){
+        userService.sendLoginEmail(email);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

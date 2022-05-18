@@ -3,6 +3,7 @@ package com.example.bezbednost.bezbednost.controller;
 import com.example.bezbednost.bezbednost.config.TokenUtils;
 import com.example.bezbednost.bezbednost.config.UserTokenState;
 import com.example.bezbednost.bezbednost.dto.JwtAuthenticationDto;
+import com.example.bezbednost.bezbednost.dto.PasswordlessLoginDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
@@ -65,4 +66,19 @@ public class AuthenticationController {
 
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
+
+    @PostMapping("/loginPasswordless")
+    public ResponseEntity<UserTokenState> createAuthenticationTokenPasswordless(@RequestBody PasswordlessLoginDto authenticationRequest, HttpServletResponse response) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                authenticationRequest.getEmail(), null);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        User user = userService.findByUsername(authenticationRequest.getEmail());
+        String jwt = tokenUtils.generateToken(user.getUsername());
+        int expiresIn = tokenUtils.getExpiresIn();
+
+        return ResponseEntity.ok(new UserTokenState(jwt, (long) expiresIn));
+    }
+
 }

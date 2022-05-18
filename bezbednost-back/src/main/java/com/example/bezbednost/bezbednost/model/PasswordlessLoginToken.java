@@ -1,15 +1,17 @@
 package com.example.bezbednost.bezbednost.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
 
-@Entity
 @Data
-public class PasswordResetToken {
-    private static final int EXPIRATION = 60 * 24;
+@Entity
+@NoArgsConstructor
+public class PasswordlessLoginToken {
+    private static final int EXPIRATION = 60;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,22 +25,10 @@ public class PasswordResetToken {
 
     private Date expiryDate;
 
-    public PasswordResetToken() { }
-
-    public PasswordResetToken(final String token) {
-        this.token = token;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
-    }
-
-    public PasswordResetToken(final String token, final User user) {
-        super();
-
+    public PasswordlessLoginToken(final String token, final User user){
         this.token = token;
         this.user = user;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
-    }
-    public Long getId() {
-        return id;
     }
 
     private Date calculateExpiryDate(final int expiryTimeInMinutes) {
