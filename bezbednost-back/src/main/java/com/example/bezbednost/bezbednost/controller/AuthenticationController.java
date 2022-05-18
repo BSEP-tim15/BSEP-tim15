@@ -53,9 +53,12 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<User> createUser(@RequestBody UserDto userDto, UriComponentsBuilder ucBuilder) {
         User existUser = this.userService.findByUsername(userDto.getUsername());
+        User existEmail =  this.userService.findByEmail(userDto.getEmail());
 
         if (existUser != null) {
             throw new ResourceConflictException(userDto.getUsername(), "Username already exists!");
+        } else if(existEmail != null) {
+            throw new ResourceConflictException(userDto.getEmail(), "Email already exist!");
         }
 
         User user = this.userService.save(userDto);

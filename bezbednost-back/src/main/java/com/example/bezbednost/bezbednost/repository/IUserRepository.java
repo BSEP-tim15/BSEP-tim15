@@ -19,4 +19,7 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Transactional
     void approve(Integer id);
+
+    @Query("SELECT u FROM User u WHERE u.email=?1")
+    User findByEmail(String email);
 }

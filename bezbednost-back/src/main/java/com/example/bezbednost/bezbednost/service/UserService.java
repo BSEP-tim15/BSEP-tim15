@@ -5,11 +5,15 @@ import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
 import com.example.bezbednost.bezbednost.iservice.IRoleService;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.mapper.UserMapper;
+import com.example.bezbednost.bezbednost.model.PasswordResetToken;
 import com.example.bezbednost.bezbednost.model.Role;
 import com.example.bezbednost.bezbednost.model.User;
+import com.example.bezbednost.bezbednost.repository.IPasswordResetTokenRepository;
 import com.example.bezbednost.bezbednost.repository.IUserRepository;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,9 +23,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +32,7 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final IRoleService roleService;
     private final JavaMailSender mailSender;
+    private final IPasswordResetTokenRepository passwordResetTokenRepository;
 
    /* public UserService(IUserRepository userRepository, PasswordEncoder passwordEncoder, IRoleService roleService) {
         this.userRepository = userRepository;
@@ -40,6 +43,11 @@ public class UserService implements IUserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -116,5 +124,45 @@ public class UserService implements IUserService {
             return true;
         }
     }
+
+    @Override
+    public void sendRecoveryURL(String email, String token){
+        User user = userRepository.findByEmail(email);
+        String subject = "Recover your account";
+        String sender = "Public key infrastructure";
+        String content = "<p>Dear " + user.getName() + ", <p>";
+        String resetURL = "http://localhost:3000/resetPassword/token=" + token;
+        content += "Reset password: <h3><a href=\"" + resetURL + "\">link</a></h3>";
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setFrom("publickeyinfrastructuresomn@gmail.com", sender);
+            helper.setTo(user.getEmail());
+            helper.setSubject(subject);
+            helper.setText(content, true);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        mailSender.send(message);
+    }
+
+    @Override
+    public void resetPassword(String email) {
+        User user = userRepository.findByEmail(email);
+
+        String token = UUID.randomUUID().toString();
+
+        createPasswordResetTokenForUser(user, token);
+
+        sendRecoveryURL(email, token);
+    }
+
+    public void createPasswordResetTokenForUser(User user, String token) {
+        PasswordResetToken myToken = new PasswordResetToken(token, user);
+        passwordResetTokenRepository.save(myToken);
+    }
+
 
 }

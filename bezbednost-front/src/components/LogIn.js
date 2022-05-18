@@ -44,9 +44,9 @@ const LogIn = () => {
                 <div className='title-underline'/>
                 <form className='mt-4 text-start' onSubmit={(e) => logIn(e)}>
                     <label className='form-label'>Username</label>
-                    <input className='form-control' type="text" placeholder='Enter username' value={username} onChange={(e) => setUsername(e.target.value)} />
+                    <input className='form-control' required type="text" placeholder='Enter username' value={username} onChange={(e) => setUsername(e.target.value)} />
                     <label className='form-label mt-2'>Password</label>
-                    <input className='form-control' type="password" placeholder='Enter password' value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input className='form-control' required type="password" placeholder='Enter password' value={password} onChange={(e) => setPassword(e.target.value)} />
                     <button type='submit' className='btn mt-4 w-25' 
                         style={{marginLeft: "38%", backgroundColor: "#4a6560", color: "white", borderRadius: "12px"}}>
                         Log in

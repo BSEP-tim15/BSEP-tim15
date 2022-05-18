@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.controller;
 
+import com.example.bezbednost.bezbednost.dto.EmailDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.model.User;
@@ -46,5 +47,12 @@ public class UserController {
         boolean verified = userService.verify(code);
 
         return verified ? "Your account is successfully verified!" : "We are sorry, your account is not verified.";
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity resetPassword(@RequestBody EmailDto email){
+        System.out.println(email);
+        userService.resetPassword(email.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
