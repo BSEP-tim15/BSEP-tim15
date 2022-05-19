@@ -7,7 +7,9 @@ import com.example.bezbednost.bezbednost.dto.PasswordlessLoginDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
+import com.example.bezbednost.bezbednost.model.PasswordlessLoginToken;
 import com.example.bezbednost.bezbednost.model.User;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,13 +70,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/loginPasswordless")
-    public ResponseEntity<UserTokenState> createAuthenticationTokenPasswordless(@RequestBody PasswordlessLoginDto authenticationRequest, HttpServletResponse response) {
+    public ResponseEntity<UserTokenState> createAuthenticationTokenPasswordless(@Param("token") String token, HttpServletResponse response) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getEmail(), null);
+                token, null);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userService.findByUsername(authenticationRequest.getEmail());
+        User user = userService.findUserFromToken(token);
         String jwt = tokenUtils.generateToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiresIn();
 

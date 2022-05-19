@@ -23,7 +23,6 @@ import java.security.Principal;
 public class UserController {
 
     private final IUserService userService;
-    private final AuthenticationManager authenticationManager;
 
     @GetMapping()
     public User user(Principal user) {
@@ -91,5 +90,15 @@ public class UserController {
     public ResponseEntity sendLoginEmail(@PathVariable String email){
         userService.sendLoginEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/validatePasswordToken")
+    public ResponseEntity validatePasswordToken(@Param("token") String token){
+        String result = userService.validatePasswordlessLoginToken(token);
+        if(result != null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 }

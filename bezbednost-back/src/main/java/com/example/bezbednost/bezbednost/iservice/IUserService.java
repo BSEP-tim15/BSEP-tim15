@@ -31,4 +31,8 @@ public interface IUserService {
     String changePassword(User user, ChangePasswordDto changePasswordDto);
 
     void sendLoginEmail(String email);
+
+    String validatePasswordlessLoginToken(String token);
+
+    User findUserFromToken(String token);
 }

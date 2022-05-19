@@ -157,7 +157,13 @@ public class UserService implements IUserService {
 
     @Override
     public String validatePasswordResetToken(String token) {
-        final PasswordResetToken passToken = passwordResetTokenRepository.findByToken(token);
+        PasswordResetToken passToken = new PasswordResetToken();
+        List<PasswordResetToken> tokens = passwordResetTokenRepository.findAll();
+        for (PasswordResetToken t: tokens) {
+            if(passwordEncoder.matches(token, t.getToken())){
+                passToken = t;
+            }
+        }
         return !isTokenFound(passToken) ? "invalidToken"
                 : isTokenExpired(passToken) ? "expired"
                 : null;
@@ -174,7 +180,13 @@ public class UserService implements IUserService {
 
     @Override
     public void resetPassword(PasswordDto passwordDto) {
-        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(passwordDto.getToken());
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        List<PasswordResetToken> tokens = passwordResetTokenRepository.findAll();
+        for (PasswordResetToken t: tokens) {
+            if(passwordEncoder.matches(passwordDto.getToken(), t.getToken())){
+                passwordResetToken = t;
+            }
+        }
         passwordDto.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
         userRepository.changePassword(passwordResetToken.getUser().getEmail(), passwordDto.getPassword());
     }
@@ -197,7 +209,30 @@ public class UserService implements IUserService {
 
         sendLoginEmail(email, token);
     }
-    
+
+    @Override
+    public String validatePasswordlessLoginToken(String token) {
+        PasswordlessLoginToken passToken = new PasswordlessLoginToken();
+        List<PasswordlessLoginToken> tokens = passwordlessLoginTokenRepository.findAll();
+        for (PasswordlessLoginToken t: tokens) {
+            if(passwordEncoder.matches(token, t.getToken())){
+                passToken = t;
+            }
+        }
+        return !isTokenFound(passToken) ? "invalidToken"
+                : isTokenExpired(passToken) ? "expired"
+                : null;
+    }
+
+    private boolean isTokenFound(PasswordlessLoginToken passToken) {
+        return passToken != null;
+    }
+
+    private boolean isTokenExpired(PasswordlessLoginToken passToken) {
+        final Calendar cal = Calendar.getInstance();
+        return passToken.getExpiryDate().before(cal.getTime());
+    }
+
     private void sendLoginEmail(String email, String token){
         User user = userRepository.findByEmail(email);
         String subject = "Log in to your account";
@@ -221,7 +256,7 @@ public class UserService implements IUserService {
     }
     
     private void createPasswordlessLoginTokenForUser(User user, String token) {
-        PasswordlessLoginToken userToken = new PasswordlessLoginToken(token, user);
+        PasswordlessLoginToken userToken = new PasswordlessLoginToken(passwordEncoder.encode(token), user);
         passwordlessLoginTokenRepository.save(userToken);
     }
 
@@ -230,8 +265,19 @@ public class UserService implements IUserService {
     }
 
     private void createPasswordResetTokenForUser(User user, String token) {
-        PasswordResetToken myToken = new PasswordResetToken(token, user);
+        PasswordResetToken myToken = new PasswordResetToken(passwordEncoder.encode(token), user);
         passwordResetTokenRepository.save(myToken);
+    }
+
+    @Override
+    public User findUserFromToken(String token) {
+        List<PasswordlessLoginToken> tokens = passwordlessLoginTokenRepository.findAll();
+        for (PasswordlessLoginToken t: tokens) {
+            if(passwordEncoder.matches(token, t.getToken())){
+                return t.getUser();
+            }
+        }
+        return null;
     }
 
 

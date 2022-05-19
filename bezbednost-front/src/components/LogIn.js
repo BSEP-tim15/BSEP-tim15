@@ -43,6 +43,7 @@ const LogIn = () => {
         axios.get(SERVER_URL + "/users/sendLoginEmail/" + email)
         .then(response => {
             console.log(response.status)
+            addToast("Log in link has been sent to your email!", { appearance: "success" });
         })
     }
 

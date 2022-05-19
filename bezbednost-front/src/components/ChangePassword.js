@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 
 const ChangePassword = () => {
@@ -10,6 +11,7 @@ const ChangePassword = () => {
     const [newPassword, setNewPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [messagePass, setMessagePass] = useState("");
+    const navigate = useNavigate();
 
     const changePasswordDto = {
         oldPassword: oldPassword,
@@ -22,7 +24,7 @@ const ChangePassword = () => {
                      'Authorization' : `Bearer ${localStorage.jwtToken}`}
         axios.put(SERVER_URL + "/users/changePassword", changePasswordDto, {headers: headers})
             .then(response => {
-                
+                navigate("/profile");
             });
     }
 

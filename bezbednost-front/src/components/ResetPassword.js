@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToasts } from 'react-toast-notifications';
 
 const ResetPassword = () => {
@@ -8,6 +9,7 @@ const ResetPassword = () => {
     const url = window.location.href;
 
     const { addToast } = useToasts();
+    const navigate = useNavigate();
 
     const [token, setToken] = useState("");
     const [password, setPassword] = useState("");
@@ -52,6 +54,7 @@ const ResetPassword = () => {
                         setMessage("Your token has expired, please request new!");
                     } else {
                         addToast("Your password is successfully changed!", { appearance: "success" });
+                        navigate("/");
                     }
                 }
             )
