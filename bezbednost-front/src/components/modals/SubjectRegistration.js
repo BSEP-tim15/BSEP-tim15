@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { useToasts } from "react-toast-notifications";
 import axios from "axios";
+import { validName, validCountry, validEmail } from '../../validation/SubjectValidation';
 
 const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
 
@@ -17,14 +18,32 @@ const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
 
     const registerSubject = (e) => {
         e.preventDefault();
-        var newSubject = {...subject, username:username, role:role}
-        axios.post(SERVER_URL + "/users", newSubject)
-            .then(response => {
-                setModalIsOpen(false);
-                window.location.reload();
+        if (validate()) {
+            var newSubject = {...subject, username:username, role:role}
+            axios.post(SERVER_URL + "/users", newSubject)
+                .then(response => {
+                    setModalIsOpen(false);
+                    window.location.reload();
             })
+        }
+
     }
 
+    const validate = () => {
+        if (!validName.test(subject.name)) {
+            alert("Invalid name!");
+            return false;
+        }
+        if (!validCountry.test(subject.country)) {
+            alert("Invalid country name!");
+            return false;
+        }
+        if (!validEmail.test(subject.email)) {
+            alert("Invalid email!");
+            return false;
+        }
+        return true;
+    }
 
     return (
         <div>
