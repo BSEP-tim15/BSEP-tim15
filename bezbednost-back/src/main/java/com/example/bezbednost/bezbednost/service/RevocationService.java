@@ -147,14 +147,14 @@ public class RevocationService implements IRevocationService {
 
         try {
             contentSigner = builder.build(keyService.readPrivateKey(
-                    "intermediateCertificates.jsk", certificateDto.getIntermediatePassword(), serialNumber.toString(), certificateDto.getIntermediatePassword()));
+                    "intermediateCertificates.jks", certificateDto.getIntermediatePassword(), serialNumber.toString(), certificateDto.getIntermediatePassword()));
         } catch (OperatorCreationException e) {
             try {
                 contentSigner = builder.build(keyService.readPrivateKey(
-                        "rootCertificates.jsk", certificateDto.getRootPassword(), serialNumber.toString(), certificateDto.getRootPassword()));
+                        "rootCertificates.jks", certificateDto.getRootPassword(), serialNumber.toString(), certificateDto.getRootPassword()));
             } catch (OperatorCreationException ex) {
                 contentSigner = builder.build(keyService.readPrivateKey(
-                        "end-entityCertificates.jsk", certificateDto.getEndEntityPassword(), serialNumber.toString(), certificateDto.getEndEntityPassword()));
+                        "end-entityCertificates.jks", certificateDto.getEndEntityPassword(), serialNumber.toString(), certificateDto.getEndEntityPassword()));
             }
         }
 
@@ -167,12 +167,12 @@ public class RevocationService implements IRevocationService {
 
     private X509Certificate getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) {
         X509Certificate certificate = (X509Certificate) keyService.readCertificate(
-                "rootCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getRootPassword());
+                "rootCertificates.jks", certificateDto.getSerialNumber().toString(), certificateDto.getRootPassword());
         if (certificate == null) {
-            if (keyService.readCertificate("intermediateCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getIntermediatePassword()) != null) {
-                certificate = (X509Certificate) keyService.readCertificate("intermediateCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getIntermediatePassword());
+            if (keyService.readCertificate("intermediateCertificates.jks", certificateDto.getSerialNumber().toString(), certificateDto.getIntermediatePassword()) != null) {
+                certificate = (X509Certificate) keyService.readCertificate("intermediateCertificates.jks", certificateDto.getSerialNumber().toString(), certificateDto.getIntermediatePassword());
             } else {
-                certificate = (X509Certificate) keyService.readCertificate("end-entityCertificates.jsk", certificateDto.getSerialNumber().toString(), certificateDto.getEndEntityPassword());
+                certificate = (X509Certificate) keyService.readCertificate("end-entityCertificates.jks", certificateDto.getSerialNumber().toString(), certificateDto.getEndEntityPassword());
             }
             return certificate;
         } else {
