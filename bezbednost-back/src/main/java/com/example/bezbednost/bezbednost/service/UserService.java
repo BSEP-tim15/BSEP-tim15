@@ -90,7 +90,7 @@ public class UserService implements IUserService {
         String subject = "Please verify your registration!";
         String sender = "Public key infrastructure";
         String content = "<p>Dear " + user.getName() + ", <p>";
-        String verifyURL = "http://localhost:3000/verify/code=" + user.getVerificationCode();
+        String verifyURL = "https://localhost:3000/verify/code=" + user.getVerificationCode();
         content += "<h3><a href=\"" + verifyURL + "\">VERIFY ACCOUNT</a></h3>";
         content += "<p>Thank you,<br>PKI</p>";
 
@@ -127,7 +127,7 @@ public class UserService implements IUserService {
         String subject = "Recover your account";
         String sender = "Public key infrastructure";
         String content = "<p>Dear " + user.getName() + ", <p>";
-        String resetURL = "http://localhost:3000/resetPassword/token=" + token;
+        String resetURL = "https://localhost:3000/resetPassword/token=" + token;
         content += "Reset password: <a href=\"" + resetURL + "\">link</a>";
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -238,7 +238,7 @@ public class UserService implements IUserService {
         String subject = "Log in to your account";
         String sender = "Public key infrastructure";
         String content = "<p>Dear " + user.getName() + ", <p>";
-        String loginURL = "http://localhost:3000/passwordlessLogin/token=" + token;
+        String loginURL = "https://localhost:3000/passwordlessLogin/token=" + token;
         content += "Click on link to log in into your account: <a href=\"" + loginURL + "\">link</a>";
 
         MimeMessage message = mailSender.createMimeMessage();
