@@ -47,7 +47,7 @@ public class AuthenticationController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = (User) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(user.getUsername());
+        String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
         int expiresIn = tokenUtils.getExpiresIn();
 
         return ResponseEntity.ok(new UserTokenState(jwt, (long) expiresIn));
@@ -77,7 +77,7 @@ public class AuthenticationController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = userService.findUserFromToken(token);
-        String jwt = tokenUtils.generateToken(user.getUsername());
+        String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
         int expiresIn = tokenUtils.getExpiresIn();
 
         return ResponseEntity.ok(new UserTokenState(jwt, (long) expiresIn));

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class TokenUtils {
@@ -29,10 +30,12 @@ public class TokenUtils {
     @Value("Authorization")
     private String AUTH_HEADER;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, List<String> roles, List<String> authorities) {
         return Jwts.builder()
                 .setIssuer(APP_NAME)
                 .setSubject(username)
+                .claim("roles", roles)
+                .claim("authorities", authorities)
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
@@ -50,7 +53,6 @@ public class TokenUtils {
 
     public String getUsernameFromToken(String token) {
         String username;
-
         try {
             final Claims claims = this.getAllClaimsFromToken(token);
             username = claims.getSubject();

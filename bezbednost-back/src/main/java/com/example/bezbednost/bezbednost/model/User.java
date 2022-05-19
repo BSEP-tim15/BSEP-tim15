@@ -4,9 +4,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,7 +62,32 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for (Role r : roles) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(r.getName()));
+            for (Permission permission : r.getPermissions()) {
+                grantedAuthorities.add(new SimpleGrantedAuthority(permission.getName()));
+            }
+        }
+        return grantedAuthorities;
+    }
+
+    public List<String> getRoleNames(){
+        List<String> roleNames = new ArrayList<>();
+        for(Role role: roles){
+            roleNames.add(role.getName());
+        }
+        return roleNames;
+    }
+
+    public List<String> getPermissionNames(){
+        List<String> permissionNames = new ArrayList<>();
+        for(Role role : roles){
+            for(Permission permission: role.getPermissions()){
+                permissionNames.add(permission.getName());
+            }
+        }
+        return permissionNames;
     }
 
     @Override
