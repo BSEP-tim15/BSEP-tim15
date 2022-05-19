@@ -94,14 +94,14 @@ public class PostCertificateService implements IPostCertificateService {
             CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
         KeyPair key = null;
         try {
-            key = findSubjectKey("rootCertificates.jsk", issuer, passwords.getRootPassword());
+            key = findSubjectKey("rootCertificates.jks", issuer, passwords.getRootPassword());
         }
         catch(FileNotFoundException e){
             key = null;
         }
         if(key == null){
             try {
-                key = findSubjectKey("intermediateCertificates.jsk",issuer, passwords.getIntermediatePassword());
+                key = findSubjectKey("intermediateCertificates.jks",issuer, passwords.getIntermediatePassword());
             }
             catch(FileNotFoundException e){
                 key = null;
@@ -180,7 +180,7 @@ public class PostCertificateService implements IPostCertificateService {
 
     private void saveCertificate(X509Certificate certificate, PrivateKey privateKey, String type, PasswordsDto passwords) throws CertificateException,
             IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
-        String fileName = type + "Certificates.jsk";
+        String fileName = type + "Certificates.jks";
         String password = getFilePassword(fileName, passwords);
         try {
             keyService.loadKeyStore(fileName, password.toCharArray());
@@ -196,11 +196,11 @@ public class PostCertificateService implements IPostCertificateService {
         }
         else{
             Certificate[] chain = null;
-            if(keyService.getChain(chainAlias, "rootCertificates.jsk", passwords.getRootPassword()) != null){
-                chain = keyService.getChain(chainAlias, "rootCertificates.jsk", passwords.getRootPassword());
+            if(keyService.getChain(chainAlias, "rootCertificates.jks", passwords.getRootPassword()) != null){
+                chain = keyService.getChain(chainAlias, "rootCertificates.jks", passwords.getRootPassword());
             }
-            else if(keyService.getChain(chainAlias, "intermediateCertificates.jsk", passwords.getIntermediatePassword()) != null){
-                chain = keyService.getChain(chainAlias, "intermediateCertificates.jsk", passwords.getIntermediatePassword());
+            else if(keyService.getChain(chainAlias, "intermediateCertificates.jks", passwords.getIntermediatePassword()) != null){
+                chain = keyService.getChain(chainAlias, "intermediateCertificates.jks", passwords.getIntermediatePassword());
             }
             certificates = new X509Certificate[chain.length + 1];
             certificates[0] = certificate;
@@ -233,7 +233,7 @@ public class PostCertificateService implements IPostCertificateService {
     public void exportCertificate(GetSingleCertificateDto certificateDto) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         CertificateDto certificate = getCertificateService.getCertificateBySerialNumber(certificateDto);
-        String keyStoreName = certificate.getCertificateType() + "Certificates.jsk";
+        String keyStoreName = certificate.getCertificateType() + "Certificates.jks";
         String keyStorePassword = getFilePassword(keyStoreName,
                 new PasswordsDto(certificateDto.getRootPassword(), certificateDto.getIntermediatePassword(), certificateDto.getEndEntityPassword()));
         String certificateName = certificateDto.getSerialNumber().toString();

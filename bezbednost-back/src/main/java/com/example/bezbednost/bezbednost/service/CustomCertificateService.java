@@ -31,7 +31,7 @@ public class CustomCertificateService implements ICustomCertificateService {
     public void createCustomCertificate(X509Certificate certificate, String type, String password) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         CustomCertificate customCertificate = new CustomCertificate();
         customCertificate.setRevoked(false);
-        customCertificate.setId(9);
+        customCertificate.setId(1000);
         customCertificate.setSerialNumber(certificate.getSerialNumber());
         if(Objects.equals(type, "root")){
             customCertificate.setIssuerSerialNumber(BigInteger.valueOf(0));

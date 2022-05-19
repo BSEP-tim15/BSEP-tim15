@@ -96,9 +96,9 @@ public class GetCertificateService implements IGetCertificateService {
 
     private List<CertificateDto> getAllCertificates(PasswordsDto passwords) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
-        String rootFile = "rootCertificates.jsk";
-        String intermediateFile = "intermediateCertificates.jsk";
-        String endEntityFile = "end-entityCertificates.jsk";
+        String rootFile = "rootCertificates.jks";
+        String intermediateFile = "intermediateCertificates.jks";
+        String endEntityFile = "end-entityCertificates.jks";
         GetSingleCertificateDto certificateDto = new GetSingleCertificateDto(
                 passwords.getRootPassword(), passwords.getIntermediatePassword(), passwords.getEndEntityPassword()
         );
@@ -110,13 +110,13 @@ public class GetCertificateService implements IGetCertificateService {
 
     private FileDto getFileInfo(GetCertificateDto certificate){
         if(Objects.equals(certificate.getCertificateType(), "root")){
-            return new FileDto("rootCertificates.jsk", certificate.getRootPassword());
+            return new FileDto("rootCertificates.jks", certificate.getRootPassword());
         }
         else if(Objects.equals(certificate.getCertificateType(), "intermediate")){
-            return new FileDto("intermediateCertificates.jsk", certificate.getIntermediatePassword());
+            return new FileDto("intermediateCertificates.jks", certificate.getIntermediatePassword());
         }
         else if(Objects.equals(certificate.getCertificateType(), "end-entity")){
-            return new FileDto("end-entityCertificates.jsk", certificate.getEndEntityPassword());
+            return new FileDto("end-entityCertificates.jks", certificate.getEndEntityPassword());
         }
         else {
             return new FileDto("all", "");
@@ -292,11 +292,11 @@ public class GetCertificateService implements IGetCertificateService {
 
     private Certificate[] getCertificateChain(GetSingleCertificateDto certificateDto) throws
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
-        Certificate[] certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "rootCertificates.jsk", certificateDto.getRootPassword());
+        Certificate[] certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "rootCertificates.jks", certificateDto.getRootPassword());
         if(certificates == null){
-            certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "intermediateCertificates.jsk", certificateDto.getIntermediatePassword());
+            certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "intermediateCertificates.jks", certificateDto.getIntermediatePassword());
             if(certificates == null){
-                certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "end-entityCertificates.jsk", certificateDto.getEndEntityPassword());
+                certificates = keyService.getChain(certificateDto.getSerialNumber().toString(), "end-entityCertificates.jks", certificateDto.getEndEntityPassword());
             }
         }
         return certificates;

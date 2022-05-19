@@ -15,6 +15,8 @@
     <description>bezbednost</description>
     <properties>
         <java.version>11</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <dependencies>
         <dependency>
@@ -146,7 +148,10 @@
             <artifactId>commons-pool2</artifactId>
             <version>2.4.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -162,6 +167,7 @@
                         </exclude>
                     </excludes>
                 </configuration>
+                <version>${project.parent.version}</version>
             </plugin>
         </plugins>
     </build>
