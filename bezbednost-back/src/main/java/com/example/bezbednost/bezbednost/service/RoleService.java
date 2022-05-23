@@ -18,6 +18,9 @@ public class RoleService implements IRoleService {
 
     @Override
     public List<Role> findByName(String role) {
+        System.out.println(roleRepository.findAll());
+        System.out.println(role);
+        System.out.println(roleRepository.findByName(role));
         return roleRepository.findByName(role);
     }
 }

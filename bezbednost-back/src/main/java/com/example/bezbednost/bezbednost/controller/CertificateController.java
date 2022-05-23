@@ -17,6 +17,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class CertificateController {
     }
 
     @PostMapping("/certificates")
+    @PreAuthorize("hasAuthority('read_certificate')")
     public ResponseEntity<List<CertificateDto>> getCertificates(@RequestBody GetCertificateDto certificate) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         return new ResponseEntity<>(getCertificateService.getCertificates(certificate), HttpStatus.OK);
@@ -114,6 +116,7 @@ public class CertificateController {
     }
 
     @PostMapping("/revoke")
+    @PreAuthorize("hasAuthority('revoke_certificate')")
     public ResponseEntity<?> revokeCertificate(@RequestBody SerialNumberDto serialNumberDto) {
         try {
             revocationService.revokeCertificate(serialNumberDto.getSerialNumber());
