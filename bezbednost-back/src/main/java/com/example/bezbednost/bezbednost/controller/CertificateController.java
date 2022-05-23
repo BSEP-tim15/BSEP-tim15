@@ -44,6 +44,7 @@ public class CertificateController {
     }
 
     @PostMapping("/createCertificate")
+    @PreAuthorize("hasAuthority('create_certificate')")
     public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws
             CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException,
             SignatureException, InvalidKeyException, NoSuchProviderException, UnrecoverableKeyException {
@@ -59,12 +60,14 @@ public class CertificateController {
     }
 
     @PostMapping("/bySubject")
+    @PreAuthorize("hasAuthority('read_certificate')")
     public ResponseEntity<List<CertificateDto>> getCertificatesBySubject(@RequestBody GetCertificateBySomeoneDto certificate) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         return new ResponseEntity<>(getCertificateService.getCertificatesBySubject(certificate), HttpStatus.OK);
     }
 
     @PostMapping("/issuers")
+    @PreAuthorize("hasAuthority('get_issuers')")
     public ResponseEntity<List<String>> getIssuers(@RequestBody PasswordsDto passwords) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         return new ResponseEntity<>(getCertificateService.getIssuers(passwords), HttpStatus.OK);
@@ -77,6 +80,7 @@ public class CertificateController {
     }
 
     @PostMapping("/singleCertificate")
+    @PreAuthorize("hasAuthority('read_certificate')")
     public ResponseEntity<CertificateDto> getCertificate(@RequestBody GetSingleCertificateDto certificate) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         return new ResponseEntity<>(getCertificateService.getCertificateBySerialNumber(certificate), HttpStatus.OK);
@@ -90,6 +94,7 @@ public class CertificateController {
     }
 
     @PostMapping("/parentCertificateSerialNumber")
+    @PreAuthorize("hasAuthority('read_certificate')")
     public ResponseEntity<BigInteger> getSerialNumberOfParentCertificate(@RequestBody GetSingleCertificateDto certificate) throws
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         return new ResponseEntity<>(getCertificateService.getSerialNumberOfParentCertificate(certificate), HttpStatus.OK);

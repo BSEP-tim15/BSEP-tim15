@@ -4,16 +4,19 @@ INSERT INTO roles VALUES (3, 'user');
 INSERT INTO roles VALUES (4, 'service');
 
 INSERT INTO permissions VALUES (1, 'read_certificate');
-INSERT INTO permissions VALUES (2, 'create_root_certificate');
-INSERT INTO permissions VALUES (3, 'create_intermediate_certificate');
-INSERT INTO permissions VALUES (4, 'create_end_entity_certificate');
-INSERT INTO permissions VALUES (5, 'revoke_certificate');
+INSERT INTO permissions VALUES (2, 'create_certificate');
+INSERT INTO permissions VALUES (3, 'revoke_certificate');
+INSERT INTO permissions VALUES (4, 'get_issuers');
 
-INSERT INTO roles_permissions VALUES (2,1);
-INSERT INTO roles_permissions VALUES (2,2);
-INSERT INTO roles_permissions VALUES (2,3);
-INSERT INTO roles_permissions VALUES (2,4);
-INSERT INTO roles_permissions VALUES (2,5);
-
-
---INSERT INTO users VALUES (1, 'Srbija', 'pavkovicn@hotmail.com', true, 'root', 'root123', 'root', '');
+INSERT INTO roles_permissions VALUES (2,1); --admin read
+INSERT INTO roles_permissions VALUES (2,2); --admin create
+INSERT INTO roles_permissions VALUES (1,1); --org read
+INSERT INTO roles_permissions VALUES (1,2); --org create
+INSERT INTO roles_permissions VALUES (4,2); --serv create
+INSERT INTO roles_permissions VALUES (1,3); --org revoke
+INSERT INTO roles_permissions VALUES (2,3); --admin revoke
+INSERT INTO roles_permissions VALUES (4,3); --serv revoke
+INSERT INTO roles_permissions VALUES (4,1); --serv read
+INSERT INTO roles_permissions VALUES (1,4); --org iss
+INSERT INTO roles_permissions VALUES (2,4); --adm iss
+INSERT INTO roles_permissions VALUES (4,4); --serv iss
