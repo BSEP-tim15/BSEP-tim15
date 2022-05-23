@@ -1,12 +1,12 @@
 package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.dto.PasswordsDto;
+import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.dto.certificate.CertificateDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
-import com.example.bezbednost.bezbednost.iservice.ICustomCertificateService;
-import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
-import com.example.bezbednost.bezbednost.iservice.IKeyToolService;
-import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
+import com.example.bezbednost.bezbednost.exception.InvalidInputException;
+import com.example.bezbednost.bezbednost.iservice.*;
+import com.example.bezbednost.bezbednost.validation.RegexValidator;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -41,17 +41,20 @@ public class PostCertificateService implements IPostCertificateService {
     private final IGetCertificateService getCertificateService;
     private final IKeyToolService keyToolService;
     private final ICustomCertificateService customCertificateService;
+    private final IValidationService validationService;
 
-    public PostCertificateService(IGetCertificateService getCertificateService, IKeyToolService keyToolService, ICustomCertificateService customCertificateService) {
+    public PostCertificateService(IGetCertificateService getCertificateService, IKeyToolService keyToolService,
+                                  ICustomCertificateService customCertificateService, IValidationService validationService) {
         this.getCertificateService = getCertificateService;
         this.keyToolService = keyToolService;
         this.customCertificateService = customCertificateService;
+        this.validationService = validationService;
     }
 
     @Override
     public void createCertificate(CertificateDto certificateDTO) throws OperatorCreationException,
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException,
-            UnrecoverableKeyException {
+            UnrecoverableKeyException, InvalidInputException {
         KeyPair keyPair = keyService.generateKeyPair();
         KeyPair subjectKey =
                 getSubjectKey(certificateDTO.getIssuer(), new PasswordsDto(certificateDTO.getRootPassword(),
@@ -86,8 +89,18 @@ public class PostCertificateService implements IPostCertificateService {
             throw new CertificateException("Certificate not trusted",e);
         }
         System.out.println("\nValidacija uspesna :)");
-        saveCertificate(certificate, keyPair.getPrivate(), certificateDTO.getCertificateType(),
-                new PasswordsDto(certificateDTO.getRootPassword(), certificateDTO.getIntermediatePassword(), certificateDTO.getEndEntityPassword()));
+
+        if (validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, certificateDTO.getIssuer()) &&
+                validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, certificateDTO.getSubject()) &&
+                validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, certificateDTO.getIssuerAlternativeName()) &&
+                validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, certificateDTO.getSubjectAlternativeName()) && !containsDangerousCharacters(certificateDTO)) {
+
+            saveCertificate(certificate, keyPair.getPrivate(), certificateDTO.getCertificateType(),
+                    new PasswordsDto(certificateDTO.getRootPassword(), certificateDTO.getIntermediatePassword(), certificateDTO.getEndEntityPassword()));
+        } else {
+            throw new InvalidInputException("Invalid input!");
+        }
+
     }
 
     private KeyPair getSubjectKey(String issuer, PasswordsDto passwords) throws KeyStoreException, NoSuchProviderException, IOException,
@@ -242,6 +255,9 @@ public class PostCertificateService implements IPostCertificateService {
         keyToolService.executeCommand(command);
     }
 
-
+    private boolean containsDangerousCharacters(CertificateDto certificateDto) {
+        return validationService.containsDangerousCharacters(certificateDto.getIssuer()) || validationService.containsDangerousCharacters(certificateDto.getSubject()) ||
+                validationService.containsDangerousCharacters(certificateDto.getSubjectAlternativeName()) || validationService.containsDangerousCharacters(certificateDto.getIssuerAlternativeName());
+    }
 
 }

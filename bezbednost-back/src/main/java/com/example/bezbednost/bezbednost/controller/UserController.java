@@ -4,6 +4,7 @@ import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
 import com.example.bezbednost.bezbednost.dto.EmailDto;
 import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.model.User;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,13 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<User> registerUser(@RequestBody UserDto userDto){
-        userService.save(userDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            userService.save(userDto);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (InvalidInputException e) {
+            e.getMessage();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/isUserRegistered")

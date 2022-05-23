@@ -6,6 +6,7 @@ import com.example.bezbednost.bezbednost.dto.SerialNumberDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateBySomeoneDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetCertificateDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
+import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IPostCertificateService;
 import com.example.bezbednost.bezbednost.iservice.IGetCertificateService;
@@ -46,8 +47,13 @@ public class CertificateController {
     public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDTO) throws
             CertificateException, OperatorCreationException, IOException, NoSuchAlgorithmException, KeyStoreException,
             SignatureException, InvalidKeyException, NoSuchProviderException, UnrecoverableKeyException {
-        postCertificateService.createCertificate(certificateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            postCertificateService.createCertificate(certificateDTO);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (InvalidInputException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/certificates")
