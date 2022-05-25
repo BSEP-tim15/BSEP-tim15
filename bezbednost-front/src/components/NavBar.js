@@ -61,12 +61,19 @@ const NavBar = () => {
         }
     }
 
+    const logout = () => {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('intermediatePassword');
+        localStorage.removeItem('rootPassword');
+        localStorage.removeItem('endEntityPassword');
+    }
+
     const adminNavBar = (
         <ul className="navbar-nav ms-auto me-5 mb-2 mb-lg-0">
             <Link to="/profile" className="nav-item" style={{textDecoration:"none", color: "black"}}>PROFILE</Link>
             <li role="button" className="nav-item ms-5" onClick={() => createCertificate()}>CREATE CERTIFICATE</li>
             <Link to="/certificates" className="nav-item ms-5" style={{textDecoration:"none", color: "black"}}>ALL CERTIFICATES</Link>
-            <Link to="/" className="nav-item ms-5" style={{textDecoration:"none", color: "black"}}>LOG OUT</Link>
+            <Link to="/" className="nav-item ms-5" onClick={logout} style={{textDecoration:"none", color: "black"}}>LOG OUT</Link>
         </ul>
     )
 
@@ -75,7 +82,7 @@ const NavBar = () => {
             <Link to="/profile" className="nav-item" style={{textDecoration:"none", color: "black"}}>PROFILE</Link>
             <li role="button" className="nav-item ms-5" onClick={() => createCertificate()}>CREATE CERTIFICATE</li>
             <Link to="/intermediateCertificates" className="nav-item ms-5" style={{textDecoration:"none", color: "black"}}>ALL CERTIFICATES</Link>
-            <Link to="/" className="nav-item ms-5" style={{textDecoration:"none", color: "black"}}>LOG OUT</Link>
+            <Link to="/" className="nav-item ms-5" onClick={logout} style={{textDecoration:"none", color: "black"}}>LOG OUT</Link>
         </ul>
     )
 
@@ -83,7 +90,7 @@ const NavBar = () => {
         <ul className="navbar-nav ms-auto me-5 mb-2 mb-lg-0">
             <Link to="/profile" className="nav-item" style={{textDecoration:"none", color: "black"}}>PROFILE</Link>
             <Link to="/endEntityCertificates" className="nav-item ms-5" style={{textDecoration:"none", color: "black"}}>ALL CERTIFICATES</Link>
-            <Link to="/" className="nav-item ms-5" style={{textDecoration:"none", color: "black"}}>LOG OUT</Link>
+            <Link to="/" className="nav-item ms-5" onClick={logout} style={{textDecoration:"none", color: "black"}}>LOG OUT</Link>
         </ul>
     )
 

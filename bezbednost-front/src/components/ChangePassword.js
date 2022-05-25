@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { validPassword } from "../validation/SubjectValidation";
 
 const ChangePassword = () => {
 
@@ -20,12 +21,38 @@ const ChangePassword = () => {
 
     const changePassword = (e) => {
         e.preventDefault();
-        const headers = {'Content-Type' : 'application/json',
-                     'Authorization' : `Bearer ${localStorage.jwtToken}`}
-        axios.put(SERVER_URL + "/users/changePassword", changePasswordDto, {headers: headers})
-            .then(response => {
-                navigate("/profile");
-            });
+        if(!passwordMatches()) {return}
+        if(validate()){
+            const headers = {'Content-Type' : 'application/json',
+                        'Authorization' : `Bearer ${localStorage.jwtToken}`}
+            axios.put(SERVER_URL + "/users/changePassword", changePasswordDto, {headers: headers})
+                .then(response => {
+                    console.log("WOHOOOO")
+                    if(response.status == 204){
+                        setMessagePass("Old password don't match!")
+                        return;
+                    }
+                    navigate("/profile");
+                });
+        }
+    }
+
+    const passwordMatches = () => {
+        if(newPassword === passwordConfirmation){
+            setMessagePass("")
+            console.log("OK1")
+            return true
+        }
+        setMessagePass("Passwords do not match!")
+        return false
+    }
+
+    const validate = () => {
+        if(!validPassword.test(newPassword)){
+            alert("Invalid password!");
+            return false;
+        }
+        return true;
     }
 
     return(
