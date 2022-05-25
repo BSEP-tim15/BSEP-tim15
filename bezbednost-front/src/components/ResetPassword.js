@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToasts } from 'react-toast-notifications';
+import { validPassword } from "../validation/SubjectValidation";
 
 const ResetPassword = () => {
 
@@ -46,18 +47,20 @@ const ResetPassword = () => {
     const resetPassword = (e) => {
         e.preventDefault();
         if(!passwordMatches()) return
-        axios.put(SERVER_URL + "/users/resetPassword", changePasswordDto)
-            .then(
-                response => {
-                    if(response.status == 204) {
-                        setIsTokenValid(false);
-                        setMessage("Your token has expired, please request new!");
-                    } else {
-                        addToast("Your password is successfully changed!", { appearance: "success" });
-                        navigate("/");
+        if(validate()) {
+            axios.put(SERVER_URL + "/users/resetPassword", changePasswordDto)
+                .then(
+                    response => {
+                        if(response.status == 204) {
+                            setIsTokenValid(false);
+                            setMessage("Your token has expired, please request new!");
+                        } else {
+                            addToast("Your password is successfully changed!", { appearance: "success" });
+                            navigate("/");
+                        }
                     }
-                }
-            )
+                )
+            }
         
     }
 
@@ -68,6 +71,14 @@ const ResetPassword = () => {
         }
         setMessagePass("Passwords do not match!")
         return false
+    }
+
+    const validate = () => {
+        if(!validPassword.test(password)){
+            alert("Invalid password!");
+            return false;
+        }
+        return true;
     }
 
     return (
