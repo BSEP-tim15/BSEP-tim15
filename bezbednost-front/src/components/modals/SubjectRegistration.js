@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { useToasts } from "react-toast-notifications";
 import axios from "axios";
-import { validName, validCountry, validEmail, validPassword } from '../../validation/SubjectValidation';
+import { validName, validCountry, validEmail, validPassword, containsDangerousCharacters } from '../../validation/SubjectValidation';
 
 const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
 
@@ -31,15 +31,15 @@ const SubjectRegistration = ({modalIsOpen, setModalIsOpen, username, role}) => {
     }
 
     const validate = () => {
-        if (!validName.test(subject.name)) {
+        if (!validName.test(subject.name) || containsDangerousCharacters(subject.name)) {
             alert("Invalid name!");
             return false;
         }
-        if (!validCountry.test(subject.country)) {
+        if (!validCountry.test(subject.country) || containsDangerousCharacters(subject.country)) {
             alert("Invalid country name!");
             return false;
         }
-        if (!validEmail.test(subject.email)) {
+        if (!validEmail.test(subject.email) || containsDangerousCharacters(subject.email)) {
             alert("Invalid email!");
             return false;
         }

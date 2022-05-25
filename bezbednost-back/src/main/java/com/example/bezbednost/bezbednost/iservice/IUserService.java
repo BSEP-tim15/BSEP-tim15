@@ -3,6 +3,7 @@ package com.example.bezbednost.bezbednost.iservice;
 import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
 import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.model.User;
 
 public interface IUserService {
@@ -10,7 +11,7 @@ public interface IUserService {
 
     User findByEmail(String email);
 
-    User save(UserDto userDto);
+    User save(UserDto userDto) throws InvalidInputException;
 
     boolean isUserRegistered(String username);
 

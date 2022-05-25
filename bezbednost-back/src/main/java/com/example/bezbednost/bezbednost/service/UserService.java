@@ -3,8 +3,10 @@ package com.example.bezbednost.bezbednost.service;
 import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
 import com.example.bezbednost.bezbednost.dto.PasswordDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.iservice.IRoleService;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
+import com.example.bezbednost.bezbednost.iservice.IValidationService;
 import com.example.bezbednost.bezbednost.mapper.UserMapper;
 import com.example.bezbednost.bezbednost.model.PasswordResetToken;
 import com.example.bezbednost.bezbednost.model.PasswordlessLoginToken;
@@ -13,6 +15,7 @@ import com.example.bezbednost.bezbednost.model.User;
 import com.example.bezbednost.bezbednost.repository.IPasswordResetTokenRepository;
 import com.example.bezbednost.bezbednost.repository.IPasswordlessLoginTokenRepository;
 import com.example.bezbednost.bezbednost.repository.IUserRepository;
+import com.example.bezbednost.bezbednost.validation.RegexValidator;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +38,7 @@ public class UserService implements IUserService {
     private final JavaMailSender mailSender;
     private final IPasswordResetTokenRepository passwordResetTokenRepository;
     private final IPasswordlessLoginTokenRepository passwordlessLoginTokenRepository;
+    private final IValidationService validationService;
 
     @Override
     public User findByUsername(String username) {
@@ -47,17 +51,24 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User save(UserDto userDto) {
-        User user = UserMapper.mapDtoToUser(userDto);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        List<Role> roles = roleService.findByName(getUserRole(userDto.getRole()));
-        user.setRoles(roles);
-        String verificationCode = RandomString.make(64);
-        user.setVerificationCode(verificationCode);
-        sendVerificationEmail(user);
-        userRepository.save(user);
+    public User save(UserDto userDto) throws InvalidInputException {
+        if (validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, userDto.getName()) &&
+                validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, userDto.getUsername()) &&
+                validationService.isValid(RegexValidator.ONLY_LETTERS_REGEX, userDto.getCountry()) &&
+                validationService.isValid(RegexValidator.EMAIL_REGEX, userDto.getEmail()) && !containsDangerousCharacters(userDto)) {
 
-        return user;
+            User user = UserMapper.mapDtoToUser(userDto);
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            List<Role> roles = roleService.findByName(getUserRole(userDto.getRole()));
+            user.setRoles(roles);
+            String verificationCode = RandomString.make(64);
+            user.setVerificationCode(verificationCode);
+            sendVerificationEmail(user);
+            userRepository.save(user);
+            return user;
+        } else {
+            throw new InvalidInputException("Invalid input!");
+        }
     }
 
     @Override
@@ -279,4 +290,10 @@ public class UserService implements IUserService {
         }
         return null;
     }
+
+    private boolean containsDangerousCharacters(UserDto userDto) {
+        return validationService.containsDangerousCharacters(userDto.getName()) || validationService.containsDangerousCharacters(userDto.getCountry()) ||
+                validationService.containsDangerousCharacters(userDto.getEmail()) || validationService.containsDangerousCharacters(userDto.getUsername());
+    }
+
 }

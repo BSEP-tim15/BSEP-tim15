@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { useToasts } from "react-toast-notifications";
 import axios from "axios";
 import RegistrationQuestion from '../modals/RegistrationQuestion';
+import { containsDangerousCharacters, validName } from '../../validation/CertificateValidation';
 
 const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
 
@@ -127,6 +128,22 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
                 addToast("For root (self signed) certificates subject and issuer have to be same!", {appearance : "error"});
                 return false;
             }
+        }
+        if (!validName.test(certificate.issuer) || containsDangerousCharacters(certificate.issuer)) {
+            alert("Invalid issuer name!");
+            return false;
+        }
+        if (!validName.test(certificate.subject) || containsDangerousCharacters(certificate.subject)) {
+            alert("Invalid subject name!");
+            return false;
+        }
+        if (!validName.test(certificate.issuerAlternativeName) || containsDangerousCharacters(certificate.issuerAlternativeName)) {
+            alert("Invalid subject alternative name!");
+            return false;
+        }
+        if (!validName.test(certificate.subjectAlternativeName) || containsDangerousCharacters(certificate.subjectAlternativeName)) {
+            alert("Invalid issuer alternative name!");
+            return false;
         }
         return true;
     }

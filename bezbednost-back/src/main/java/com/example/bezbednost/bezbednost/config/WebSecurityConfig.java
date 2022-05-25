@@ -54,6 +54,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new TokenAuthenticationFilter(this.tokenUtils, userService), BasicAuthenticationFilter.class);
 
         http.csrf().disable();
+
+        http
+                .headers()
+                .xssProtection()
+                .and()
+                .contentSecurityPolicy("script-src 'self'");
     }
 
     @Override

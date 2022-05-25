@@ -5,6 +5,7 @@ import com.example.bezbednost.bezbednost.config.UserTokenState;
 import com.example.bezbednost.bezbednost.dto.JwtAuthenticationDto;
 import com.example.bezbednost.bezbednost.dto.PasswordlessLoginDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.model.PasswordlessLoginToken;
@@ -54,7 +55,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> createUser(@RequestBody UserDto userDto, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<User> createUser(@RequestBody UserDto userDto, UriComponentsBuilder ucBuilder) throws InvalidInputException {
         User existUser = this.userService.findByUsername(userDto.getUsername());
         User existEmail =  this.userService.findByEmail(userDto.getEmail());
 
