@@ -35,7 +35,7 @@ const RootCertificates = () => {
             .then(response => {
                 var user = response.data;
 
-                axios.post(SERVER_URL + "/certificates/intermediateCertificates/" + user.username, certificate)
+                axios.post(SERVER_URL + "/certificates/intermediateCertificates/" + user.username, certificate, {headers: headers})
                     .then(response => {
                         setCertificates(response.data);
                     })
@@ -50,6 +50,8 @@ const RootCertificates = () => {
     }
 
     const revokeCertificate = (serialNumber) => {
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+
         var serialNumberDto = {
             serialNumber: serialNumber,
             rootPassword: localStorage.rootPassword, 
@@ -57,7 +59,7 @@ const RootCertificates = () => {
             endEntityPassword: localStorage.endEntityPassword
         }
 
-        axios.post(SERVER_URL + "/certificates/revoke", serialNumberDto)
+        axios.post(SERVER_URL + "/certificates/revoke", serialNumberDto, {headers: headers})
             .then(response => {
                 console.log(response.data);
                 setRevoked(!revoked);

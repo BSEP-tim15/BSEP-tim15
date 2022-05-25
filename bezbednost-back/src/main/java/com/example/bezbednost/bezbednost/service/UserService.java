@@ -79,13 +79,13 @@ public class UserService implements IUserService {
 
     private String getUserRole(String role){
         if(role.contains("root")){
-            return "organization";
+            return "ROLE_ORGANIZATION";
         } else if(role.contains("intermediate")){
-            return "service";
+            return "ROLE_SERVICE";
         } else if(role.contains("end-entity")) {
-            return "user";
+            return "ROLE_USER";
         } else {
-            return "admin";
+            return "ROLE_ADMIN";
         }
     }
 

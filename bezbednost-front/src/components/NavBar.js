@@ -40,7 +40,7 @@ const NavBar = () => {
             endEntityPassword: localStorage.endEntityPassword
         }
 
-        if(role !== "admin"){
+        if(role !== "ROLE_ADMIN"){
             const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
             axios.post(SERVER_URL + `/certificates/canUserCreateCertificate/${user.username}`, certificate, {headers:headers})
                 .then(response => {
@@ -98,9 +98,9 @@ const NavBar = () => {
 
         <nav className="navbar navbar-expand-lg navbar-light mt-3 me-5">
             <div className="collapse navbar-collapse">
-                {role === "admin" && adminNavBar}
-                {(role === "service" || role === "organization") && intermediateNavBar}
-                {role === "user" && endEntityNavBar}
+                {role === "ROLE_ADMIN" && adminNavBar}
+                {(role === "ROLE_SERVICE" || role === "ROLE_ORGANIZATION") && intermediateNavBar}
+                {role === "ROLE_USER" && endEntityNavBar}
             </div>
 
             <CreateCertificate modalIsOpen={createCertifikate} setModalIsOpen={setCreateCertificate} />

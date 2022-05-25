@@ -15,6 +15,8 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
 
     useEffect(() => {
 
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+
         var certificate = {
             serialNumber: serialNumber, 
             rootPassword: localStorage.rootPassword, 
@@ -22,7 +24,7 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
             endEntityPassword: localStorage.endEntityPassword
         }
 
-        axios.post(SERVER_URL + "/certificates/singleCertificate", certificate)
+        axios.post(SERVER_URL + "/certificates/singleCertificate", certificate, {headers: headers})
             .then(response => {
                 var certificate = response.data;
                 certificate.subject = certificate.subject.substring(3);
@@ -43,13 +45,17 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
             endEntityPassword: localStorage.endEntityPassword
         }
 
-        axios.post(SERVER_URL + "/certificates/parentCertificateSerialNumber", certificate)
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+
+        axios.post(SERVER_URL + "/certificates/parentCertificateSerialNumber", certificate, {headers: headers})
             .then(response => {
                 setSerialNumber(response.data);
             })
     }
 
     const exportCertificate = (e) => {
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
+
         e.preventDefault();
 
         var certificate = {
@@ -59,7 +65,7 @@ const SingleCertificate = ({modalIsOpen, setModalIsOpen, serialNumber, setSerial
             endEntityPassword: localStorage.endEntityPassword
         }
 
-        axios.post(SERVER_URL + "/certificates/exportCertificate", certificate)
+        axios.post(SERVER_URL + "/certificates/exportCertificate", certificate, {headers: headers})
             .then(response => {
                 addToast("Certificate is successfully exported!", { appearance: "success" });
                 setTimeout(() => {

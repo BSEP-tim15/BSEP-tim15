@@ -33,7 +33,7 @@ const EndEntityCertificates = () => {
             .then(response => {
                 var user = response.data;
 
-                axios.post(SERVER_URL + "/certificates/endEntityCertificates/" + user.username, certificate)
+                axios.post(SERVER_URL + "/certificates/endEntityCertificates/" + user.username, certificate, {headers: headers})
                     .then(response => {
                         setCertificates(response.data);
                     })

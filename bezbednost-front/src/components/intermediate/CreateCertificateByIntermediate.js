@@ -43,7 +43,7 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
                         endEntityPassword: localStorage.endEntityPassword
                     }
 
-                    axios.post(SERVER_URL + "/certificates/maxDate", cert)
+                    axios.post(SERVER_URL + "/certificates/maxDate", cert, {headers: headers})
                         .then(response => {
                             console.log(user.username);
                             console.log(response.data);
@@ -81,6 +81,7 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
     }
 
     const createCertificate = (e) => {
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
         e.preventDefault();
 
         if(isCertificateValid()){
@@ -99,10 +100,10 @@ const CreateCertificateByIntermediate = ({modalIsOpen, setModalIsOpen}) => {
             };
             
 
-            axios.post(SERVER_URL + "/certificates/createCertificate", cert)
+            axios.post(SERVER_URL + "/certificates/createCertificate", cert, {headers: headers})
                 .then(response => {
 
-                    axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
+                    axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject, {headers: headers})
                         .then(response => {
                             if(response.data === false){
                                 setRegistration(true);

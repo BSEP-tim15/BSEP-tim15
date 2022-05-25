@@ -53,6 +53,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
     }
 
     const setCertificateType = (type) => {
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
         setCertificate(() => {return {...certificate, certificateType: type}});
         setType(type);
 
@@ -62,7 +63,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
             endEntityPassword: localStorage.endEntityPassword
         }
 
-        axios.post(SERVER_URL + "/certificates/issuers", passwords)
+        axios.post(SERVER_URL + "/certificates/issuers", passwords, {headers: headers})
             .then(response => {
                 setIssuers(response.data);
             })
@@ -70,6 +71,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const setIssuer = (issuer) => {
         setCertificate(() => {return {...certificate, issuer: issuer}});
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
 
         if(type !== "root"){
 
@@ -80,7 +82,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
                 endEntityPassword: localStorage.endEntityPassword
             }
 
-            axios.post(SERVER_URL + "/certificates/maxDate", certificate)
+            axios.post(SERVER_URL + "/certificates/maxDate", certificate, {headers: headers})
                 .then(response => {
                     
                     var maxDate = response.data;
@@ -92,6 +94,7 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
 
     const createCertificate = (e) => {
         e.preventDefault();
+        const headers = {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${localStorage.jwtToken}`}
 
         if(isCertificateValid()){
 
@@ -111,10 +114,10 @@ const CreateCertificate = ({modalIsOpen, setModalIsOpen}) => {
             };
             
 
-            axios.post(SERVER_URL + "/certificates/createCertificate", cert)
+            axios.post(SERVER_URL + "/certificates/createCertificate", cert, {headers: headers})
                 .then(response => {
 
-                    axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject)
+                    axios.get(SERVER_URL + "/users/isUserRegistered?username=" + certificate.subject, {headers:headers})
                         .then(response => {
                             if(response.data === false){
                                 setRegistration(true);

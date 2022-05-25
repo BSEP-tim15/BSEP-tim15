@@ -35,6 +35,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (authToken != null) {
                 username = tokenUtils.getUsernameFromToken(authToken);
+                System.out.println(username);
                 if (username != null) {
                     UserDetails userDetails = userService.loadUserByUsername(username);
                     if (this.tokenUtils.validateToken(authToken, userDetails)) {
