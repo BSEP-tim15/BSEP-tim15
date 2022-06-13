@@ -111,7 +111,7 @@ public class UserService implements IUserService {
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setFrom("publickeyinfrastructuresomn@gmail.com", sender);
+            helper.setFrom("publickeyinfrastructuresomn@hotmail.com", sender);
             helper.setTo(user.getEmail());
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -145,7 +145,7 @@ public class UserService implements IUserService {
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setFrom("publickeyinfrastructuresomn@gmail.com", sender);
+            helper.setFrom("publickeyinfrastructuresomn@hotmail.com", sender);
             helper.setTo(user.getEmail());
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -256,7 +256,7 @@ public class UserService implements IUserService {
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
         try {
-            helper.setFrom("publickeyinfrastructuresomn@gmail.com", sender);
+            helper.setFrom("publickeyinfrastructuresomn@hotmail.com", sender);
             helper.setTo(user.getEmail());
             helper.setSubject(subject);
             helper.setText(content, true);
