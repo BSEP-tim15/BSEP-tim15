@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_KEY: 'BSEP-tim15_BSEP-tim15'
-  PROJECT_PATH: '/bezbednost-back' 
+  PROJECT_PATH: 'bezbednost-back' 
 
 jobs:
   build:
@@ -34,6 +34,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
+        working-directory: ${{ env.PROJECT_PATH }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
