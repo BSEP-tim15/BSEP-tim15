@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_KEY: 'BSEP-tim15_BSEP-tim15'
-  PROJECT_PATH: 'bezbednost-back' 
+  PROJECT_PATH: '/bezbednost-back' 
 
 jobs:
   build:
