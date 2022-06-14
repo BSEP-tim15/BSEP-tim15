@@ -176,6 +176,10 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <compilerArgs>
+                        <arg>--add-exports</arg>
+                        <arg>java.base/sun.security.tools.keytool=ALL-UNNAMED</arg>
+                    </compilerArgs>
                 </configuration>
                 <version>${project.parent.version}</version>
             </plugin>
