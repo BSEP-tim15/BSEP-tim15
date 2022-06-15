@@ -176,12 +176,20 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
-                    <compilerArgs>
-                        <arg>--add-exports</arg>
-                        <arg>java.base/sun.security.tools.keytool=ALL-UNNAMED</arg>
-                    </compilerArgs>
                 </configuration>
                 <version>${project.parent.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>7.1.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

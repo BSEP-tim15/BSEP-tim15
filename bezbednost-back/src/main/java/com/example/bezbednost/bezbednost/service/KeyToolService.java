@@ -9,7 +9,7 @@ public class KeyToolService implements IKeyToolService {
     public void executeCommand(String command) {
         try {
             printCommand(command);
-            sun.security.tools.keytool.Main.main(parse(command));
+            //sun.security.tools.keytool.Main.main(parse(command));
         }
         catch (Exception e) {
             e.printStackTrace();
