@@ -1,0 +1,37 @@
+AUTHENTICATION CONTROLLER
+==========================================================
+
+- signup = AC-SU10
+- login = AC-LI11
+- two factor authentication = AC-TFALI12
+- passwordless login = AC-PWLI13
+
+
+USER CONTROLLER
+==========================================================
+
+- get user = UC-GU20
+- register user = UC-RU21
+- verify account = UC-VA22
+- reset password = UC-RP23
+- validate token = UC-VT24
+- change password = UC-CP25
+- send login email = UC-SLE26
+- validate password token = UC-VPT27
+- enable/disable two factor authentication = UC-EDTFA28
+
+CERTIFICATE CONTROLLER
+==========================================================
+
+- create certificate = CC-CC30
+- get certificates = CC-GCS31
+- get certificates by subject = CC-GCS32
+- get issuers = CC-GI33
+- max date for certificates = CC-MDC34
+- get certificate = CC-GC35
+- export certificate = CC-EC36
+- parent serial number = CC-PSN37
+- validate certificate = CC-VC38
+- can user create certificate = CC-CUCC39
+- revoke certificate = CC-RC40
+- check revocation status = CC-CRS41
