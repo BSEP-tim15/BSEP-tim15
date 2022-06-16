@@ -1,7 +1,10 @@
 package com.example.bezbednost.bezbednost.service;
 
+import com.example.bezbednost.bezbednost.config.TokenUtils;
+import com.example.bezbednost.bezbednost.config.UserTokenState;
 import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
 import com.example.bezbednost.bezbednost.dto.PasswordDto;
+import com.example.bezbednost.bezbednost.dto.TfaAuthenticationDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.iservice.IRoleService;
@@ -16,8 +19,15 @@ import com.example.bezbednost.bezbednost.repository.IPasswordResetTokenRepositor
 import com.example.bezbednost.bezbednost.repository.IPasswordlessLoginTokenRepository;
 import com.example.bezbednost.bezbednost.repository.IUserRepository;
 import com.example.bezbednost.bezbednost.validation.RegexValidator;
+import de.taimos.totp.TOTP;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
+import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.codec.binary.Hex;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +37,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @Service
@@ -39,6 +50,8 @@ public class UserService implements IUserService {
     private final IPasswordResetTokenRepository passwordResetTokenRepository;
     private final IPasswordlessLoginTokenRepository passwordlessLoginTokenRepository;
     private final IValidationService validationService;
+    private final TokenUtils tokenUtils;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public User findByUsername(String username) {
@@ -64,6 +77,9 @@ public class UserService implements IUserService {
             String verificationCode = RandomString.make(64);
             user.setVerificationCode(verificationCode);
             sendVerificationEmail(user);
+            //user.setSecret("YQQIXDH6XVXXPHJXLAEDF3GUWMBDQ3FE");
+            String secret = generateSecretKey();
+            user.setSecret(secret);
             userRepository.save(user);
             return user;
         } else {
@@ -291,9 +307,60 @@ public class UserService implements IUserService {
         return null;
     }
 
+    @Override
+    public UserTokenState login2fa(TfaAuthenticationDto tfaAuthenticationDto) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                tfaAuthenticationDto.getUsername(), tfaAuthenticationDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        User user = (User) authentication.getPrincipal();
+
+        if (!user.isApproved()) return null;
+        if (!user.isUsing2FA()) return null;
+
+        String secret = user.getSecret();
+        String code = getTOTPCode(secret);
+        if (code == null || !(code.equals(tfaAuthenticationDto.getCode()))) return null;
+
+        String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
+        int expiresIn = tokenUtils.getExpiresIn();
+        UserTokenState userTokenState = new UserTokenState(jwt, (long) expiresIn);
+
+        return userTokenState;
+    }
+    private String generateSecretKey() {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[20];
+        random.nextBytes(bytes);
+        Base32 base32 = new Base32();
+
+        return base32.encodeToString(bytes);
+    }
+
+    private String getTOTPCode(String secretKey) {
+        Base32 base32 = new Base32();
+        byte[] bytes = base32.decode(secretKey);
+        String hexKey = Hex.encodeHexString(bytes);
+
+        return TOTP.getOTP(hexKey);
+    }
+
     private boolean containsDangerousCharacters(UserDto userDto) {
         return validationService.containsDangerousCharacters(userDto.getName()) || validationService.containsDangerousCharacters(userDto.getCountry()) ||
                 validationService.containsDangerousCharacters(userDto.getEmail()) || validationService.containsDangerousCharacters(userDto.getUsername());
     }
 
+    @Override
+    public void changeUsingTwoFactorAuth(Boolean enable, Integer id) {
+        if (enable) {
+            userRepository.changeSecretCode(id, generateSecretKey());
+        } else {
+            userRepository.disableTwoFactorAuth(id);
+        }
+    }
+
+    @Override
+    public String getSecretCode(Integer id) {
+        return userRepository.getSecretCode(id);
+    }
 }

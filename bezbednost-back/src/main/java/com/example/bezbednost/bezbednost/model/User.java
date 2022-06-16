@@ -3,6 +3,7 @@ package com.example.bezbednost.bezbednost.model;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.jboss.aerogear.security.otp.api.Base32;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,7 +48,16 @@ public class User implements UserDetails {
     @Column(name = "verification_code", updatable = false)
     private String verificationCode;
 
-    public User() { }
+    @Column(name = "using_2fa")
+    private boolean isUsing2FA;
+
+    @Column(name = "secret")
+    private String secret;
+
+    public User() {
+        super();
+        this.secret = Base32.random();
+    }
 
     public User(Integer id, String name, String username, String password, String country, String email, boolean isApproved, List<Role> roles) {
         this.id = id;

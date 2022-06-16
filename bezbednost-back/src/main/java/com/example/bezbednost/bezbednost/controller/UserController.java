@@ -1,9 +1,6 @@
 package com.example.bezbednost.bezbednost.controller;
 
-import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
-import com.example.bezbednost.bezbednost.dto.EmailDto;
-import com.example.bezbednost.bezbednost.dto.PasswordDto;
-import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.dto.*;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.model.User;
@@ -18,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -148,6 +146,25 @@ public class UserController {
         } else {
             loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=VALIDATE_PASSWORD_TOKEN status=success");
             return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @PutMapping("/twoFactor")
+    public ResponseEntity changeTwoFactorAuth(@RequestBody EnableTwoFactorAuthDto enableTwoFactorAuthDto) {
+        try {
+            userService.changeUsingTwoFactorAuth(enableTwoFactorAuthDto.getIsEnabled(), enableTwoFactorAuthDto.getId());
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/secretCode/{id}")
+    public ResponseEntity<String> getSecretCode(@PathVariable Integer id) {
+        try {
+            return new ResponseEntity<>(userService.getSecretCode(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

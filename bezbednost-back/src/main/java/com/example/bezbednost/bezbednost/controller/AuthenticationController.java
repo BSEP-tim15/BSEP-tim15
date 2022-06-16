@@ -3,6 +3,7 @@ package com.example.bezbednost.bezbednost.controller;
 import com.example.bezbednost.bezbednost.config.TokenUtils;
 import com.example.bezbednost.bezbednost.config.UserTokenState;
 import com.example.bezbednost.bezbednost.dto.JwtAuthenticationDto;
+import com.example.bezbednost.bezbednost.dto.TfaAuthenticationDto;
 import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.exception.ResourceConflictException;
@@ -55,15 +56,18 @@ public class AuthenticationController {
                 authenticationRequest.getUsername(), authenticationRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("******************************************************");
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
 
         User user = (User) authentication.getPrincipal();
         String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
         int expiresIn = tokenUtils.getExpiresIn();
+        UserTokenState userTokenState = new UserTokenState(jwt, (long) expiresIn);
+
+        if (user.isUsing2FA()) {
+            userTokenState.setAccessToken("2fa");
+        }
 
         loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=LOGIN status=success ID="+ user.getId());
-        return ResponseEntity.ok(new UserTokenState(jwt, (long) expiresIn));
+        return ResponseEntity.ok(userTokenState);
 
         } catch (Exception e) {
             loggerError.error("location=AuthenticationController timestamp="+LocalDateTime.now().toString()+" action=LOGIN status=failure message="+ e.getMessage());
@@ -71,6 +75,22 @@ public class AuthenticationController {
         }
 
     }
+
+    @PostMapping("/tfa-login")
+    public ResponseEntity<UserTokenState> twoFactorAuth(@RequestBody TfaAuthenticationDto tfaAuthenticationDto) {
+        try {
+            UserTokenState userTokenState = userService.login2fa(tfaAuthenticationDto);
+            if (userTokenState != null) {
+                return new ResponseEntity<>(userTokenState, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     @PostMapping("/signup")
     public ResponseEntity<User> createUser(@RequestBody UserDto userDto, UriComponentsBuilder ucBuilder) throws InvalidInputException {
