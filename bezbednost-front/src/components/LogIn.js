@@ -5,6 +5,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useToasts } from 'react-toast-notifications';
 import Passwords from './modals/Passwords';
+import TwoFALogin from './TwoFALogin';
+import TwoFactorAuth from './modals/TwoFactorAuth';
 
 const LogIn = () => {
 
@@ -12,6 +14,7 @@ const LogIn = () => {
 
     const { addToast } = useToasts();
     const [passwordsModal, setPasswordsModal] = useState(false);
+    const [pinCodeModal, setPinCodeModal] = useState(false);
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -26,10 +29,14 @@ const LogIn = () => {
         e.preventDefault();
         axios.post(SERVER_URL + "/auth/login", credentials)
             .then(response => {
-                let token = response.data.accessToken;
-                console.log(token);
-                localStorage.setItem('jwtToken', token);
-                setPasswordsModal(true);
+                if (response.data.accessToken === "2fa") {
+                    setPinCodeModal(true);
+                } else {
+                    let token = response.data.accessToken;
+                    console.log(token);
+                    localStorage.setItem('jwtToken', token);
+                    setPasswordsModal(true);
+                }
             })
             .catch(error => {
                 addToast("Wrong username or password. Please try again.", { appearance: "error" });
@@ -67,8 +74,8 @@ const LogIn = () => {
                         <a onClick={(e)=> setIsPasswordless(true)} style={{marginLeft: "40%", fontSize: "15px", color: "#4a6560"}}>Passwordless login</a> <br />
                     </form>
                 </div>
-
                 <Passwords modalIsOpen={passwordsModal} setModalIsOpen={setPasswordsModal} />
+                <TwoFactorAuth modalIsOpen={pinCodeModal} setModalIsOpen={setPinCodeModal} username={username} password={password} />
             </div>}
             {isPasswordless &&
             <div className='card ms-auto me-5' style={{width: "40%", "marginTop": "13%", borderColor: "#4a6560"}} >

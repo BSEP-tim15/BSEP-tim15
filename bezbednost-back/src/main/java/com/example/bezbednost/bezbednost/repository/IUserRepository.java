@@ -27,4 +27,17 @@ public interface IUserRepository extends JpaRepository<User, Integer> {
     @Transactional
     @Query("update User u set u.password=?2 where u.email=?1")
     void changePassword(String email, String password);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.isUsing2FA=false WHERE u.id=?1")
+    void disableTwoFactorAuth(Integer id);
+
+    @Query("SELECT u.secret FROM User u WHERE u.id=?1")
+    String getSecretCode(Integer id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.isUsing2FA=true, u.secret=?2 WHERE u.id=?1")
+    void changeSecretCode(Integer id, String secretCode);
 }
