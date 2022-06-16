@@ -2,10 +2,7 @@ package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.config.TokenUtils;
 import com.example.bezbednost.bezbednost.config.UserTokenState;
-import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
-import com.example.bezbednost.bezbednost.dto.PasswordDto;
-import com.example.bezbednost.bezbednost.dto.TfaAuthenticationDto;
-import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.dto.*;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.iservice.IRoleService;
 import com.example.bezbednost.bezbednost.iservice.IUserService;
@@ -77,7 +74,6 @@ public class UserService implements IUserService {
             String verificationCode = RandomString.make(64);
             user.setVerificationCode(verificationCode);
             sendVerificationEmail(user);
-            //user.setSecret("YQQIXDH6XVXXPHJXLAEDF3GUWMBDQ3FE");
             String secret = generateSecretKey();
             user.setSecret(secret);
             userRepository.save(user);
@@ -308,6 +304,25 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserTokenState login(JwtAuthenticationDto jwtAuthenticationDto) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                jwtAuthenticationDto.getUsername(), jwtAuthenticationDto.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        User user = (User) authentication.getPrincipal();
+        String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
+        int expiresIn = tokenUtils.getExpiresIn();
+        UserTokenState userTokenState = new UserTokenState(jwt, (long) expiresIn);
+
+        if (user.isUsing2FA()) {
+            userTokenState.setAccessToken("2fa");
+        }
+
+        return userTokenState;
+    }
+
+    @Override
     public UserTokenState login2fa(TfaAuthenticationDto tfaAuthenticationDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 tfaAuthenticationDto.getUsername(), tfaAuthenticationDto.getPassword()));
@@ -324,10 +339,10 @@ public class UserService implements IUserService {
 
         String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
         int expiresIn = tokenUtils.getExpiresIn();
-        UserTokenState userTokenState = new UserTokenState(jwt, (long) expiresIn);
 
-        return userTokenState;
+        return new UserTokenState(jwt, (long) expiresIn);
     }
+
     private String generateSecretKey() {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[20];

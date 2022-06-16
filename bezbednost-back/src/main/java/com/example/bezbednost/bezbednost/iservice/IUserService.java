@@ -1,10 +1,7 @@
 package com.example.bezbednost.bezbednost.iservice;
 
 import com.example.bezbednost.bezbednost.config.UserTokenState;
-import com.example.bezbednost.bezbednost.dto.ChangePasswordDto;
-import com.example.bezbednost.bezbednost.dto.PasswordDto;
-import com.example.bezbednost.bezbednost.dto.TfaAuthenticationDto;
-import com.example.bezbednost.bezbednost.dto.UserDto;
+import com.example.bezbednost.bezbednost.dto.*;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.model.User;
 import org.springframework.data.jpa.repository.Query;
@@ -41,6 +38,8 @@ public interface IUserService {
     User findUserFromToken(String token);
 
     UserTokenState login2fa(TfaAuthenticationDto tfaAuthenticationDto);
+
+    UserTokenState login(JwtAuthenticationDto jwtAuthenticationDto);
 
     void changeUsingTwoFactorAuth(Boolean isEnabled, Integer id);
 

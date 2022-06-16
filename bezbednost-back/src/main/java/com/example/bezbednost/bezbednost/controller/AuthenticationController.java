@@ -52,25 +52,16 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody JwtAuthenticationDto authenticationRequest, HttpServletResponse response) {
         try {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        User user = (User) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
-        int expiresIn = tokenUtils.getExpiresIn();
-        UserTokenState userTokenState = new UserTokenState(jwt, (long) expiresIn);
-
-        if (user.isUsing2FA()) {
-            userTokenState.setAccessToken("2fa");
-        }
-
-        loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=LOGIN status=success ID="+ user.getId());
-        return ResponseEntity.ok(userTokenState);
-
+            UserTokenState userTokenState = userService.login(authenticationRequest);
+            if (userTokenState != null) {
+                loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=LOGIN status=success");
+                return ResponseEntity.ok(userTokenState);
+            } else {
+                loggerError.error("location=AuthenticationController timestamp=" + LocalDateTime.now().toString() + " action=LOGIN status=failure message=token is null");
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
-            loggerError.error("location=AuthenticationController timestamp="+LocalDateTime.now().toString()+" action=LOGIN status=failure message="+ e.getMessage());
+            loggerError.error("location=AuthenticationController timestamp=" + LocalDateTime.now().toString() + " action=LOGIN status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -81,12 +72,15 @@ public class AuthenticationController {
         try {
             UserTokenState userTokenState = userService.login2fa(tfaAuthenticationDto);
             if (userTokenState != null) {
+                loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=TWO_FACTOR_LOGIN status=success");
                 return new ResponseEntity<>(userTokenState, HttpStatus.OK);
             } else {
+                loggerError.error("location=AuthenticationController timestamp=" + LocalDateTime.now().toString() + " action=LOGIN status=failure message=token is null");
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
         } catch (Exception e) {
+            loggerError.error("location=AuthenticationController timestamp=" + LocalDateTime.now().toString() + " action=TWO_FACTOR_LOGIN status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -105,12 +99,12 @@ public class AuthenticationController {
             }
 
             User user = this.userService.save(userDto);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=SIGNUP status=success ID="+ user.getId());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=SIGNUP status=success ID=" + user.getId());
 
             return new ResponseEntity<>(user, HttpStatus.CREATED);
 
         } catch (Exception e) {
-            loggerError.error("location=AuthenticationController timestamp="+LocalDateTime.now().toString()+" action=SIGNUP status=failure message="+ e.getMessage());
+            loggerError.error("location=AuthenticationController timestamp=" + LocalDateTime.now().toString() + " action=SIGNUP status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -127,12 +121,12 @@ public class AuthenticationController {
             String jwt = tokenUtils.generateToken(user.getUsername(), user.getRoleNames(), user.getPermissionNames());
             int expiresIn = tokenUtils.getExpiresIn();
 
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=PASSWORDLESS_LOGIN status=success ID="+ user.getId());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=PASSWORDLESS_LOGIN status=success ID=" + user.getId());
 
             return ResponseEntity.ok(new UserTokenState(jwt, (long) expiresIn));
 
         } catch (Exception e) {
-            loggerError.error("location=AuthenticationController timestamp="+LocalDateTime.now().toString()+" action=PASSWORDLESS_LOGIN status=failure message="+ e.getMessage());
+            loggerError.error("location=AuthenticationController timestamp=" + LocalDateTime.now().toString() + " action=PASSWORDLESS_LOGIN status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

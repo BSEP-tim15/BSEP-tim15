@@ -40,7 +40,7 @@ public class UserController {
     @GetMapping()
     public User user(Principal principal) {
         User user = userService.findByUsername(principal.getName());
-        loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=GET_USER status=success ID=" + user.getId());
+        loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=GET_USER status=success ID=" + user.getId());
         return user;
     }
 
@@ -51,14 +51,14 @@ public class UserController {
             loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=REGISTER_USER status=success");
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (InvalidInputException e) {
-            loggerError.error("location=UserController timestamp="+ LocalDateTime.now().toString()+" action=REGISTER_USER status=failure message="+ e.getMessage());
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=REGISTER_USER status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/isUserRegistered")
     public boolean isUserRegistered(@RequestParam String username){
-        loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=IS_USER_REGISTERED status=success");
+        loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=IS_USER_REGISTERED status=success");
         return userService.isUserRegistered(username);
     }
 
@@ -68,7 +68,7 @@ public class UserController {
             loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=GET_ROLE status=success");
             return this.userService.findUserRole(id);
         }  catch (Exception e) {
-            loggerError.error("location=UserController timestamp="+ LocalDateTime.now().toString()+" action=GET_ROLE status=failure message="+ e.getMessage());
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=GET_ROLE status=failure message=" + e.getMessage());
             return String.valueOf(HttpStatus.BAD_REQUEST);
         }
     }
@@ -76,7 +76,7 @@ public class UserController {
     @GetMapping("/verify")
     public String verifyAccount(@Param("code") String code) {
         boolean verified = userService.verify(code);
-        loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=VERIFY_ACCOUNT status=success");
+        loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=VERIFY_ACCOUNT status=success");
         return verified ? "Your account is successfully verified!" : "We are sorry, your account is not verified.";
     }
 
@@ -84,10 +84,10 @@ public class UserController {
     public ResponseEntity resetPassword(@RequestBody EmailDto emailDto){
         try {
             userService.resetPassword(emailDto.getEmail());
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=RESET_PASSWORD status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=RESET_PASSWORD status=success");
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=UserController timestamp="+ LocalDateTime.now().toString()+" action=RESET_PASSWORD status=failure message="+ e.getMessage());
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=RESET_PASSWORD status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -99,7 +99,7 @@ public class UserController {
         if(result != null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=VALIDATE_TOKEN status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=VALIDATE_TOKEN status=success");
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
@@ -108,11 +108,11 @@ public class UserController {
     public ResponseEntity resetPassword(@RequestBody PasswordDto passwordDto){
         String result = userService.validatePasswordResetToken(passwordDto.getToken());
         if(result != null) {
-            loggerError.error("location=UserController timestamp="+ LocalDateTime.now().toString()+" action=RESET_PASSWORD status=failure message=Token is not valid");
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=RESET_PASSWORD status=failure message=Token is not valid");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             userService.resetPassword(passwordDto);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=RESET_PASSWORD status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=RESET_PASSWORD status=success");
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
@@ -125,7 +125,7 @@ public class UserController {
             loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CHANGE_PASSWORD status=success ID=" + u.getId());
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            loggerError.error("location=UserController timestamp="+ LocalDateTime.now().toString()+" action=CHANGE_PASSWORD status=failure");
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=CHANGE_PASSWORD status=failure");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
@@ -140,11 +140,11 @@ public class UserController {
     @GetMapping("/validatePasswordToken")
     public ResponseEntity validatePasswordToken(@Param("token") String token){
         String result = userService.validatePasswordlessLoginToken(token);
-        if(result != null) {
-            loggerError.error("location=UserController timestamp="+ LocalDateTime.now().toString()+" action=VALIDATE_PASSWORD_TOKEN status=failure message=Token is not valid");
+        if (result != null) {
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=VALIDATE_PASSWORD_TOKEN status=failure message=Token is not valid");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=VALIDATE_PASSWORD_TOKEN status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=VALIDATE_PASSWORD_TOKEN status=success");
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
@@ -153,8 +153,10 @@ public class UserController {
     public ResponseEntity changeTwoFactorAuth(@RequestBody EnableTwoFactorAuthDto enableTwoFactorAuthDto) {
         try {
             userService.changeUsingTwoFactorAuth(enableTwoFactorAuthDto.getIsEnabled(), enableTwoFactorAuthDto.getId());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=ENABLE_DISABLE_TWO_FACTOR_AUTH status=success");
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=ENABLE_DISABLE_TWO_FACTOR_AUTH status=failure message=Code is not valid");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -162,8 +164,10 @@ public class UserController {
     @GetMapping("/secretCode/{id}")
     public ResponseEntity<String> getSecretCode(@PathVariable Integer id) {
         try {
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=GET_CODE status=success");
             return new ResponseEntity<>(userService.getSecretCode(id), HttpStatus.OK);
         } catch (Exception e) {
+            loggerError.error("location=UserController timestamp=" + LocalDateTime.now().toString() + " action=GET_CODE status=failure message=Code is not valid");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
