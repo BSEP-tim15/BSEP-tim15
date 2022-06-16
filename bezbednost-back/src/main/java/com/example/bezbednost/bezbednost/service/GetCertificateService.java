@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -85,7 +86,7 @@ public class GetCertificateService implements IGetCertificateService {
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException,
             UnrecoverableKeyException, OCSPException, OperatorCreationException {
         for (CertificateDto certificateDto : getCertificates(certificate)) {
-            if (certificateDto.getSubject().equals("CN=" + username) && (certificateDto.getCertificateType() == "root" || certificateDto.getCertificateType() == "intermediate")) {
+            if (certificateDto.getSubject().equals("CN=" + username) && (certificateDto.getCertificateType().equals("root") || certificateDto.getCertificateType().equals("intermediate"))) {
                 GetSingleCertificateDto singleCertificate = new GetSingleCertificateDto(certificateDto.getSerialNumber(),
                         certificate.getRootPassword(), certificate.getIntermediatePassword(), certificate.getEndEntityPassword());
                 if(revocationService.checkIfCertificateIsValid(singleCertificate)) return true;
@@ -126,9 +127,10 @@ public class GetCertificateService implements IGetCertificateService {
     private List<CertificateDto> getCertificatesFromFile(FileDto file, GetSingleCertificateDto getCertificateDto) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         List<CertificateDto> certificates = new ArrayList<>();
-        try{
+        InputStream inputStream= new FileInputStream(file.getFileName());
+        try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
-            keyStore.load(new FileInputStream(file.getFileName()), file.getPassword().toCharArray());
+            keyStore.load(inputStream, file.getPassword().toCharArray());
             Enumeration<String> aliases = keyStore.aliases();
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
@@ -144,6 +146,8 @@ public class GetCertificateService implements IGetCertificateService {
             }
         } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e){
             e.printStackTrace();
+        } finally {
+            inputStream.close();
         }
 
         return certificates;

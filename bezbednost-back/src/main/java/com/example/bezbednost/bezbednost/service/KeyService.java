@@ -77,11 +77,18 @@ public class KeyService implements IKeyService {
             NoSuchAlgorithmException, UnrecoverableKeyException {
         keyStore = KeyStore.getInstance("JKS", "SUN");
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
-        keyStore.load(in, keyStorePass.toCharArray());
 
-        if(keyStore.isKeyEntry(alias)) {
-            return (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
+        try {
+            keyStore.load(in, keyStorePass.toCharArray());
+            if(keyStore.isKeyEntry(alias)) {
+                return (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            in.close();
         }
+        
         return null;
     }
 

@@ -1,6 +1,7 @@
 package com.example.bezbednost.bezbednost.config;
 
 import com.example.bezbednost.bezbednost.model.User;
+import com.sun.istack.NotNull;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -54,7 +55,7 @@ public class TokenUtils {
     public String getUsernameFromToken(String token) {
         String username;
         try {
-            final Claims claims = this.getAllClaimsFromToken(token);
+            @NotNull final Claims claims = this.getAllClaimsFromToken(token);
             username = claims.getSubject();
         } catch (ExpiredJwtException ex) {
             throw ex;
