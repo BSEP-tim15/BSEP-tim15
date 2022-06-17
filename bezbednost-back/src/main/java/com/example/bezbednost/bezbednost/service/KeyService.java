@@ -109,9 +109,11 @@ public class KeyService implements IKeyService {
                 if (keyStore.isKeyEntry(alias)) {
                     return keyStore.getCertificate(alias);
                 }
+            } catch(IOException e) {
+                LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
             } finally {
-                inputStream.close();
                 in.close();
+                inputStream.close();
             }
 
 
