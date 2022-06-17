@@ -1,6 +1,8 @@
 package com.example.bezbednost.bezbednost.config;
 
+import com.example.bezbednost.bezbednost.iservice.IUserService;
 import com.example.bezbednost.bezbednost.service.CustomUserService;
+import com.example.bezbednost.bezbednost.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -15,9 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-    protected final Log logger = LogFactory.getLog(getClass());
-    private final TokenUtils tokenUtils;
-    private final CustomUserService userService;
+    protected final Log LOGGER = LogFactory.getLog(getClass());
+    private TokenUtils tokenUtils;
+    private CustomUserService userService;
 
     public TokenAuthenticationFilter(TokenUtils tokenHelper, CustomUserService userService) {
         this.tokenUtils = tokenHelper;
@@ -27,11 +29,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String username;
+        String authorizationHeader = request.getHeader("Authorization");
 
         String authToken = tokenUtils.getToken(request);
         try {
             if (authToken != null) {
                 username = tokenUtils.getUsernameFromToken(authToken);
+                System.out.println(username);
                 if (username != null) {
                     UserDetails userDetails = userService.loadUserByUsername(username);
                     if (this.tokenUtils.validateToken(authToken, userDetails)) {
@@ -42,7 +46,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException ex) {
-            logger.debug("Token expired!");
+            LOGGER.debug("Token expired!");
         }
 
         filterChain.doFilter(request, response);

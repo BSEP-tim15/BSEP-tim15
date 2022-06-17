@@ -39,8 +39,8 @@ public class CertificateController {
     private final IGetCertificateService getCertificateService;
     private final IRevocationService revocationService;
 
-    private final Logger loggerInfo = LoggerFactory.getLogger(CertificateController.class);
-    private final Logger loggerError = LoggerFactory.getLogger("logerror");
+    private Logger loggerInfo = LoggerFactory.getLogger(CertificateController.class);
+    private Logger loggerError = LoggerFactory.getLogger("logerror");
 
 
     @Autowired

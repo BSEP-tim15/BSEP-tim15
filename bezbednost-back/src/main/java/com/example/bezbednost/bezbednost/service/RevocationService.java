@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.service;
 
+import com.example.bezbednost.bezbednost.dto.PasswordsDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
 import com.example.bezbednost.bezbednost.iservice.IRevocationService;
@@ -16,6 +17,7 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+//import sun.misc.BASE64Decoder;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -30,7 +32,7 @@ public class RevocationService implements IRevocationService {
 
     private final IKeyService keyService;
     private final ICustomCertificateRepository customCertificateRepository;
-    private final Logger logger = LoggerFactory.getLogger("logerror");
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     public RevocationService(IKeyService keyService, ICustomCertificateRepository customCertificateRepository) {
         this.keyService = keyService;
@@ -81,7 +83,7 @@ public class RevocationService implements IRevocationService {
             cert.checkValidity(new Date());
             return true;
         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-            logger.error("location=RevocationService timestamp=" + LocalDateTime.now() + " action=IS_ROOT_VALID status=failure message=" + e.getMessage());
+            LOGGER.error("location=RevocationService timestamp=" + LocalDateTime.now() + " action=IS_ROOT_VALID status=failure message=" + e.getMessage());
         }
         return false;
     }

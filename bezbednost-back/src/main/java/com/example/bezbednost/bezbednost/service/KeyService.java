@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 @Service
 public class KeyService implements IKeyService {
     private KeyStore keyStore;
-    private final Logger logger = LoggerFactory.getLogger("logerror");
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     public KeyService(){
         try {
             keyStore = KeyStore.getInstance("JKS", "SUN");
         } catch (KeyStoreException e) {
-            logger.error("location=KeyService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
+            LOGGER.error("location=KeyService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         } catch (NoSuchProviderException e) {
-            logger.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         }
     }
 
@@ -35,7 +35,7 @@ public class KeyService implements IKeyService {
             keyGen.initialize(2048, random);
             return keyGen.generateKeyPair();
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            logger.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=GENERATE_KEY_PAIR status=failure message=" + e.getMessage());
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=GENERATE_KEY_PAIR status=failure message=" + e.getMessage());
         }
         return null;
     }
@@ -59,11 +59,11 @@ public class KeyService implements IKeyService {
     @Override
     public Certificate[] getChain(String alias, String fileName, String password) throws KeyStoreException, NoSuchProviderException,
             IOException, CertificateException, NoSuchAlgorithmException {
-        KeyStore ks = KeyStore.getInstance("JKS", "SUN");
-        ks.load(new FileInputStream(fileName), password.toCharArray());
-        if (ks.getCertificateChain(alias) != null);
+        KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
+        keyStore.load(new FileInputStream(fileName), password.toCharArray());
+        if (keyStore.getCertificateChain(alias) != null);
         {
-            return ks.getCertificateChain(alias);
+            return keyStore.getCertificateChain(alias);
         }
     }
 
@@ -88,7 +88,7 @@ public class KeyService implements IKeyService {
                 return (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
             }
         } catch (IOException e) {
-            logger.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_PRIVATE_KEY status=failure message=" + e.getMessage());
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_PRIVATE_KEY status=failure message=" + e.getMessage());
         } finally {
             in.close();
             inputStream.close();
@@ -111,14 +111,14 @@ public class KeyService implements IKeyService {
                     return keyStore.getCertificate(alias);
                 }
             } catch(IOException e) {
-                logger.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
+                LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
             } finally {
                 in.close();
                 inputStream.close();
             }
 
         } catch (KeyStoreException | CertificateException | NoSuchProviderException | IOException | NoSuchAlgorithmException e) {
-            logger.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
         } finally {
             in.close();
             inputStream.close();

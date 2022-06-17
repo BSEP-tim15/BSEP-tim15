@@ -4,6 +4,7 @@ import com.example.bezbednost.bezbednost.config.UserTokenState;
 import com.example.bezbednost.bezbednost.dto.*;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import com.example.bezbednost.bezbednost.model.User;
+import org.springframework.data.jpa.repository.Query;
 
 public interface IUserService {
     User findByUsername(String username);

@@ -25,8 +25,8 @@ public class UserController {
 
     private final IUserService userService;
 
-    private final Logger loggerInfo = LoggerFactory.getLogger(UserController.class);
-    private final Logger loggerError = LoggerFactory.getLogger("logerror");
+    private Logger loggerInfo = LoggerFactory.getLogger(UserController.class);
+    private Logger loggerError = LoggerFactory.getLogger("logerror");
 
     @Autowired
     public UserController(IUserService userService) {

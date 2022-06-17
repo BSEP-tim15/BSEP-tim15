@@ -53,7 +53,7 @@ public class UserService implements IUserService {
     private final TokenUtils tokenUtils;
     private final AuthenticationManager authenticationManager;
 
-    private final Logger logger = LoggerFactory.getLogger("logerror");
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     @Override
     public User findByUsername(String username) {
@@ -136,7 +136,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            logger.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_VERIFICATION_EMAIL status=failure message=" + e.getMessage());
+            LOGGER.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_VERIFICATION_EMAIL status=failure message=" + e.getMessage());
         }
         mailSender.send(message);
     }
@@ -170,7 +170,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            logger.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_RECOVERY_EMAIL status=failure message=" + e.getMessage());
+            LOGGER.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_RECOVERY_EMAIL status=failure message=" + e.getMessage());
         }
         mailSender.send(message);
     }
@@ -281,7 +281,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            logger.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_LOGIN_EMAIL status=failure message=" + e.getMessage());
+            LOGGER.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_LOGIN_EMAIL status=failure message=" + e.getMessage());
         }
         mailSender.send(message);
     }
