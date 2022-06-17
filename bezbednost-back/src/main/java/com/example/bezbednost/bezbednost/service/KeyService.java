@@ -98,14 +98,15 @@ public class KeyService implements IKeyService {
     }
 
     @Override
-    public Certificate readCertificate(String fileName, String alias, String password) {
+    public Certificate readCertificate(String fileName, String alias, String password) throws IOException {
+        InputStream inputStream = new FileInputStream(fileName);
+        BufferedInputStream in = new BufferedInputStream(inputStream);
+
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
-            InputStream inputStream = new FileInputStream(fileName);
-            BufferedInputStream in = new BufferedInputStream(inputStream);
+
             try {
                 keyStore.load(in, password.toCharArray());
-
                 if (keyStore.isKeyEntry(alias)) {
                     return keyStore.getCertificate(alias);
                 }
@@ -116,9 +117,11 @@ public class KeyService implements IKeyService {
                 inputStream.close();
             }
 
-
         } catch (KeyStoreException | CertificateException | NoSuchProviderException | IOException | NoSuchAlgorithmException e) {
             LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
+        } finally {
+            in.close();
+            inputStream.close();
         }
         return null;
     }

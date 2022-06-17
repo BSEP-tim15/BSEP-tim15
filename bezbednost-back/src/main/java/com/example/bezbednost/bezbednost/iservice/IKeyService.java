@@ -1,5 +1,6 @@
 package com.example.bezbednost.bezbednost.iservice;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -21,5 +22,5 @@ public interface IKeyService {
 
     PrivateKey readPrivateKey(String keyStoreFile, String keyStorePass, String alias, String pass) throws KeyStoreException, NoSuchProviderException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException;
 
-    Certificate readCertificate(String fileName, String alias, String password);
+    Certificate readCertificate(String fileName, String alias, String password) throws IOException;
 }
