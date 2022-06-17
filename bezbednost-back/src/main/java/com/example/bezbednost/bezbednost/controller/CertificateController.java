@@ -30,10 +30,10 @@ import java.security.cert.CertificateException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/certificates", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
-@Slf4j
 public class CertificateController {
     private final IPostCertificateService postCertificateService;
     private final IGetCertificateService getCertificateService;

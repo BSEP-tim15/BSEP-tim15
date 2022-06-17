@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
-@Slf4j
 public class UserController {
 
     private final IUserService userService;
