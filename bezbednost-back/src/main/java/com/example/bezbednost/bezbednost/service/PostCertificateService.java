@@ -1,7 +1,6 @@
 package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.dto.PasswordsDto;
-import com.example.bezbednost.bezbednost.dto.UserDto;
 import com.example.bezbednost.bezbednost.dto.certificate.CertificateDto;
 import com.example.bezbednost.bezbednost.dto.certificate.GetSingleCertificateDto;
 import com.example.bezbednost.bezbednost.exception.InvalidInputException;

@@ -1,7 +1,6 @@
 package com.example.bezbednost.bezbednost.config;
 
 import com.example.bezbednost.bezbednost.model.User;
-import com.sun.istack.NotNull;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -17,30 +16,30 @@ import java.util.List;
 @Component
 public class TokenUtils {
     private static final String AUDIENCE_WEB = "web";
-    private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
+    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
 
     @Value("spring-security-example")
-    private String APP_NAME;
+    private String appName;
 
     @Value("somesecret")
-    private String SECRET;
+    private String secret;
 
     @Value("3600000")
-    private int EXPIRES_IN;
+    private int expiresIn;
 
     @Value("Authorization")
-    private String AUTH_HEADER;
+    private String authHeader;
 
     public String generateToken(String username, List<String> roles, List<String> authorities) {
         return Jwts.builder()
-                .setIssuer(APP_NAME)
+                .setIssuer(appName)
                 .setSubject(username)
                 .claim("roles", roles)
                 .claim("authorities", authorities)
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
-                .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
+                .signWith(signatureAlgorithm, secret).compact();
     }
 
     public String getToken(HttpServletRequest request) {
@@ -131,7 +130,7 @@ public class TokenUtils {
     }
 
     public int getExpiresIn() {
-        return EXPIRES_IN;
+        return expiresIn;
     }
 
     private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
@@ -143,7 +142,7 @@ public class TokenUtils {
 
         try {
             claims = Jwts.parser()
-                    .setSigningKey(SECRET)
+                    .setSigningKey(secret)
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException ex) {
@@ -155,7 +154,7 @@ public class TokenUtils {
     }
 
     private String getAuthHeaderFromHeader(HttpServletRequest request) {
-        return request.getHeader(AUTH_HEADER);
+        return request.getHeader(authHeader);
     }
 
     private String generateAudience() {
@@ -163,6 +162,6 @@ public class TokenUtils {
     }
 
     private Date generateExpirationDate() {
-        return new Date(new Date().getTime() + EXPIRES_IN);
+        return new Date(new Date().getTime() + expiresIn);
     }
 }

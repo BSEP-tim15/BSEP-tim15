@@ -29,4 +29,9 @@ public class TokenBasedAuthentication extends AbstractAuthenticationToken {
     public Object getPrincipal() {
         return principle;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }

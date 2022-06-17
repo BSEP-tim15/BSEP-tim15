@@ -3,8 +3,6 @@ package com.example.bezbednost.bezbednost.dto.certificate;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigInteger;
-
 public class GetCertificateBySomeoneDto {
 
     @Getter @Setter private String someone;

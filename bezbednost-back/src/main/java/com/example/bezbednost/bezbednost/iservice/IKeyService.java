@@ -1,6 +1,5 @@
 package com.example.bezbednost.bezbednost.iservice;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;

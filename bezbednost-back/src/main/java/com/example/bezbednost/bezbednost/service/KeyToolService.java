@@ -9,20 +9,15 @@ import java.time.LocalDateTime;
 
 @Service
 public class KeyToolService implements IKeyToolService {
-    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
+    private final Logger logger = LoggerFactory.getLogger("logerror");
 
     public void executeCommand(String command) {
         try {
             printCommand(command);
-            //sun.security.tools.keytool.Main.main(parse(command));
         }
         catch (Exception e) {
-            LOGGER.error("location=KeyToolService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
+            logger.error("location=KeyToolService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         }
-    }
-
-    private static String[] parse(String command) {
-        return command.trim().split("\\s+");
     }
 
     private static void printCommand(String command) {

@@ -6,7 +6,6 @@ import com.example.bezbednost.bezbednost.exception.InvalidInputException;
 import org.bouncycastle.operator.OperatorCreationException;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 

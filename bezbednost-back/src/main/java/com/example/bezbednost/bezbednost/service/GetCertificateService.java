@@ -40,7 +40,7 @@ public class GetCertificateService implements IGetCertificateService {
     private final KeyService keyService = new KeyService();
     private final IRevocationService revocationService;
 
-    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
+    private final Logger logger = LoggerFactory.getLogger("logerror");
 
     public GetCertificateService(IRevocationService revocationService) {
         this.revocationService = revocationService;
@@ -66,7 +66,7 @@ public class GetCertificateService implements IGetCertificateService {
 
     @Override
     public List<CertificateDto> getCertificatesForEndEntity(GetCertificateDto certificate, String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
-        List<CertificateDto> endEntityCertificates = new ArrayList<CertificateDto>();
+        List<CertificateDto> endEntityCertificates = new ArrayList<>();
         for (CertificateDto certificateDto : getCertificates(certificate)) {
             if (certificateDto.getSubject().equals("CN=" + username)) {
                 endEntityCertificates.add(certificateDto);
@@ -77,7 +77,7 @@ public class GetCertificateService implements IGetCertificateService {
 
     @Override
     public List<CertificateDto> getCertificatesForIntermediate(GetCertificateDto certificate, String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
-        List<CertificateDto> intermediateCertificates = new ArrayList<CertificateDto>();
+        List<CertificateDto> intermediateCertificates = new ArrayList<>();
         for (CertificateDto certificateDto : getCertificates(certificate)) {
             if (certificateDto.getSubject().equals("CN=" + username) || certificateDto.getIssuer().equals("CN=" + username)) {
                 intermediateCertificates.add(certificateDto);
@@ -131,15 +131,16 @@ public class GetCertificateService implements IGetCertificateService {
 
     private List<CertificateDto> getCertificatesFromFile(FileDto file, GetSingleCertificateDto getCertificateDto) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
+
         List<CertificateDto> certificates = new ArrayList<>();
-        InputStream inputStream= new FileInputStream(file.getFileName());
-        try {
+
+        try (InputStream inputStream = new FileInputStream(file.getFileName())) {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
             keyStore.load(inputStream, file.getPassword().toCharArray());
             Enumeration<String> aliases = keyStore.aliases();
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
-                X509Certificate cert  = (X509Certificate) keyStore.getCertificate(alias);
+                X509Certificate cert = (X509Certificate) keyStore.getCertificate(alias);
                 getCertificateDto.setSerialNumber(cert.getSerialNumber());
                 CertificateDto certificateDTO = new CertificateDto(cert.getSerialNumber(), cert.getIssuerDN().toString(),
                         cert.getSubjectDN().toString(), cert.getNotBefore(), cert.getNotAfter(),
@@ -149,10 +150,8 @@ public class GetCertificateService implements IGetCertificateService {
                 certificateDTO.setCertificateType(getCertificateType(file.getFileName()));
                 certificates.add(certificateDTO);
             }
-        } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e){
-            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
-        } finally {
-            inputStream.close();
+        } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e) {
+            logger.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         }
 
         return certificates;

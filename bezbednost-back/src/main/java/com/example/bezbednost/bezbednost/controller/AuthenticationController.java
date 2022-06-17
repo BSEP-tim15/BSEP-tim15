@@ -36,16 +36,14 @@ import java.time.LocalDateTime;
 public class AuthenticationController {
 
     private final TokenUtils tokenUtils;
-    private final AuthenticationManager authenticationManager;
     private final IUserService userService;
 
-    private Logger loggerInfo = LoggerFactory.getLogger(AuthenticationController.class);
-    private Logger loggerError = LoggerFactory.getLogger("logerror");
+    private final Logger loggerInfo = LoggerFactory.getLogger(AuthenticationController.class);
+    private final Logger loggerError = LoggerFactory.getLogger("logerror");
 
     @Autowired
-    public AuthenticationController(TokenUtils tokenUtils, AuthenticationManager authenticationManager, IUserService userService) {
+    public AuthenticationController(TokenUtils tokenUtils, IUserService userService) {
         this.tokenUtils = tokenUtils;
-        this.authenticationManager = authenticationManager;
         this.userService = userService;
     }
 
