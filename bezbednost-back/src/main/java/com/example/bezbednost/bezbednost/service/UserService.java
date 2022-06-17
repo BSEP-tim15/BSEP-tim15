@@ -21,6 +21,8 @@ import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,6 +37,7 @@ import javax.mail.internet.MimeMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -49,6 +52,8 @@ public class UserService implements IUserService {
     private final IValidationService validationService;
     private final TokenUtils tokenUtils;
     private final AuthenticationManager authenticationManager;
+
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     @Override
     public User findByUsername(String username) {
@@ -131,7 +136,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_VERIFICATION_EMAIL status=failure message=" + e.getMessage());
         }
         mailSender.send(message);
     }
@@ -165,7 +170,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_RECOVERY_EMAIL status=failure message=" + e.getMessage());
         }
         mailSender.send(message);
     }
@@ -276,7 +281,7 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error("location=UserService timestamp=" + LocalDateTime.now() + " action=SEND_LOGIN_EMAIL status=failure message=" + e.getMessage());
         }
         mailSender.send(message);
     }

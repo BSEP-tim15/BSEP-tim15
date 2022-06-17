@@ -1,6 +1,8 @@
 package com.example.bezbednost.bezbednost.service;
 
 import com.example.bezbednost.bezbednost.iservice.IKeyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -8,18 +10,20 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 
 @Service
 public class KeyService implements IKeyService {
     private KeyStore keyStore;
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     public KeyService(){
         try {
             keyStore = KeyStore.getInstance("JKS", "SUN");
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            LOGGER.error("location=KeyService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         }
     }
 
@@ -30,10 +34,8 @@ public class KeyService implements IKeyService {
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
             keyGen.initialize(2048, random);
             return keyGen.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=GENERATE_KEY_PAIR status=failure message=" + e.getMessage());
         }
         return null;
     }
@@ -59,7 +61,7 @@ public class KeyService implements IKeyService {
             IOException, CertificateException, NoSuchAlgorithmException {
         KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
         keyStore.load(new FileInputStream(fileName), password.toCharArray());
-        if(keyStore.getCertificateChain(alias) != null);
+        if (keyStore.getCertificateChain(alias) != null);
         {
             return keyStore.getCertificateChain(alias);
         }
@@ -86,7 +88,7 @@ public class KeyService implements IKeyService {
                 return (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_PRIVATE_KEY status=failure message=" + e.getMessage());
         } finally {
             in.close();
             inputStream.close();
@@ -99,15 +101,22 @@ public class KeyService implements IKeyService {
     public Certificate readCertificate(String fileName, String alias, String password) {
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS", "SUN");
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
-            keyStore.load(in, password.toCharArray());
+            InputStream inputStream = new FileInputStream(fileName);
+            BufferedInputStream in = new BufferedInputStream(inputStream);
+            try {
+                keyStore.load(in, password.toCharArray());
 
-            if (keyStore.isKeyEntry(alias)) {
-                return keyStore.getCertificate(alias);
+                if (keyStore.isKeyEntry(alias)) {
+                    return keyStore.getCertificate(alias);
+                }
+            } finally {
+                inputStream.close();
+                in.close();
             }
 
+
         } catch (KeyStoreException | CertificateException | NoSuchProviderException | IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " action=READ_CERTIFICATE status=failure message=" + e.getMessage());
         }
         return null;
     }

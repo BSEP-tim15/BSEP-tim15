@@ -14,6 +14,8 @@ import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 //import sun.misc.BASE64Decoder;
 
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class RevocationService implements IRevocationService {
 
     private final IKeyService keyService;
     private final ICustomCertificateRepository customCertificateRepository;
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     public RevocationService(IKeyService keyService, ICustomCertificateRepository customCertificateRepository) {
         this.keyService = keyService;
@@ -79,7 +83,7 @@ public class RevocationService implements IRevocationService {
             cert.checkValidity(new Date());
             return true;
         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-            e.printStackTrace();
+            LOGGER.error("location=RevocationService timestamp=" + LocalDateTime.now() + " action=IS_ROOT_VALID status=failure message=" + e.getMessage());
         }
         return false;
     }
@@ -110,12 +114,6 @@ public class RevocationService implements IRevocationService {
             return false;
         }
 
-        /*try {
-            cert.verify(issuerCertificate.getPublicKey());
-            return true;
-        } catch (CertificateException | NoSuchAlgorithmException | SignatureException | InvalidKeyException | NoSuchProviderException e) {
-            return false;
-        }*/
         return true;
     }
 
@@ -160,9 +158,8 @@ public class RevocationService implements IRevocationService {
 
         X509CertificateHolder[] responseList = new X509CertificateHolder[1];
         responseList[0] = new X509CertificateHolder(certificate.getEncoded());
-        BasicOCSPResp response = respBuilder.build(contentSigner, responseList, new Date());
 
-        return response;
+        return respBuilder.build(contentSigner, responseList, new Date());
     }
 
     private X509Certificate getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) {

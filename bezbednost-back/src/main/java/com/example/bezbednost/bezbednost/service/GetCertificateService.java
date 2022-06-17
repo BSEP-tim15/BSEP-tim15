@@ -40,7 +40,7 @@ public class GetCertificateService implements IGetCertificateService {
     private final KeyService keyService = new KeyService();
     private final IRevocationService revocationService;
 
-    private Logger loggerError = LoggerFactory.getLogger("logerror");
+    private final Logger LOGGER = LoggerFactory.getLogger("logerror");
 
     public GetCertificateService(IRevocationService revocationService) {
         this.revocationService = revocationService;
@@ -150,7 +150,7 @@ public class GetCertificateService implements IGetCertificateService {
                 certificates.add(certificateDTO);
             }
         } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e){
-            loggerError.error("location=GetCertificateService timestamp=" + LocalDateTime.now().toString() + " status=failure message=" + e.getMessage());
+            LOGGER.error("location=GetCertificateService timestamp=" + LocalDateTime.now() + " status=failure message=" + e.getMessage());
         } finally {
             inputStream.close();
         }
@@ -174,8 +174,7 @@ public class GetCertificateService implements IGetCertificateService {
                     ASN1Sequence seq = ASN1Sequence.getInstance(name.getName());
                     ASN1Integer value = (ASN1Integer) seq.getObjectAt(1);
                     byte[] extensionBytes = value.getValue().toByteArray();
-                    String extension = new String(extensionBytes, StandardCharsets.UTF_8);
-                    return extension;
+                    return new String(extensionBytes, StandardCharsets.UTF_8);
                 }
             }
         }
