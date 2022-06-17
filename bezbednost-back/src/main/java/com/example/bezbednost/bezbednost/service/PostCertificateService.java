@@ -36,6 +36,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 @Service
 public class PostCertificateService implements IPostCertificateService {
+    private Random random = SecureRandom.getInstanceStrong();
     private final KeyService keyService = new KeyService();
     private String chainAlias = "";
     private final IGetCertificateService getCertificateService;
@@ -44,7 +45,7 @@ public class PostCertificateService implements IPostCertificateService {
     private final IValidationService validationService;
 
     public PostCertificateService(IGetCertificateService getCertificateService, IKeyToolService keyToolService,
-                                  ICustomCertificateService customCertificateService, IValidationService validationService) {
+                                  ICustomCertificateService customCertificateService, IValidationService validationService) throws NoSuchAlgorithmException {
         this.getCertificateService = getCertificateService;
         this.keyToolService = keyToolService;
         this.customCertificateService = customCertificateService;
@@ -181,9 +182,8 @@ public class PostCertificateService implements IPostCertificateService {
         BigInteger maxLimit = new BigInteger("5000000000000");
         BigInteger minLimit = new BigInteger("25000000000");
         BigInteger bigInteger = maxLimit.subtract(minLimit);
-        Random randNum = new Random();
         int len = maxLimit.bitLength();
-        BigInteger res = new BigInteger(len, randNum);
+        BigInteger res = new BigInteger(len, this.random);
         if (res.compareTo(minLimit) < 0)
             res = res.add(minLimit);
         if (res.compareTo(bigInteger) >= 0)
@@ -215,7 +215,7 @@ public class PostCertificateService implements IPostCertificateService {
             else if(keyService.getChain(chainAlias, "intermediateCertificates.jks", passwords.getIntermediatePassword()) != null){
                 chain = keyService.getChain(chainAlias, "intermediateCertificates.jks", passwords.getIntermediatePassword());
             }
-            certificates = new X509Certificate[chain.length + 1];
+            certificates = new X509Certificate[Objects.requireNonNull(chain).length + 1];
             certificates[0] = certificate;
             int i = 1;
             for(Certificate cer: chain){

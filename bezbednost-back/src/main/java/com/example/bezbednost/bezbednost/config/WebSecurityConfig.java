@@ -51,13 +51,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
-                .authorizeRequests().antMatchers("/**").permitAll()
-                .antMatchers("/api/foo").permitAll()
+                .authorizeRequests().antMatchers("/api/foo").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated().and()
                 .cors().and()
                 .addFilterBefore(new TokenAuthenticationFilter(this.tokenUtils, userService), BasicAuthenticationFilter.class);
 
-        http.csrf().disable();
+        //http.csrf().disable();
 
         http
                 .headers()

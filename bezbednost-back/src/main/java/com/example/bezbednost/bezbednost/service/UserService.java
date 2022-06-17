@@ -104,7 +104,10 @@ public class UserService implements IUserService {
     @Override
     public String findUserRole(Integer id) {
         Optional<User> user = this.userRepository.findById(id);
-        List<Role> roles = user.get().getRoles();
+        List<Role> roles = new ArrayList<>();
+        if (user.isPresent()) {
+            roles = user.get().getRoles();
+        }
         return roles.get(0).getName();
     }
 

@@ -53,10 +53,12 @@ public class TokenUtils {
     }
 
     public String getUsernameFromToken(String token) {
-        String username;
+        String username = "";
         try {
-            @NotNull final Claims claims = this.getAllClaimsFromToken(token);
-            username = claims.getSubject();
+            final Claims claims = this.getAllClaimsFromToken(token);
+            if (claims != null) {
+                username = claims.getSubject();
+            }
         } catch (ExpiredJwtException ex) {
             throw ex;
         } catch (Exception e) {

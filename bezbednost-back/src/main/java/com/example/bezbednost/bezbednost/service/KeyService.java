@@ -75,8 +75,10 @@ public class KeyService implements IKeyService {
     public PrivateKey readPrivateKey(String keyStoreFile, String keyStorePass, String alias, String pass)
             throws KeyStoreException, NoSuchProviderException, IOException, CertificateException,
             NoSuchAlgorithmException, UnrecoverableKeyException {
+
         keyStore = KeyStore.getInstance("JKS", "SUN");
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
+        InputStream inputStream = new FileInputStream(keyStoreFile);
+        BufferedInputStream in = new BufferedInputStream(inputStream);
 
         try {
             keyStore.load(in, keyStorePass.toCharArray());
@@ -87,8 +89,9 @@ public class KeyService implements IKeyService {
             e.printStackTrace();
         } finally {
             in.close();
+            inputStream.close();
         }
-        
+
         return null;
     }
 
