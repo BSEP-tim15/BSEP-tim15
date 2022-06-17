@@ -16,6 +16,8 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -28,6 +30,7 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,6 +39,8 @@ import java.util.stream.Stream;
 public class GetCertificateService implements IGetCertificateService {
     private final KeyService keyService = new KeyService();
     private final IRevocationService revocationService;
+
+    private Logger loggerError = LoggerFactory.getLogger("logerror");
 
     public GetCertificateService(IRevocationService revocationService) {
         this.revocationService = revocationService;
@@ -145,7 +150,7 @@ public class GetCertificateService implements IGetCertificateService {
                 certificates.add(certificateDTO);
             }
         } catch (FileNotFoundException | OperatorCreationException | OCSPException | UnrecoverableKeyException e){
-            e.printStackTrace();
+            loggerError.error("location=GetCertificateService timestamp=" + LocalDateTime.now().toString() + " status=failure message=" + e.getMessage());
         } finally {
             inputStream.close();
         }

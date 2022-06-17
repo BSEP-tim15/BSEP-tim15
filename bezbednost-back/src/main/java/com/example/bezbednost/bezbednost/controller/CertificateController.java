@@ -58,10 +58,10 @@ public class CertificateController {
             SignatureException, InvalidKeyException, NoSuchProviderException, UnrecoverableKeyException {
         try {
             postCertificateService.createCertificate(certificateDTO);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-CC30 status=success serial_number="+ certificateDTO.getSerialNumber());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-CC30 status=success serial_number=" + certificateDTO.getSerialNumber());
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (InvalidInputException e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-CC30 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-CC30 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -70,7 +70,7 @@ public class CertificateController {
     @PreAuthorize("hasAuthority('read_certificate')")
     public ResponseEntity<List<CertificateDto>> getCertificates(@RequestBody GetCertificateDto certificate) throws
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
-        loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-GCS31 status=success");
+        loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS31 status=success");
         return new ResponseEntity<>(getCertificateService.getCertificates(certificate), HttpStatus.OK);
     }
 
@@ -80,10 +80,10 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         try {
             List<CertificateDto> certificates = getCertificateService.getCertificatesBySubject(certificate);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-GCS32 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS32 status=success");
             return new ResponseEntity<>(certificates, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-GCS32 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS32 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -94,10 +94,10 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, UnrecoverableKeyException, OCSPException, OperatorCreationException {
         try {
             List<String> issuers = getCertificateService.getIssuers(passwords);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-GI33 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-GI33 status=success");
             return new ResponseEntity<>(issuers, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-GI33 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-GI33 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -108,10 +108,10 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         try {
             Date maxDate = getCertificateService.getMaxDateForCertificate(certificate);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-MDC34 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-MDC34 status=success");
             return new ResponseEntity<>(maxDate, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-MDC34 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-MDC34 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -123,10 +123,10 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         try {
             CertificateDto certificateDto = getCertificateService.getCertificateBySerialNumber(certificate);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-GC35 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-GC35 status=success");
             return new ResponseEntity<>(certificateDto, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-GC35 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-GC35 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -137,10 +137,10 @@ public class CertificateController {
             CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException {
         try {
             postCertificateService.exportCertificate(certificate);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-EC36 status=success serial_number=" + certificate.getSerialNumber());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-EC36 status=success serial_number=" + certificate.getSerialNumber());
             return new ResponseEntity<>(certificate, HttpStatus.CREATED);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-EC36 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-EC36 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -152,10 +152,10 @@ public class CertificateController {
             CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         try {
             BigInteger parentSerialNumber = getCertificateService.getSerialNumberOfParentCertificate(certificate);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-PSN37 status=success serial_number=" + certificate.getSerialNumber());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-PSN37 status=success serial_number=" + certificate.getSerialNumber());
             return new ResponseEntity<>(parentSerialNumber, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-PSN37 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-PSN37 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -165,10 +165,10 @@ public class CertificateController {
     public ResponseEntity<?> validateCertificate(@RequestBody GetSingleCertificateDto certificateDto) {
         try {
             boolean isValid = revocationService.checkIfCertificateIsValid(certificateDto);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-VC38 status=success serial_number=" + certificateDto.getSerialNumber());
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-VC38 status=success serial_number=" + certificateDto.getSerialNumber());
             return ResponseEntity.ok(isValid);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-VC38 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-VC38 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -177,10 +177,10 @@ public class CertificateController {
     public ResponseEntity<?> canUserCreateCertificate(@RequestBody GetCertificateDto certificateDto, @PathVariable String username) {
         try {
             boolean isValid = getCertificateService.canUserCreateCertificate(certificateDto, username);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-CUCC39 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-CUCC39 status=success");
             return ResponseEntity.ok(isValid);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-CUCC39 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-CUCC39 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -190,9 +190,9 @@ public class CertificateController {
     public ResponseEntity<?> revokeCertificate(@RequestBody SerialNumberDto serialNumberDto) {
         try {
             revocationService.revokeCertificate(serialNumberDto.getSerialNumber());
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-RC40 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-RC40 status=success");
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-RC40 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-RC40 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -202,10 +202,10 @@ public class CertificateController {
     public ResponseEntity<?> isRevoked(@RequestBody GetSingleCertificateDto certificateDto) {
         try {
             boolean isRevoked = revocationService.checkIfCertificateIsRevoked(certificateDto);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-CRS41 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-CRS41 status=success");
             return ResponseEntity.ok(isRevoked);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-CRS41 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-CRS41 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -214,10 +214,10 @@ public class CertificateController {
     public ResponseEntity<List<CertificateDto>> getCertificatesForIntermediate(@RequestBody GetCertificateDto certificate, @PathVariable String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         try {
             List<CertificateDto> certificates = getCertificateService.getCertificatesForIntermediate(certificate, username);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-GCS31 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS31 status=success");
             return new ResponseEntity<>(certificates, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-GCS31 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS31 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -227,10 +227,10 @@ public class CertificateController {
     public ResponseEntity<List<CertificateDto>> getCertificatesForEndEntity(@RequestBody GetCertificateDto certificate, @PathVariable String username) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
         try {
             List<CertificateDto> certificates = getCertificateService.getCertificatesForEndEntity(certificate, username);
-            loggerInfo.info("timestamp="+ LocalDateTime.now().toString()+" action=CC-GCS31 status=success");
+            loggerInfo.info("timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS31 status=success");
             return new ResponseEntity<>(certificates, HttpStatus.OK);
         } catch (Exception e) {
-            loggerError.error("location=CertificateController timestamp="+LocalDateTime.now().toString()+" action=CC-GCS31 status=failure message="+ e.getMessage());
+            loggerError.error("location=CertificateController timestamp=" + LocalDateTime.now().toString() + " action=CC-GCS31 status=failure message=" + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
