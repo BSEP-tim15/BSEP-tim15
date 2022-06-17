@@ -77,7 +77,7 @@ public class RevocationService implements IRevocationService {
         customCertificateRepository.save(certificate);
     }
 
-    private boolean isRootCertificateValid(GetSingleCertificateDto certificateDto) {
+    private boolean isRootCertificateValid(GetSingleCertificateDto certificateDto) throws IOException {
         X509Certificate cert = getCertificateBySerialNumber(certificateDto);
         try {
             cert.checkValidity(new Date());
@@ -103,7 +103,7 @@ public class RevocationService implements IRevocationService {
         return true;
     }
 
-    private boolean validateDatesAndKeys(GetSingleCertificateDto certificateDto, GetSingleCertificateDto certificateIssuerDto) {
+    private boolean validateDatesAndKeys(GetSingleCertificateDto certificateDto, GetSingleCertificateDto certificateIssuerDto) throws IOException {
         X509Certificate cert = getCertificateBySerialNumber(certificateDto);
         X509Certificate issuerCertificate = getCertificateBySerialNumber(certificateIssuerDto);
 
@@ -162,7 +162,7 @@ public class RevocationService implements IRevocationService {
         return respBuilder.build(contentSigner, responseList, new Date());
     }
 
-    private X509Certificate getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) {
+    private X509Certificate getCertificateBySerialNumber(GetSingleCertificateDto certificateDto) throws IOException {
         X509Certificate certificate = (X509Certificate) keyService.readCertificate(
                 "rootCertificates.jks", certificateDto.getSerialNumber().toString(), certificateDto.getRootPassword());
         if (certificate == null) {
